@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "rootDir": "src",
+    "outDir": "dist",
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"]
+    },
+    "incremental": true,
+    "tsBuildInfoFile": ".tsbuildinfo",
+    "noEmitOnError": false,
+    "typeRoots": ["./node_modules/@types", "./src/@types"]
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", ".tsbuildinfo"]
+}
