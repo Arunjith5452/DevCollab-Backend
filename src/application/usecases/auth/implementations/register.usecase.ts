@@ -1,5 +1,4 @@
 import { RegisterDTO } from "@/application/dtos/auth/register.dto"
-import { validateEmail } from "@/shared/utils/email-validate.util"
 import { inject, injectable } from "inversify"
 import { IUserRepositor } from "@/infrastructure/db/repository/interface/user.interface"
 import { IUser } from "@/infrastructure/db/interface/user.inteface"
@@ -9,6 +8,8 @@ import { redisClient } from "@/infrastructure/redis/redis-client"
 import { sendOtpEmail } from "@/shared/utils/sent-otp.util"
 import { IExecute } from "../interfaces/execute-usecase.interface"
 import { randomBytes } from "crypto"
+import { validateEmail } from "@/shared/utils/email-validate.util"
+import { ErrorMessage } from "@/domain/enums/messages/error-message.enum"
 
 @injectable()
 export class RegiserUseCase implements IExecute<RegisterDTO,{token:string}> {
@@ -21,11 +22,11 @@ export class RegiserUseCase implements IExecute<RegisterDTO,{token:string}> {
             const isValidEmail = await validateEmail(email)
 
             if (!isValidEmail) {
-                throw new Error("Email is not valid")
+                throw new Error(ErrorMessage.EMAIL_INVALID)
             }
 
-            const existingUser = await this._userRepository.getUserByEmail(email)
-            if (existingUser) throw new Error("Email already registered")
+            const existingUser = await this._userRepository.findByEmail(email)
+            if (existingUser) throw new Error(ErrorMessage.EMAIL_ALREADY_EXISTS)
 
             const otp = generateOTP()
             const expiryTime = 3 * 60

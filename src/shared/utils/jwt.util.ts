@@ -18,7 +18,7 @@ export const verifyToken = (token: string, type: "access" | "refresh")=>{
     try {
 
         const secret = type === "access" ? ACCESS_TOKEN_SECRET : REFRESH_TOKEN_SECRET
-        return jwt.verify(token, secret)
+        return  jwt.verify(token, secret)
 
     } catch (err) {
 
