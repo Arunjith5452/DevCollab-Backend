@@ -1,5 +1,3 @@
-import { ForgotPasswordUseCase } from "@/application/usecases/auth/implementations/forgot-password.usecase";
-import { RefreshTokenUseCase } from "@/application/usecases/auth/implementations/refresh-token.usecase";
 
 export const AUTH_TYPES = {
   AuthController: Symbol.for("AuthController"),
@@ -7,5 +5,8 @@ export const AUTH_TYPES = {
   VerifyOtpUseCase:Symbol.for("VerifyOtpUseCase"),
   LoginUseCase:Symbol.for("LoginUseCase"),
   RefreshTokenUseCase:Symbol.for("RefreshTokenUseCase"),
-  ForgotPasswordUseCase:Symbol.for("ForgotPasswordUseCase")
+  ResendOtpUseCase:Symbol.for("ResendOtpUseCase"),
+  ForgotPasswordUseCase:Symbol.for("ForgotPasswordUseCase"),
+  VerifyForgotOtpUseCase:Symbol.for("VerifyForgotOtpUseCase"),
+  ResetPasswordUseCase:Symbol.for("ResetPasswordUseCase")
 };

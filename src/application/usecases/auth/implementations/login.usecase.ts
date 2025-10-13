@@ -9,6 +9,8 @@ import { generateAccessToken, generateRefreshToken } from "@/shared/utils/jwt.ut
 import { redisClient } from "@/infrastructure/redis/redis-client";
 import { IExecute } from "../interfaces/execute-usecase.interface";
 import { AuthResult } from "@/domain/types/auth";
+import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
+import { SuccessMessage } from "@/domain/enums/messages/success-message.enum";
 
 
 @injectable()
@@ -21,24 +23,24 @@ export class LoginUseCase implements IExecute<LoginDTO,AuthResult> {
 
             const isValidEmail = await validateEmail(email)
 
-            if (!isValidEmail) throw new Error("Email is not valid")
+            if (!isValidEmail) throw new Error(ErrorMessage.EMAIL_INVALID)
 
-            const user = await this._userRepository.getUserByEmail(email)
-            if (!user) throw new Error("Email does not exist")
+            const user = await this._userRepository.findByEmail(email)
+            if (!user) throw new Error(ErrorMessage.EMAIL_NOT_EXIST)
 
             const isPassword = await verify(user.password, password)
 
-            if (!isPassword) throw new Error("Invalid password");
+            if (!isPassword) throw new Error(ErrorMessage.INVALID_PASSWORD);
 
             const payload = { userId: user._id.toString(), email: user.email }
 
             const accessToken = generateAccessToken(payload);
             const refreshToken = generateRefreshToken(payload);
 
-            await redisClient.set(`refresh:${user.email}`, refreshToken, "EX", 7*24*60*60); // 7 days
+            await redisClient.set(`refresh:${user.email}`, refreshToken, "EX", 7*24*60*60); 
 
 
-            return { message: "User login successfully",
+            return { message: SuccessMessage.LOGIN_SUCCESS ,
                 accessToken,
                 refreshToken
              }
