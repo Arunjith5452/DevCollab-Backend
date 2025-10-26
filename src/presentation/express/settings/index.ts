@@ -5,7 +5,7 @@ import { config } from "dotenv";
 import { DatabaseService } from "@/infrastructure/db/mongoose/connect.db";
 
 
-config()
+config({quiet:true})
 const PORT = process.env.PORT;
 
 const bootstrap = async () => {

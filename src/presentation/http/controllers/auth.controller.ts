@@ -3,7 +3,7 @@ import { LoginDTO } from "@/application/dtos/auth/login.dto";
 import { RegisterDTO } from "@/application/dtos/auth/register.dto";
 import { ResetPasswordDTO } from "@/application/dtos/auth/resetPassword.dto";
 import { VerifyOtpDTO } from "@/application/dtos/auth/verifyOtp.dto";
-import { IExecute } from "@/application/usecases/auth/interfaces/execute-usecase.interface";
+import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { ServerErrorStatus } from "@/domain/enums/status-codes/server-error-status.enum";
 import { SuccessStatus } from "@/domain/enums/status-codes/success-status.enum";
 import { AuthResult } from "@/domain/types/auth";
@@ -62,34 +62,27 @@ export class AuthController {
         }
     }
 
-    AuthVerify(req: Request, res: Response) {
-        return res.status(SuccessStatus.OK).json({
-            success: true, user: {
-                email: req.user?.email, id: req.user?.userId
-            }
-        })
-    }
-
     async Login(req: Request, res: Response) {
         try {
 
 
             const result = await this._loginUseCase.execute(req.body)
 
+
             res.cookie("refreshToken", result.refreshToken, {
                 httpOnly: true,
                 sameSite: "strict",
-                maxAge: 7 * 24 * 60 * 60 * 1000
-            })
-
+                maxAge: Number(process.env.REFRESH_TOKEN_MAX_AGE),
+            });
 
             res.cookie("accessToken", result.accessToken, {
                 httpOnly: true,
                 sameSite: "strict",
-                maxAge: 15 * 60 * 1000,
-            })
+                maxAge: Number(process.env.ACCESS_TOKEN_MAX_AGE),
+            });
 
             return res.json({
+                role: result.role,
                 message: result.message,
                 data: result.accessToken
             })
@@ -109,7 +102,7 @@ export class AuthController {
             res.cookie("accessToken", result.accessToken, {
                 httpOnly: true,
                 sameSite: "strict",
-                maxAge: 15 * 60 * 1000,
+                maxAge: Number(process.env.ACCESS_TOKEN_MAX_AGE)
             })
 
             return res.json({ data: result.accessToken })

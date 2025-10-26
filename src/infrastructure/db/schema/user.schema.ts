@@ -16,7 +16,7 @@ export const userSchema = new Schema({
     },
     role: {
         type: String,
-        defalt: "user"
+        default: "user"
     },
     techStack: [{
         type: String,
@@ -58,7 +58,7 @@ export const userSchema = new Schema({
     verification: {
         email: {
             type: Boolean,
-            default: false
+            default: true
         },
         phone: {
             type: Boolean,

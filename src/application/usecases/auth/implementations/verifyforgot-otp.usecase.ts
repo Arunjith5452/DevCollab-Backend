@@ -1,7 +1,7 @@
-import { IExecute } from "../interfaces/execute-usecase.interface";
-import { redisClient } from "@/infrastructure/redis/redis-client";
+import { redisClient } from "@/infrastructure/providers/redis/redis-client";
 import { VerifyForgotOtpDTO } from "@/application/dtos/auth/forgotOtp.dto";
 import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
+import { IExecute } from "@/application/interface/execute.usecase.interface";
 
 
 

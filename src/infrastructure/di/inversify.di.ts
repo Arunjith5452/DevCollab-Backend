@@ -1,16 +1,18 @@
 import { Container } from 'inversify'
 import { AuthModule } from './modules/auth'
 import { UserModule } from './modules/user'
+import { AdminModule } from './modules/admin'
 
-const conatiner = new Container({
+const container = new Container({
     defaultScope:"Singleton",
     autobind:true
 })
 
-conatiner.load(
+container.load(
     AuthModule,
-    UserModule
+    UserModule,
+    AdminModule
 )
 
 
-export {conatiner}
+export {container}

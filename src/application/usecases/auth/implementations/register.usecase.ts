@@ -1,20 +1,20 @@
 import { RegisterDTO } from "@/application/dtos/auth/register.dto"
 import { inject, injectable } from "inversify"
 import { IUserRepositor } from "@/infrastructure/db/repository/interface/user.interface"
-import { IUser } from "@/infrastructure/db/interface/user.inteface"
 import { USER_TYPES } from "@/infrastructure/di/types/user"
 import { generateOTP } from "@/shared/utils/otp-generator.util"
-import { redisClient } from "@/infrastructure/redis/redis-client"
+import { redisClient } from "@/infrastructure/providers/redis/redis-client"
 import { sendOtpEmail } from "@/shared/utils/sent-otp.util"
-import { IExecute } from "../interfaces/execute-usecase.interface"
 import { randomBytes } from "crypto"
 import { validateEmail } from "@/shared/utils/email-validate.util"
 import { ErrorMessage } from "@/domain/enums/messages/error-message.enum"
+import { UserEntity } from "@/domain/entities/user.entity"
+import { IExecute } from "@/application/interface/execute.usecase.interface"
 
 @injectable()
 export class RegiserUseCase implements IExecute<RegisterDTO,{token:string}> {
 
-    constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository:IUserRepositor<IUser>){}
+    constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository:IUserRepositor<UserEntity>){}
 
     async execute({ name,email,password }: RegisterDTO): Promise<{token:string}> {
 
@@ -45,7 +45,7 @@ export class RegiserUseCase implements IExecute<RegisterDTO,{token:string}> {
 
             console.log(`OTP for ${email}:`,otp)
 
-            return {token}
+            return {token }
 
         } catch (error) {
             throw error

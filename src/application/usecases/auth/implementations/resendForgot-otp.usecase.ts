@@ -1,9 +1,9 @@
-import { redisClient } from "@/infrastructure/redis/redis-client";
-import { IExecute } from "../interfaces/execute-usecase.interface";
+import { redisClient } from "@/infrastructure/providers/redis/redis-client";
 import { generateOTP } from "@/shared/utils/otp-generator.util";
 import { sendOtpEmail } from "@/shared/utils/sent-otp.util";
 import { ResendOtp } from "@/application/dtos/auth/resend.dto";
 import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
+import { IExecute } from "@/application/interface/execute.usecase.interface";
 
 export class ResendForgotOTPUseCase implements IExecute<ResendOtp, { message: string }> {
 
