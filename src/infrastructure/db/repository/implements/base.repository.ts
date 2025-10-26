@@ -1,31 +1,43 @@
-import { Model, UpdateQuery, FilterQuery, HydratedDocument } from "mongoose"
+import { Model, UpdateQuery, FilterQuery, HydratedDocument } from "mongoose";
 import { IBaseRepository } from "../interface/base-repository.interface";
 
 export abstract class BaseRepository<T> implements IBaseRepository<T> {
 
-    constructor(protected readonly model: Model<T>) {
-    }
-    async create(item: Partial<HydratedDocument<T>>): Promise<HydratedDocument<T>> {
-        return await this.model.create(item)
-    }
+  constructor(protected readonly model: Model<T>) {}
 
-    async findById(id: string): Promise<HydratedDocument<T> | null> {
-        return await this.model.findById(id)
-    }
+  async create(item: Partial<T>): Promise<T> {
+    return await this.model.create(item);
+  }
 
-    async findAll(): Promise<HydratedDocument<T>[] | null> {
-        return await this.model.find({});
-    }
+  async findById(id: string): Promise<T | null> {
+    return await this.model.findById(id);
+  }
 
-    async update(id: string, update: UpdateQuery<T>): Promise<HydratedDocument<T> | null> {
-        return await this.model.findByIdAndUpdate(id, update, { new: true })
-    }
+  async findAll(): Promise<T[]> {
+    const result = await this.model.find({});
+    return result || [];
+  }
 
-    async findOne(filtered: FilterQuery<T>): Promise<HydratedDocument<T> | null> {
-        return await this.model.findOne(filtered)
-    }
+  async update(id: string, update: UpdateQuery<T>): Promise<T | null> {
+    return await this.model.findByIdAndUpdate(id, update, { new: true });
+  }
 
-    async delete(id: string): Promise<HydratedDocument<T> | null> {
-        return await this.model.findByIdAndDelete(id)
-    }
+  async findOne(filter: FilterQuery<T>): Promise<T | null> {
+    return await this.model.findOne(filter);
+  }
+
+  async find(filter: FilterQuery<T>,options:{skip:number,limit:number}): Promise<T[]> {
+    let query = this.model.find(filter)
+    if(options.skip) query = query.skip(options.skip)
+    if(options.limit) query = query.limit(options.limit)
+    return await query
+  }
+
+  async delete(id: string): Promise<T | null> {
+    return await this.model.findByIdAndDelete(id);
+  }
+
+ async count(filter: FilterQuery<T>): Promise<number> {
+  return await this.model.countDocuments(filter);
+}
 }

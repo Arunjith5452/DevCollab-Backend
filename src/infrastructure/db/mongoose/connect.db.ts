@@ -1,3 +1,4 @@
+import { logger } from '@/infrastructure/providers/logs/logger';
 import mongoose from 'mongoose';
 
 export class DatabaseService {
@@ -7,9 +8,9 @@ export class DatabaseService {
                 maxPoolSize:100,
                 minPoolSize:10,
             });
-            console.log('Connected to MongoDB',host,name);
+            logger.info('Connected to MongoDB',host,name);
         } catch (error) {
-            console.error('Database connection error:', error);
+            logger.error('Database connection error:', error);
             process.exit(1);
         }
     }

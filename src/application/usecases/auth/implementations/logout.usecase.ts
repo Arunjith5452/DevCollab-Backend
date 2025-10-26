@@ -1,17 +1,17 @@
 import { LogoutDTO } from "@/application/dtos/auth/logout.dto";
-import { IExecute } from "../interfaces/execute-usecase.interface";
 import { inject } from "inversify";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
 import { IUserRepositor } from "@/infrastructure/db/repository/interface/user.interface";
-import { IUser } from "@/infrastructure/db/interface/user.inteface";
 import { verifyToken } from "@/shared/utils/jwt.util";
-import { redisClient } from "@/infrastructure/redis/redis-client";
+import { redisClient } from "@/infrastructure/providers/redis/redis-client";
+import { UserEntity } from "@/domain/entities/user.entity";
+import { IExecute } from "@/application/interface/execute.usecase.interface";
 
 
 
 export class LogoutUseCase implements IExecute<LogoutDTO, void> {
 
-    constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepositor<IUser>) { }
+    constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepositor<UserEntity>) { }
 
     async execute({ refreshToken }: LogoutDTO): Promise<void> {
 

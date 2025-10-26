@@ -5,6 +5,7 @@ import compression from 'compression'
 import cors from "cors"
 import cookieParser from "cookie-parser"
 import { profileRouter } from '../router/auth/profile.router'
+import { adminRouter } from '../router/admin/admin.router'
 
 app.use(cors({
   origin: "http://localhost:3000",
@@ -17,5 +18,6 @@ app.use(express.json())
 
 app.use("/api",authRouter)
 app.use("/api",profileRouter)
+app.use("/api",adminRouter)
 
 export default app;

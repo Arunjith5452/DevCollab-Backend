@@ -20,14 +20,12 @@ export const validateDTO = (dtoClass: any) => {
             });
 
             if (errors.length > 0) {
-                const formattedErrors = errors.map(err => ({
-                    field: err.property,
-                    errors: Object.values(err.constraints || {}),
-                }));
-
-                return res.status(ClientErrorStatus.BAD_REQUEST).json({
-                    message: formattedErrors.map(e => `${e.errors.join(", ")}`).join("; ")
+                const formattedErrors: Record<string, string> = {};
+                errors.forEach(err => {
+                    formattedErrors[err.property] = Object.values(err.constraints || {}).join(", ");
                 });
+
+                return res.status(ClientErrorStatus.BAD_REQUEST).json(formattedErrors);
             }
 
             req.body = dtoInstance;
