@@ -12,15 +12,15 @@ export class RefreshTokenUseCase implements IExecute<string, RefreshResult> {
 
     constructor(
         @inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepositor<UserEntity>,
-        
+
     ) { }
 
-    async execute(refreshToken:string): Promise<RefreshResult> {
+    async execute(refreshToken: string): Promise<RefreshResult> {
 
         try {
             if (!refreshToken) throw new Error("Refresh token is missing")
 
-            const decoded:any = verifyToken(refreshToken, "refresh")
+            const decoded: any = verifyToken(refreshToken, "refresh")
 
             if (!decoded) throw new Error("Invalid or expired refresh token")
 
@@ -32,7 +32,7 @@ export class RefreshTokenUseCase implements IExecute<string, RefreshResult> {
             const user = await this._userRepository.findByEmail(decoded.email);
             if (!user) throw new Error("User not found");
 
-            const newAccessToken = generateAccessToken({ userId: user.id!.toString(), email: user.email ,role:user.role})
+            const newAccessToken = generateAccessToken({ userId: user.id!.toString(), email: user.email, role: user.role })
 
             return {
                 accessToken: newAccessToken,

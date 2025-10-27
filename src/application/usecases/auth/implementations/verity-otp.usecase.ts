@@ -29,7 +29,7 @@ export class VerifyOtpUseCase implements IExecute<VerifyOtpDTO,{message:string}>
 
             if (Number(tempUser.otp) !== Number(otp)) throw new Error(ErrorMessage.OTP_INVALID)
 
-            const user = UserEntity.create({email:tempUser.email,password:tempUser.password,role:tempUser.role,username:tempUser.username,id:tempUser.id,status:tempUser.status})
+            const user = UserEntity.create({email:tempUser.email,password:tempUser.password,role:tempUser.role,username:tempUser.name,id:tempUser.id,status:tempUser.status})
             const hashedPassword = await user.getHashedPassword()
             user.setPassword(hashedPassword)
 

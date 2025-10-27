@@ -42,7 +42,7 @@ export class AdminController {
 
             const { newStatus } = req.body
             const userId = req.params.id
-            const result = await this._updateUserStatusUseCase.execute({ userId,newStatus });
+            const result = await this._updateUserStatusUseCase.execute({ userId,newStatus })
 
             return res.json(result)
         } catch (error) {

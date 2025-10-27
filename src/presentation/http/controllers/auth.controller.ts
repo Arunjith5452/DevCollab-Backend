@@ -5,7 +5,6 @@ import { ResetPasswordDTO } from "@/application/dtos/auth/resetPassword.dto";
 import { VerifyOtpDTO } from "@/application/dtos/auth/verifyOtp.dto";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { ServerErrorStatus } from "@/domain/enums/status-codes/server-error-status.enum";
-import { SuccessStatus } from "@/domain/enums/status-codes/success-status.enum";
 import { AuthResult } from "@/domain/types/auth";
 import { RefreshResult } from "@/domain/types/auth/refresh.types";
 import { AUTH_TYPES } from "@/infrastructure/di/types";
@@ -89,8 +88,9 @@ export class AuthController {
         } catch (error) {
 
             const err = error as Error
-            return res.status(ServerErrorStatus.INTERNAL_SERVER_ERROR).json(err.message)
+            return res.status(ServerErrorStatus.INTERNAL_SERVER_ERROR).json({message:err.message})
         }
+    
     }
 
     async RefreshToken(req: Request, res: Response) {

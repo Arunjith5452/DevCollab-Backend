@@ -20,19 +20,21 @@ export const validateDTO = (dtoClass: any) => {
             });
 
             if (errors.length > 0) {
-                const formattedErrors: Record<string, string> = {};
-                errors.forEach(err => {
-                    formattedErrors[err.property] = Object.values(err.constraints || {}).join(", ");
-                });
+                const messages = errors
+                    .map(err => Object.values(err.constraints || {}).join(", "))
+                    .join("; ");
 
-                return res.status(ClientErrorStatus.BAD_REQUEST).json(formattedErrors);
+                return res.status(ClientErrorStatus.BAD_REQUEST).json({
+                    message: messages,
+                });
             }
 
             req.body = dtoInstance;
 
             next();
-        } catch (error: any) {
-            res.status(ServerErrorStatus.INTERNAL_SERVER_ERROR).json(error);
+        } catch (error) {
+            const err = error as Error
+            return res.status(ServerErrorStatus.INTERNAL_SERVER_ERROR).json(err.message)
         }
     };
 };
