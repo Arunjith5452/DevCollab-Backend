@@ -1,4 +1,4 @@
-import { IsEmail, IsString, Matches, MaxLength, MinLength } from "class-validator";
+import { IsEmail, IsOptional, IsString, Matches, MaxLength, MinLength } from "class-validator";
 import { Expose } from "class-transformer";
 
 export class LoginDTO {
@@ -15,9 +15,11 @@ export class LoginDTO {
         message: "Password must contain at least one uppercase letter and one number",
     })
     password: string;
+    @IsString() @IsOptional() googleId?: string; // ← NEW
 
     constructor() {
         this.email = "";
         this.password = "";
+        this.googleId = ""
     }
 }

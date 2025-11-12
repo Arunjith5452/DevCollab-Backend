@@ -15,8 +15,9 @@ export const userSchema = new Schema({
         required: true,
     },
     role: {
-        type: String,
-        default: "user"
+        type: [String],
+        enum: ["user", "creator", "contributor"],
+        default: ["user"]
     },
     techStack: [{
         type: String,
@@ -24,6 +25,8 @@ export const userSchema = new Schema({
     githubProfile: {
         type: String,
     },
+    googleId: { type: String, required: false },
+
     bio: {
         type: String,
     },
@@ -66,7 +69,7 @@ export const userSchema = new Schema({
         },
         payment: {
             type: Boolean,
-            default: false 
+            default: false
         }
     },
 

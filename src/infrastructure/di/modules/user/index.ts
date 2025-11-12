@@ -4,6 +4,7 @@ import { UserRepository } from "@/infrastructure/db/repository/implements/user.r
 import { Model } from "mongoose";
 import { userModel } from "@/infrastructure/db/models/user.model";
 
+
 export const UserModule = new ContainerModule(({bind})=>{
     bind<UserRepository>(USER_TYPES.UserRepository).to(UserRepository)
     bind<Model<any>>("UserModel").toConstantValue(userModel)

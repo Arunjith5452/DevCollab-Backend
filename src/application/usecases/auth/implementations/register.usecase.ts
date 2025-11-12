@@ -18,6 +18,7 @@ export class RegiserUseCase implements IExecute<RegisterDTO,{token:string}> {
 
     async execute({ name,email,password }: RegisterDTO): Promise<{token:string}> {
 
+
         try {
             const isValidEmail = await validateEmail(email)
 

@@ -1,4 +1,6 @@
+import { CheckUserBlockStatusUseCase } from "@/application/usecases/auth/implementations/check-user-block-status.usecase";
 import { ForgotPasswordUseCase } from "@/application/usecases/auth/implementations/forgot-password.usecase";
+import { GoogleLoginUseCase } from "@/application/usecases/auth/implementations/google-login.usecase";
 import { LoginUseCase } from "@/application/usecases/auth/implementations/login.usecase";
 import { RefreshTokenUseCase } from "@/application/usecases/auth/implementations/refresh-token.usecase";
 import { RegiserUseCase } from "@/application/usecases/auth/implementations/register.usecase";
@@ -21,5 +23,6 @@ export const AuthModule = new ContainerModule(({bind})=>{
     bind<ForgotPasswordUseCase>(AUTH_TYPES.ForgotPasswordUseCase).to(ForgotPasswordUseCase)
     bind<VerifyForgotOtpUseCase>(AUTH_TYPES.VerifyForgotOtpUseCase).to(VerifyForgotOtpUseCase)
     bind<ResetPasswordUseCase>(AUTH_TYPES.ResetPasswordUseCase).to(ResetPasswordUseCase)
-
+    bind<CheckUserBlockStatusUseCase>(AUTH_TYPES.CheckUserBlockStatusUseCase).to(CheckUserBlockStatusUseCase)
+    bind<GoogleLoginUseCase>(AUTH_TYPES.GoogleLoginUseCase).to(GoogleLoginUseCase)
 })

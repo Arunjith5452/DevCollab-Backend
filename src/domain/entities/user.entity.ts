@@ -7,15 +7,17 @@ export class UserEntity {
   private _email: string;
   private _password: string;
   private _username: string;
-  private _role: string;
+  private _role: string[];
   private _status: string;
+  private _googleId?: string;
 
   private constructor(
     email: string,
     password: string,
     username: string,
-    role: string,
+    role: string[],
     status: string,
+    googleId?: string,
     id?: string,
   ) {
     this._email = email;
@@ -23,6 +25,7 @@ export class UserEntity {
     this._username = username;
     this._role = role;
     this._status = status;
+    this._googleId = googleId;
     this._id = id;
   }
 
@@ -36,13 +39,14 @@ export class UserEntity {
     email: string;
     password: string;
     username: string;
-    role: string;
+    role: string[];
     status: string;
+    googleId?: string
     id?: string;
   }): UserEntity {
     // const email = Email.create(data.email);
     // const hashedPassword = await Password.create(data.password);
-    return new UserEntity(data.email, data.password, data.username, data.role, data.status, data.id);
+    return new UserEntity(data.email, data.password, data.username, data.role, data.status, data.googleId, data.id);
   }
 
   get id(): string | undefined {
@@ -61,7 +65,7 @@ export class UserEntity {
     return this._password
   }
 
-  get role(): string {
+  get role(): string[] {
     return this._role
   }
 
@@ -69,10 +73,13 @@ export class UserEntity {
     return this._status
   }
 
-  isBlocked() {
+  get googleId(): string | undefined {
+    return this._googleId
+  }
 
-    if ( this._status === Status.BLOCK) {
-      throw new Error(ErrorMessage.FORBIDDEN)
+  isBlocked() {
+    if (this._status === Status.BLOCK) {
+      throw new Error(ErrorMessage.ADMIN_BLOCKED)
     }
 
   }

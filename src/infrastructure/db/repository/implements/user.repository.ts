@@ -29,4 +29,9 @@ export class UserRepository extends BaseRepository<UserEntity> implements IUserR
         return await this.userPersistenceMapper.fromMongo(createUser)
     }
 
+    async updateUser(userId : string , data:Partial<UserEntity>):Promise<UserEntity | null>{
+        const update = await this.update(userId,data)
+        return update ? this.userPersistenceMapper.fromMongo(update) : null
+    }
+
 }

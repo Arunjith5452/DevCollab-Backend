@@ -1,12 +1,17 @@
 import { validate } from "deep-email-validator";
 
-export async function validateEmail(email: string) {
+/**
+ * Validates an email address using deep-email-validator.
+ * @param email - The email address to validate.
+ * @returns True if valid, otherwise false.
+ */
+export async function validateEmail(email: string): Promise<boolean> {
   const { valid } = await validate({
     email,
-    validateRegex: true, 
-    validateMx: true,    
-    validateTypo: true, 
-    validateSMTP: false, 
+    validateRegex: true,
+    validateMx: true,
+    validateTypo: false,
+    validateSMTP: false,
   });
 
   return valid;
