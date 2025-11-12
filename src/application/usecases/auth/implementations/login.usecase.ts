@@ -25,33 +25,30 @@ export class LoginUseCase implements IExecute<LoginDTO, AuthResult> {
 
             if (!isValidEmail) throw new Error(ErrorMessage.EMAIL_INVALID)
 
-        
+
 
             const user = await this._userRepository.findByEmail(email)
-        
+
             if (!user) throw new Error(ErrorMessage.EMAIL_NOT_EXIST)
 
-                if(user.status == 'block'){
-                    throw new Error(ErrorMessage.FORBIDDEN)
-                }
+            user.isBlocked()
 
             const isPassword = await verify(user.password, password)
 
             if (!isPassword) throw new Error(ErrorMessage.INVALID_PASSWORD);
 
-            const payload = { userId: user.id, email: user.email,role:user.role }
+            const payload = { userId: user.id, email: user.email, role: user.role }
 
             const accessToken = generateAccessToken(payload);
             const refreshToken = generateRefreshToken(payload);
 
-            await redisClient.set(`refresh:${user.email}`, refreshToken, "EX", 7 * 24 * 60 * 60);
-
+            await redisClient.set(`refresh:${user.email}`, refreshToken, 'EX', Number(process.env.REFRESH_TOKEN_MAX_AGE))
 
             return {
                 message: SuccessMessage.LOGIN_SUCCESS,
                 accessToken,
                 refreshToken,
-                role: user.role!
+                role: user.role
             }
 
         } catch (error) {

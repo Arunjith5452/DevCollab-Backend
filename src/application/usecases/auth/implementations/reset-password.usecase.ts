@@ -24,17 +24,18 @@ export class ResetPasswordUseCase implements IExecute<ResetPasswordDTO, { messag
 
             const user = await this._userRepository.findByEmail(email)
 
-            if(!user) {
+            if (!user) {
                 throw new Error(ErrorMessage.USER_NOT_FOUND)
             }
 
-            const userEntity = UserEntity.create({email:user.email,password:user.password,role:user.role,username:user.username,id:user.id,status:user.status})
+            const userEntity = UserEntity.create({ email: user.email, password: newPassword, role: user.role, username: user.username, id: user.id, status: user.status })
             const hashedPassword = await userEntity.getHashedPassword();
             userEntity.setPassword(hashedPassword)
 
-            await this._userRepository.updatePassword(user.id!,userEntity.password)
 
-             return { message:SuccessMessage.PASSWORD_RESET}
+            await this._userRepository.updatePassword(user.id!, userEntity.password)
+
+            return { message: SuccessMessage.PASSWORD_RESET }
 
         } catch (error) {
 

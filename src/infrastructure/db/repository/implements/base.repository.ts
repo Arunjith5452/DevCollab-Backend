@@ -1,4 +1,4 @@
-import { Model, UpdateQuery, FilterQuery, HydratedDocument } from "mongoose";
+import { Model, UpdateQuery, FilterQuery } from "mongoose";
 import { IBaseRepository } from "../interface/base-repository.interface";
 
 export abstract class BaseRepository<T> implements IBaseRepository<T> {
@@ -27,7 +27,7 @@ export abstract class BaseRepository<T> implements IBaseRepository<T> {
   }
 
   async find(filter: FilterQuery<T>,options:{skip:number,limit:number}): Promise<T[]> {
-    let query = this.model.find(filter)
+    let query = this.model.find(filter).sort({ createdAt: -1 })
     if(options.skip) query = query.skip(options.skip)
     if(options.limit) query = query.limit(options.limit)
     return await query

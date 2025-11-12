@@ -1,19 +1,21 @@
 import { hash } from "@/shared/utils/password-hash.utils";
+import { ErrorMessage } from "../enums/messages/error-message.enum";
+import { Status } from "../enums/status.enums";
 
 export class UserEntity {
   private readonly _id?: string;
   private _email: string;
   private _password: string;
   private _username: string;
-  private _role :string;
-  private _status:string;
+  private _role: string;
+  private _status: string;
 
   private constructor(
     email: string,
     password: string,
     username: string,
-    role:string,
-    status:string,
+    role: string,
+    status: string,
     id?: string,
   ) {
     this._email = email;
@@ -24,23 +26,23 @@ export class UserEntity {
     this._id = id;
   }
 
-//   async updateDetails(updateDto: UpdateUserDto) {
-//     if (updateDto.email) await this.changeEmail(updateDto.email);
-//     if (updateDto.password) await this.changePassowrd(updateDto.password);
-//     if (updateDto.username) this.changeUsername(updateDto.username);
-//   }
+  //   async updateDetails(updateDto: UpdateUserDto) {
+  //     if (updateDto.email) await this.changeEmail(updateDto.email);
+  //     if (updateDto.password) await this.changePassowrd(updateDto.password);
+  //     if (updateDto.username) this.changeUsername(updateDto.username);
+  //   }
 
-  static  create(data: {
+  static create(data: {
     email: string;
     password: string;
     username: string;
-    role:string;
-    status:string;
+    role: string;
+    status: string;
     id?: string;
   }): UserEntity {
     // const email = Email.create(data.email);
     // const hashedPassword = await Password.create(data.password);
-    return new UserEntity(data.email, data.password, data.username,data.role,data.status, data.id);
+    return new UserEntity(data.email, data.password, data.username, data.role, data.status, data.id);
   }
 
   get id(): string | undefined {
@@ -59,22 +61,28 @@ export class UserEntity {
     return this._password
   }
 
-  get role() : string{
+  get role(): string {
     return this._role
   }
 
-  get status() : string{
+  get status(): string {
     return this._status
   }
 
+  isBlocked() {
 
-   setPassword(newPassword:string){
-        this._password = newPassword
+    if ( this._status === Status.BLOCK) {
+      throw new Error(ErrorMessage.FORBIDDEN)
     }
-    
-    async getHashedPassword(){
-        return await hash(this.password)
-    }
- 
+
+  }
+  setPassword(newPassword: string) {
+    this._password = newPassword
+  }
+
+  async getHashedPassword() {
+    return await hash(this.password)
+  }
+
 
 }

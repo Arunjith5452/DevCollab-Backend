@@ -1,5 +1,4 @@
 import { UserEntity } from "@/domain/entities/user.entity";
-import { HydratedDocument } from "mongoose";
 import { IBaseRepository } from "./base-repository.interface";
 
 

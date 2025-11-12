@@ -11,4 +11,6 @@ export enum ErrorMessage {
     SERVER_ERROR = "Internal server error",
     OTP_INVALID = "Invalid OTP",
     OTP_EXPIRED = "OTP has expired",
+    USER_UPDATE_FAILED = 'User Update Failed',
+    ADMIN_BLOCKED = 'Your account has been blocked by the admin'
 }
