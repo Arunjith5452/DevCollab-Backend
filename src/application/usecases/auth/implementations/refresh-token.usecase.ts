@@ -6,6 +6,7 @@ import { generateAccessToken, verifyToken } from "@/shared/utils/jwt.util";
 import { redisClient } from "@/infrastructure/providers/redis/redis-client";
 import { UserEntity } from "@/domain/entities/user.entity";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
+import { Status } from "@/domain/enums/status.enums";
 
 @injectable()
 export class RefreshTokenUseCase implements IExecute<string, RefreshResult> {
@@ -31,6 +32,11 @@ export class RefreshTokenUseCase implements IExecute<string, RefreshResult> {
 
             const user = await this._userRepository.findByEmail(decoded.email);
             if (!user) throw new Error("User not found");
+
+
+            if(user.status === Status.BLOCK){
+                throw new Error("Admin blocked please try again")
+            }
 
             const newAccessToken = generateAccessToken({ userId: user.id!.toString(), email: user.email, role: user.role })
 

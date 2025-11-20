@@ -31,7 +31,7 @@ export class GetAllUsersUseCase implements IExecute<GetAllUsersQuery, { message:
             let total = Math.ceil(count / limit)
 
             return {
-                message: SuccessMessage.USER_CREATED,
+                message: SuccessMessage.USERS_FETCHED,
                 users,
                 total
             }

@@ -6,31 +6,43 @@ export class UserEntity {
   private readonly _id?: string;
   private _email: string;
   private _password: string;
-  private _username: string;
+  private _name: string;
   private _role: string;
   private _status: string;
+  private _googleId?: string;
+  private _profileImage?: string;
+  private _githubProfile?: string;
+  private _bio?: string;
+  private _title?: string
+  private _techStack?: string[];
 
   private constructor(
     email: string,
     password: string,
-    username: string,
+    name: string,
     role: string,
     status: string,
+    googleId?: string,
+    profileImage?: string,
+    githubProfile?: string,
     id?: string,
+    bio?: string,
+    title?: string,
+    techStack?: string[],
   ) {
     this._email = email;
     this._password = password;
-    this._username = username;
+    this._name = name;
     this._role = role;
     this._status = status;
+    this._googleId = googleId;
+    this._profileImage = profileImage;
+    this._githubProfile = githubProfile
     this._id = id;
+    this._bio = bio;
+    this._title = title
+    this._techStack = techStack
   }
-
-  //   async updateDetails(updateDto: UpdateUserDto) {
-  //     if (updateDto.email) await this.changeEmail(updateDto.email);
-  //     if (updateDto.password) await this.changePassowrd(updateDto.password);
-  //     if (updateDto.username) this.changeUsername(updateDto.username);
-  //   }
 
   static create(data: {
     email: string;
@@ -38,11 +50,37 @@ export class UserEntity {
     username: string;
     role: string;
     status: string;
+    googleId?: string;
+    profileImage?: string,
+    githubProfile?: string,
     id?: string;
   }): UserEntity {
-    // const email = Email.create(data.email);
-    // const hashedPassword = await Password.create(data.password);
-    return new UserEntity(data.email, data.password, data.username, data.role, data.status, data.id);
+    return new UserEntity(data.email, data.password, data.username, data.role, data.status, data.googleId, data.profileImage, data.githubProfile, data.id);
+  }
+  updateProfile(data: {
+    username?: string;
+    bio?: string;
+    title?: string;
+    profileImage?: string;
+    techStack?: string[];
+  }) {
+    if (data.username) {
+      if (data.username.length < 3)
+        throw new Error("Name must be at least 3 characters");
+      this._name = data.username;
+    }
+
+    if (data.bio) {
+      if (data.bio.length > 300)
+        throw new Error("Bio cannot exceed 300 characters");
+      this._bio = data.bio;
+    }
+
+    if (data.title) this._title = data.title;
+
+    if (data.profileImage) this._profileImage = data.profileImage;
+
+    if (data.techStack) this._techStack = data.techStack;
   }
 
   get id(): string | undefined {
@@ -54,7 +92,7 @@ export class UserEntity {
   }
 
   get username(): string {
-    return this._username;
+    return this._name;
   }
 
   get password(): string {
@@ -69,10 +107,32 @@ export class UserEntity {
     return this._status
   }
 
-  isBlocked() {
+  get googleId(): string | undefined {
+    return this._googleId
+  }
 
-    if ( this._status === Status.BLOCK) {
-      throw new Error(ErrorMessage.FORBIDDEN)
+  get bio(): string | undefined {
+    return this._bio
+  }
+
+  get profileImage(): string | undefined {
+    return this._profileImage
+  }
+
+  get title(): string | undefined {
+    return this._title
+  }
+
+  get techStack(): string[] | undefined {
+    return this._techStack
+  }
+  get githubProfile(): string | undefined {
+    return this._githubProfile
+  }
+
+  isBlocked() {
+    if (this._status === Status.BLOCK) {
+      throw new Error(ErrorMessage.ADMIN_BLOCKED)
     }
 
   }
@@ -83,6 +143,5 @@ export class UserEntity {
   async getHashedPassword() {
     return await hash(this.password)
   }
-
 
 }

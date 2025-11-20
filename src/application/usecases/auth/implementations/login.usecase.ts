@@ -20,12 +20,9 @@ export class LoginUseCase implements IExecute<LoginDTO, AuthResult> {
     async execute({ email, password }: LoginDTO): Promise<AuthResult> {
 
         try {
-
             const isValidEmail = await validateEmail(email)
 
             if (!isValidEmail) throw new Error(ErrorMessage.EMAIL_INVALID)
-
-
 
             const user = await this._userRepository.findByEmail(email)
 

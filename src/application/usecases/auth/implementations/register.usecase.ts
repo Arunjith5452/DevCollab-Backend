@@ -51,7 +51,6 @@ export class RegiserUseCase implements IExecute<RegisterDTO,{token:string}> {
             throw error
         }
 
-
     }
 
 }

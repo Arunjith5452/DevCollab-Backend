@@ -2,9 +2,9 @@ import { UpdateStatusDTO } from "@/application/dtos/admin/updateStatus.dto";
 import { Role } from "@/domain/enums/role.enum";
 import { container } from "@/infrastructure/di/inversify.di";
 import { AdminController } from "@/presentation/http/controllers/admin.controller";
-import { AuthGuard } from "@/shared/middlewares/authGuard";
-import { validateDTO } from "@/shared/middlewares/validate-dto.middlware";
 import { Request, Response, Router } from "express";
+import { AuthGuard } from "../../middlewares/auth-guard.middlware";
+import { validateDTO } from "../../middlewares/validate-dto.middlware";
 
 const router = Router();
 const adminController = container.get(AdminController);

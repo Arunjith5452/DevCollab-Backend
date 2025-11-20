@@ -9,5 +9,4 @@ export const AdminModule = new ContainerModule(({bind})=>{
 bind<AdminController>(ADMIN_TYPES.AdminController).to(AdminController)
 bind<GetAllUsersUseCase>(ADMIN_TYPES.GetAllUsersUseCase).to(GetAllUsersUseCase)
 bind<UpdateUserStatusUseCase>(ADMIN_TYPES.UpdateUserStatusUseCase).to(UpdateUserStatusUseCase)
-
 })

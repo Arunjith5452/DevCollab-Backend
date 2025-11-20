@@ -6,7 +6,6 @@ import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
 import { SuccessMessage } from "@/domain/enums/messages/success-message.enum";
 import { IUserRepositor } from "@/infrastructure/db/repository/interface/user.interface";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
-import { redisClient } from "@/infrastructure/providers/redis/redis-client";
 import { inject, injectable } from "inversify";
 
 @injectable()
@@ -22,9 +21,7 @@ export class UpdateUserStatusUseCase implements IExecute<{userId:string,newStatu
 
             
             let user = await this._userRepository.findById(userId)
-            
-            // let refreshToken = await redisClient.get(`refresh:${user?.email}`)
-
+        
 
               if(!user){
                 throw new Error(ErrorMessage.USER_NOT_FOUND)
@@ -37,13 +34,11 @@ export class UpdateUserStatusUseCase implements IExecute<{userId:string,newStatu
                 throw new Error(ErrorMessage.USER_UPDATE_FAILED)
             }
  
-            // await redisClient.del(`refresh:${refreshToken}`)
-
             let userDoc = this._userMapper.toResponse(updatedUser)
 
             return {
                 message : SuccessMessage.USER_UPDATED,
-                newStatus:userDoc
+                newStatus:userDoc.status
             }
 
             
