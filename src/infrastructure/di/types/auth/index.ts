@@ -10,5 +10,6 @@ export const AUTH_TYPES = {
   VerifyForgotOtpUseCase: Symbol.for("VerifyForgotOtpUseCase"),
   ResetPasswordUseCase: Symbol.for("ResetPasswordUseCase"),
   CheckUserBlockStatusUseCase: Symbol.for('CheckUserBlockStatusUseCase'),
-  GoogleLoginUseCase:Symbol.for('GoogleLoginUseCase')
+  GoogleLoginUseCase:Symbol.for('GoogleLoginUseCase'),
+  GitHubLoginUseCase:Symbol.for('GitHubLoginUseCase')
 };

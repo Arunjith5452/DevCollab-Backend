@@ -15,9 +15,12 @@ export const userSchema = new Schema({
         required: true,
     },
     role: {
-        type: [String],
-        enum: ["user", "creator", "contributor"],
-        default: ["user"]
+        type: String,
+        enum: ["user", "admin"],
+        default: "user"
+    },
+    title: {
+        type: String
     },
     techStack: [{
         type: String,
@@ -26,9 +29,11 @@ export const userSchema = new Schema({
         type: String,
     },
     googleId: { type: String, required: false },
-
     bio: {
         type: String,
+    },
+    profileImage: {
+        type: String
     },
     status: {
         type: String,

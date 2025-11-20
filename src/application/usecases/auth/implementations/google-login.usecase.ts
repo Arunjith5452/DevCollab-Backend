@@ -20,7 +20,7 @@ export class GoogleLoginUseCase implements IExecute<GoogleLoginDTO, AuthResult> 
 
     constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepositor<UserEntity>) { }
 
-    async execute({ email, name, googleId }: GoogleLoginDTO): Promise<AuthResult> {
+    async execute({ email, name, googleId, image }: GoogleLoginDTO): Promise<AuthResult> {
 
         try {
 
@@ -34,21 +34,26 @@ export class GoogleLoginUseCase implements IExecute<GoogleLoginDTO, AuthResult> 
 
                 const randomPassword = randomBytes(12).toString("hex");
 
-                user = UserEntity.create({
+                const newUser = UserEntity.create({
                     email,
                     username: name!,
                     password: randomPassword,
+                    role: Role.USER,
+                    status: Status.ACTIVE,
                     googleId,
-                    role: [Role.USER],
-                    status: Status.ACTIVE
+                    profileImage: image
                 })
 
-                const hashedPassword = await user.getHashedPassword();
-                user.setPassword(hashedPassword)
+                const hashedPassword = await newUser.getHashedPassword();
+                newUser.setPassword(hashedPassword)
 
-                await this._userRepository.createUser(user)
+                await this._userRepository.createUser(newUser)
 
-                console.log("user",user)
+                user = await this._userRepository.findByEmail(email)
+
+                if (!user) {
+                    throw new Error("Failed to retrieve newly created user.")
+                }
             }
 
             user.isBlocked()

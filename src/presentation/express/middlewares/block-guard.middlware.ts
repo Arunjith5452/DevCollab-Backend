@@ -5,26 +5,23 @@ import { Status } from "@/domain/enums/status.enums"
 import { container } from "@/infrastructure/di/inversify.di"
 import { AUTH_TYPES } from "@/infrastructure/di/types"
 
-export const BlockGuard = (roles: Array<string>) =>async (req: Request, res: Response, next: NextFunction) => {
-    try {
+export const BlockGuard = (roles: Array<string>) => async (req: Request, res: Response, next: NextFunction) => {
+  try {
 
-      const checkUserBlockStatusUseCase = container.get<CheckUserBlockStatusUseCase>(AUTH_TYPES.CheckUserBlockStatusUseCase)
+    const checkUserBlockStatusUseCase = container.get<CheckUserBlockStatusUseCase>(AUTH_TYPES.CheckUserBlockStatusUseCase)
+    const user = await checkUserBlockStatusUseCase.execute(req.user?.userId!);
+    if (user.status === Status.BLOCK) {
 
-      const user = await checkUserBlockStatusUseCase.execute(req.user?.userId!);
+      res.clearCookie("accessToken")
+      res.clearCookie("refreshToken")
 
-      if (user.status === Status.BLOCK) {
-
-        res.clearCookie("accessToken")
-        res.clearCookie("refreshToken")
-
-        return res.status(401).json({ message: "Your account has been blocked by admin",success:false,blocked:true })
-      }
-
-      next()
-    } catch (error) {
-        console.log(error)
-      return res
-        .status(ServerErrorStatus.INTERNAL_SERVER_ERROR).json({ message: "Internal Server Error" })
+      return res.status(401).json({ message: "Your account has been blocked by admin", success: false, blocked: true })
     }
-  };
+
+    next()
+  } catch (error) {
+    return res
+      .status(ServerErrorStatus.INTERNAL_SERVER_ERROR).json({ message: "Internal Server Error" })
+  }
+};
 

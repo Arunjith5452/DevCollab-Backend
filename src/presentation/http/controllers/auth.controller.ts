@@ -1,4 +1,5 @@
 import { forgotPasswordDTO } from "@/application/dtos/auth/forgotPassword.dto";
+import { GithubLoginDTO } from "@/application/dtos/auth/gitHub-Login.dto";
 import { GoogleLoginDTO } from "@/application/dtos/auth/google-Login.dto";
 import { LoginDTO } from "@/application/dtos/auth/login.dto";
 import { RegisterDTO } from "@/application/dtos/auth/register.dto";
@@ -13,6 +14,7 @@ import { errorResponse, successResponse } from "@/shared/utils/response.util";
 import { Request, Response } from "express";
 import { inject, injectable } from "inversify";
 
+
 @injectable()
 export class AuthController {
     constructor(
@@ -24,7 +26,8 @@ export class AuthController {
         @inject(AUTH_TYPES.ResendOtpUseCase) private readonly _resendOtpUseCase: IExecute<VerifyOtpDTO, { message: string }>,
         @inject(AUTH_TYPES.VerifyForgotOtpUseCase) private readonly _verifyForgotOtpUseCase: IExecute<VerifyOtpDTO, { message: string }>,
         @inject(AUTH_TYPES.ResetPasswordUseCase) private readonly _resetPasswordUseCase: IExecute<ResetPasswordDTO, { message: string }>,
-        @inject(AUTH_TYPES.GoogleLoginUseCase) private readonly _googleLoginUseCase: IExecute<GoogleLoginDTO, AuthResult>
+        @inject(AUTH_TYPES.GoogleLoginUseCase) private readonly _googleLoginUseCase: IExecute<GoogleLoginDTO, AuthResult>,
+        @inject(AUTH_TYPES.GitHubLoginUseCase) private readonly _gitHubLoginUseCase: IExecute<GithubLoginDTO, AuthResult>
     ) { }
 
     /**
@@ -36,7 +39,7 @@ export class AuthController {
     async Register(req: Request, res: Response) {
         try {
             const result = await this._registerUseCase.execute(req.body);
-            return successResponse(res,"" ,result.token);
+            return successResponse(res, "", result.token);
         } catch (error) {
             return errorResponse(res,
                 "Registration failed",
@@ -125,7 +128,6 @@ export class AuthController {
             );
         }
     }
-
 
     /**
      * Refreshes access token using the stored refresh token.
@@ -227,25 +229,26 @@ export class AuthController {
 
     async googleLogin(req: Request, res: Response) {
 
+        console.log("this is this body", req.body)
+
         try {
 
             const result = await this._googleLoginUseCase.execute(req.body)
 
             res.cookie("refreshToken", result.refreshToken, {
                 httpOnly: true,
-                sameSite: "none",
+                sameSite: "strict",
                 maxAge: Number(process.env.REFRESH_TOKEN_MAX_AGE),
             });
 
             res.cookie("accessToken", result.accessToken, {
                 httpOnly: true,
-                sameSite: "none",
+                sameSite: "strict",
                 maxAge: Number(process.env.ACCESS_TOKEN_MAX_AGE),
             });
 
             return successResponse(res, result.message, {
                 role: result.role,
-                accessToken: result.accessToken,
             });
 
         } catch (error) {
@@ -259,6 +262,43 @@ export class AuthController {
 
         }
 
+    }
+
+    async gitHubLogin(req: Request, res: Response) {
+
+        console.log("gibulogin",req.body)
+
+        try {
+
+            const result = await this._gitHubLoginUseCase.execute(req.body)
+
+            res.cookie("refreshToken", result.refreshToken, {
+                httpOnly: true,
+                sameSite: "strict",
+                maxAge: Number(process.env.REFRESH_TOKEN_MAX_AGE),
+            });
+
+            res.cookie("accessToken", result.accessToken, {
+                httpOnly: true,
+                sameSite: "strict",
+                maxAge: Number(process.env.ACCESS_TOKEN_MAX_AGE),
+            });
+
+
+            return successResponse(res, result.message, {
+                role: result.role
+            })
+
+        } catch (error) {
+
+            return errorResponse(
+                res,
+                "GitHub Authentication failed",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+
+        }
     }
 
     /**

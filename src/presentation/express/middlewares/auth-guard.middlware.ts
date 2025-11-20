@@ -13,7 +13,7 @@ export const AuthGuard = (roles:Array<string>)=>(req: Request, res: Response, ne
             return res.status(ClientErrorStatus.UNAUTHORIZED).json({ success: false, message: "Token missing" })
         }
 
-        const verify = verifyToken(token, "access") as { email: string, userId: string, role:string | string[] }
+        const verify = verifyToken(token, "access") as { email: string, userId: string, role:string }
 
         if (!verify) {
             return res.status(ClientErrorStatus.UNAUTHORIZED).json({ success: false, message: "Decode token failed" })

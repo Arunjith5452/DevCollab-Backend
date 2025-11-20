@@ -5,7 +5,7 @@ declare global {
             user: {
                 userId: string,
                 email: string,
-                role:string | string[],
+                role:string,
                 iat?: number;
                 exp?: number;
             }

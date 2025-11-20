@@ -1,5 +1,6 @@
 import { CheckUserBlockStatusUseCase } from "@/application/usecases/auth/implementations/check-user-block-status.usecase";
 import { ForgotPasswordUseCase } from "@/application/usecases/auth/implementations/forgot-password.usecase";
+import { GitHubLoginUseCase } from "@/application/usecases/auth/implementations/github-login.usecase";
 import { GoogleLoginUseCase } from "@/application/usecases/auth/implementations/google-login.usecase";
 import { LoginUseCase } from "@/application/usecases/auth/implementations/login.usecase";
 import { RefreshTokenUseCase } from "@/application/usecases/auth/implementations/refresh-token.usecase";
@@ -25,4 +26,5 @@ export const AuthModule = new ContainerModule(({bind})=>{
     bind<ResetPasswordUseCase>(AUTH_TYPES.ResetPasswordUseCase).to(ResetPasswordUseCase)
     bind<CheckUserBlockStatusUseCase>(AUTH_TYPES.CheckUserBlockStatusUseCase).to(CheckUserBlockStatusUseCase)
     bind<GoogleLoginUseCase>(AUTH_TYPES.GoogleLoginUseCase).to(GoogleLoginUseCase)
+    bind<GitHubLoginUseCase>(AUTH_TYPES.GitHubLoginUseCase).to(GitHubLoginUseCase)
 })

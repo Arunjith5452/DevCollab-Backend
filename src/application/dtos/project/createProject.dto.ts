@@ -86,6 +86,11 @@ export class CreateProjectDTO {
   visibility: Visibility;
 
   @Expose()
+  @IsString({ message: "Expectation must be a string" })
+  @IsOptional()
+  image?: string;
+
+  @Expose()
   @ValidateNested({ each: true })
   @Type(() => RequiredRoleDTO)
   @ArrayNotEmpty({ message: "At least one team role is required" })
@@ -101,6 +106,7 @@ export class CreateProjectDTO {
     this.endDate = "";
     this.expectation = "";
     this.visibility = Visibility.PUBLIC;
+    this.image = '';
     this.requiredRoles = [];
   }
 }

@@ -4,6 +4,18 @@ import { plainToInstance, } from "class-transformer";
 import { ServerErrorStatus } from "@/domain/enums/status-codes/server-error-status.enum";
 import { ClientErrorStatus } from "@/domain/enums/status-codes/client-error-status.enum";
 
+
+/**
+ * Middleware for validating incoming request data using DTO classes.
+ * 
+ * Converts the plain request body into a DTO instance and validates it 
+ * using `class-validator` decorators defined in the DTO.
+ * 
+ *  * @param dtoClass - The DTO class used for validation.
+ * @returns An Express middleware function for DTO validation.
+ * 
+ */
+
 export const validateDTO = (dtoClass: any) => {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {

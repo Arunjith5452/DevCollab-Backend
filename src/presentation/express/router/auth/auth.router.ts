@@ -12,6 +12,7 @@ import { VerifyForgotOtpDTO } from "@/application/dtos/auth/forgotOtp.dto";
 import { ResetPasswordDTO } from "@/application/dtos/auth/resetPassword.dto";
 import { GoogleLoginDTO } from "@/application/dtos/auth/google-Login.dto";
 import { validateDTO } from "../../middlewares/validate-dto.middlware";
+import { GithubLoginDTO } from "@/application/dtos/auth/gitHub-Login.dto";
 
 
 const authController = container.get(AuthController)
@@ -26,6 +27,7 @@ router.post("/auth/reset-password", validateDTO(ResetPasswordDTO), (req: Request
 router.post("/auth/logout", validateDTO(LogoutDTO), (req: Request, res: Response) => authController.Logout(req, res))
 router.post("/auth/resend-otp", validateDTO(ResendOtp), (req: Request, res: Response) => authController.ResendOtp(req, res))
 router.post("/auth/google/callback", validateDTO(GoogleLoginDTO), (req: Request, res: Response) => authController.googleLogin(req, res))
+router.post("/auth/github/callback",validateDTO(GithubLoginDTO),(req:Request,res:Response)=>authController.gitHubLogin(req,res))
 
 
 export { router as authRouter }                           

@@ -1,4 +1,4 @@
-import { logger } from '@/infrastructure/providers/logs/logger';
+ import { logger } from '@/infrastructure/providers/logs/logger';
 import mongoose from 'mongoose';
 
 export class DatabaseService {

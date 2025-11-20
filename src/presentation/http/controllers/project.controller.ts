@@ -13,17 +13,23 @@ import { inject, injectable } from "inversify";
 @injectable()
 export class ProjectController {
 
-    constructor(@inject(PROJECT_TYPES.CreateProjectUseCase) private readonly _createProjectUseCase: IExecute<{userId:string,dto:CreateProjectDTO}, { message: string }>,
+    constructor(@inject(PROJECT_TYPES.CreateProjectUseCase) private readonly _createProjectUseCase: IExecute<{ userId: string, dto: CreateProjectDTO }, { message: string }>,
         @inject(PROJECT_TYPES.ListProjectUseCase) private readonly _listProjectUseCase: IExecute<GetAllProjectsQuery, any>,
         @inject(PROJECT_TYPES.ProjectDetailsUseCase) private readonly _projectDetailsUseCase: IExecute<string, { project: ProjectEntity[], message: string }>
     ) { }
 
 
+    /**
+    * Creates a new project for a user.
+    * @param req - Express request containing project data in the body and user ID in the request object.
+    * @param res - Express response object.
+    * @returns JSON response with success message upon successful project creation.
+    */
     async createProject(req: Request, res: Response) {
         try {
 
             const userId = req.user?.userId
-            const result = await this._createProjectUseCase.execute({userId,dto:req.body} )
+            const result = await this._createProjectUseCase.execute({ userId, dto: req.body })
 
             return successResponse(res, result.message)
 
@@ -38,6 +44,13 @@ export class ProjectController {
         }
     }
 
+
+    /**
+         * Fetches all projects with optional filters and pagination.
+         * @param req - Express request containing query parameters (search, techStack, difficulty, teamSize, page, limit).
+         * @param res - Express response object.
+         * @returns JSON response containing a list of projects and total count.
+         */
     async getAllProjects(req: Request, res: Response) {
 
         try {
@@ -71,10 +84,14 @@ export class ProjectController {
             )
 
         }
-
-
     }
 
+    /**
+     * Retrieves detailed information of a specific project.
+     * @param req - Express request containing the project ID in parameters.
+     * @param res - Express response object.
+     * @returns JSON response containing detailed project data.
+     */
     async projectDetails(req: Request, res: Response) {
         try {
 
@@ -99,5 +116,4 @@ export class ProjectController {
 
         }
     }
-
 }

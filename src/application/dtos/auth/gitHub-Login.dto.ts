@@ -1,7 +1,7 @@
-import { IsEmail, IsOptional, IsString, IsUrl } from "class-validator";
+import { IsEmail, IsOptional, isString, IsString } from "class-validator";
 import { Expose } from "class-transformer";
 
-export class GoogleLoginDTO {
+export class GithubLoginDTO {
 
   @Expose()
   @IsEmail({}, { message: "Invalid email format" })
@@ -14,18 +14,18 @@ export class GoogleLoginDTO {
 
   @Expose()
   @IsOptional()
-  @IsString({ message: "Google ID must be a string" })
-  googleId!: string;
+  @IsString({ message: "Image URL must be a string" })
+  image?: string;      
 
   @Expose()
   @IsOptional()
-  @IsString({ message: "Image URL must be a string" })
-  image?: string;
+  @IsString({ message: "github URL must be a string" })
+  githubUrl?:string
 
   constructor() {
     this.email = "";
     this.name = "";
-    this.googleId = "";
     this.image = "";
+    this.githubUrl = ""
   }
 }

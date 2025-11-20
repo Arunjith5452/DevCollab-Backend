@@ -15,7 +15,10 @@ export class LoginDTO {
         message: "Password must contain at least one uppercase letter and one number",
     })
     password: string;
-    @IsString() @IsOptional() googleId?: string; // ← NEW
+    
+    @IsString() 
+    @IsOptional() 
+    googleId?: string;
 
     constructor() {
         this.email = "";

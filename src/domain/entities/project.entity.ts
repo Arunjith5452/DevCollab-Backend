@@ -14,6 +14,14 @@ export class ProjectEntity {
   private _status: string;
   private readonly _createdAt: Date;
   private _updatedAt?: Date;
+  private _image?: string;
+
+  private _members: {
+    userId: string;
+    role: string;
+    joinedAt: string;
+    status: string;
+  }[];
 
   private constructor(data: {
     creatorId: string;
@@ -30,6 +38,13 @@ export class ProjectEntity {
     status?: string;
     createdAt?: Date;
     updatedAt?: Date;
+    image?: string;
+    members: {
+      userId: string;
+      role: string;
+      joinedAt: string;
+      status: string;
+    }[];
     id?: string;
   }) {
     this._creatorId = data.creatorId;
@@ -43,9 +58,11 @@ export class ProjectEntity {
     this._expectation = data.expectation;
     this._visibility = data.visibility;
     this._requiredRoles = data.requiredRoles;
-    this._status =  data.status || "active";
+    this._status = data.status || "active";
     this._createdAt = data.createdAt || new Date();
     this._updatedAt = data.updatedAt;
+    this._image = data.image
+    this._members = data.members;
     this._id = data.id;
   }
 
@@ -64,6 +81,13 @@ export class ProjectEntity {
     status?: string;
     createdAt?: Date;
     updatedAt?: Date;
+    image?: string;
+    members: {
+      userId: string;
+      role: string;
+      joinedAt: string;
+      status: string;
+    }[];
     id?: string;
   }): ProjectEntity {
     if (!data.title?.trim()) throw new Error("Project title is required");
@@ -75,7 +99,6 @@ export class ProjectEntity {
     });
   }
 
-  // ✅ Getters
   get id(): string | undefined {
     return this._id;
   }
@@ -120,6 +143,12 @@ export class ProjectEntity {
   }
   get updatedAt(): Date | undefined {
     return this._updatedAt;
+  }
+  get image(): string | undefined {
+    return this._image
+  }
+  get members() {
+    return this._members;
   }
 
   updateProjectDetails(title?: string, description?: string) {

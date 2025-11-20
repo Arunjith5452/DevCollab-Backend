@@ -13,6 +13,9 @@ export const projectSchema = new Schema(
     expectation: {
       type: String,
     },
+    image: {
+      type: String
+    },
     creatorId: {
       type: Types.ObjectId,
       ref: "Users",

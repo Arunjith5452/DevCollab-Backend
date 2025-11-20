@@ -33,5 +33,7 @@ export class UserRepository extends BaseRepository<UserEntity> implements IUserR
         const update = await this.update(userId,data)
         return update ? this.userPersistenceMapper.fromMongo(update) : null
     }
+   
+    
 
 }

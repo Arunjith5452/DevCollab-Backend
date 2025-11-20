@@ -4,6 +4,7 @@ import { ProjectEntity } from "@/domain/entities/project.entity";
 import { UserEntity } from "@/domain/entities/user.entity";
 import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
 import { Role } from "@/domain/enums/role.enum";
+import { Status } from "@/domain/enums/status.enums";
 import { IProjectRepository } from "@/infrastructure/db/repository/interface/project.interface";
 import { IUserRepositor } from "@/infrastructure/db/repository/interface/user.interface";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
@@ -12,18 +13,18 @@ import { inject } from "inversify";
 
 
 
-export class CreateProjectUseCase implements IExecute<{userId:string,dto:CreateProjectDTO}, { message: string }> {
+export class CreateProjectUseCase implements IExecute<{ userId: string, dto: CreateProjectDTO }, { message: string }> {
     constructor(@inject(PROJECT_TYPES.ProjectRepository) private readonly _projectRepository: IProjectRepository<ProjectEntity>,
-                @inject(USER_TYPES.UserRepository) private readonly _userRepository : IUserRepositor<UserEntity>
-) { }
+        @inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepositor<UserEntity>
+    ) { }
 
-    async execute({userId,dto}:{userId:string,dto:CreateProjectDTO}): Promise<{ message: string }> {
+    async execute({ userId, dto }: { userId: string, dto: CreateProjectDTO }): Promise<{ message: string }> {
 
         try {
 
             const user = await this._userRepository.findById(userId)
 
-            if(!user){
+            if (!user) {
                 throw new Error(ErrorMessage.USER_NOT_FOUND)
             }
 
@@ -38,17 +39,21 @@ export class CreateProjectUseCase implements IExecute<{userId:string,dto:CreateP
                 expectation: dto.expectation,
                 visibility: dto.visibility,
                 requiredRoles: dto.requiredRoles,
-                creatorId: user.id!
-            })
+                creatorId: user.id!,
+                image:dto.image,
+                members: [
+                    {
+                        userId: user.id!,
+                        role: Role.CREATOR,
+                        joinedAt: new Date().toISOString(),
+                        status: Status.ACTIVE,
+                    },
+                ],
+            });
 
-              await this._projectRepository.createProject(project)
+            console.log("project image",project)
 
-            
-             if(user && !user.role.includes(Role.CREATOR)){
-                user.role.push(Role.CREATOR)
-                await this._userRepository.updateUser(user.id!,{role:user.role})
-             }
-
+            await this._projectRepository.createProject(project)
 
             return { message: "Project created successFully" }
 

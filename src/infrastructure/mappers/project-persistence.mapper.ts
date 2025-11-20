@@ -17,6 +17,7 @@ export class ProjectPersistenceMapper {
       status: project.status,
       createdAt: project.createdAt,
       updatedAt: project.updatedAt,
+      image: project.image,
     };
   }
 
@@ -37,6 +38,8 @@ export class ProjectPersistenceMapper {
       status: doc.status,
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
+      image: doc.image,
+      members: []
     });
   }
 }

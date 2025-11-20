@@ -5,7 +5,7 @@ import { BlockGuard } from "../../middlewares/block-guard.middlware";
 const router = Router();
 
 
-router.get("/profile/me",AuthGuard([Role.ADMIN,Role.USER,Role.CREATOR,Role.CONTRIBUTER]),BlockGuard([Role.USER,Role.CREATOR,Role.CONTRIBUTER,Role.MAINTAINER]),(req,res)=>{
+router.get("/profile/me",AuthGuard([Role.ADMIN,Role.USER]),BlockGuard([Role.USER]),(req,res)=>{
   res.json({ cookies: req.cookies });
 
 })
