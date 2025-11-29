@@ -14,20 +14,23 @@ export class UpdateUserProfileUseCase implements IExecute<{ userId: string, dto:
     async execute({ userId, dto }: { userId: string, dto: UpdateProfileDTO }): Promise<UserEntity | null> {
         try {
 
-            let user = await this._userRepository.findById(userId)
-            
+            let user = await this._userRepository.findEntityById(userId)
+
             user?.updateProfile(dto)
-            console.log("dto",dto)
+
+            // console.log("DTO:", dto);
+            // console.log("Saving username:", dto.username);
+
 
             const updated = await this._userRepository.updateUser(userId, {
-                username: user?.username,
+                username: dto?.username,
                 bio: dto?.bio,
                 title: dto?.title,
                 techStack: dto.techStack,
                 profileImage: user?.profileImage,
             })
 
-            console.log("lalalalalalal",updated)
+            // console.log("updated",updated)
 
             return updated;
 

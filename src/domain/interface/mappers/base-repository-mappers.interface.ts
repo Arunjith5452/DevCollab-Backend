@@ -1,4 +1,4 @@
-export interface IBaseMapper<T>{
-    toMongo(entity:T):any;
-    fromMongo(doc:any):Promise<T>;
+export interface IBaseMapper<T, D> {
+    toMongo(entity: T): D;
+    fromMongo(doc: D): Promise<T>;
 }

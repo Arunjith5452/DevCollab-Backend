@@ -1,5 +1,5 @@
 import { UserEntity } from "@/domain/entities/user.entity";
-import { IUser } from "../db/interface/user.inteface";
+import { MongoUser } from "./interface/user.mapper.interface";
 
 
 export class UserPersistenceMapper {
@@ -11,27 +11,27 @@ export class UserPersistenceMapper {
             name: user.username,
             status: user.status,
             bio: user.bio,
-            profileImage: user.profileImage,
             title: user.title,
+            techStack: user.techStack,
+            profileImage: user.profileImage,
             googleId: user.googleId,
-            githubProfile:user.githubProfile
+            githubProfile: user.githubProfile
         }
     }
 
-    async fromMongo(doc:any): Promise<UserEntity> {
+    async fromMongo(doc: any): Promise<UserEntity> {
         return UserEntity.create({
             id: doc._id.toString(),
             email: doc.email,
-            username: doc.username,
+            username: doc.name,
             password: doc.password,
             role: doc.role,
             status: doc.status,
             googleId: doc?.googleId,
-            profileImage:doc?.profileImage,
-            githubProfile:doc?.githubProfile
-
+            profileImage: doc?.profileImage,
+            githubProfile: doc?.githubProfile,
         })
     }
-} 
+}
 
 

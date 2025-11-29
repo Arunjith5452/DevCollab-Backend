@@ -1,7 +1,8 @@
 import { ProjectEntity } from "@/domain/entities/project.entity";
+import { MongoMember } from "./interface/project.mapper.interface";
 
 export class ProjectPersistenceMapper {
-  toMongo(project: ProjectEntity): any {
+  toMongo(project: ProjectEntity) {
     return {
       creatorId: project.creatorId,
       title: project.title,
@@ -18,6 +19,7 @@ export class ProjectPersistenceMapper {
       createdAt: project.createdAt,
       updatedAt: project.updatedAt,
       image: project.image,
+      members: project.members,
     };
   }
 
@@ -39,7 +41,13 @@ export class ProjectPersistenceMapper {
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
       image: doc.image,
-      members: []
+      members: (doc.members as MongoMember[])?.map((m) => ({
+        userId: m.userId.toString(),
+        role: m.role,
+        joinedAt: m.joinedAt,
+        status: m.status
+      })) || []
+
     });
   }
 }

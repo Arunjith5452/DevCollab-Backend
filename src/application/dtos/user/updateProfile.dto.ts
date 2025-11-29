@@ -14,7 +14,7 @@ export class UpdateProfileDTO {
   @IsOptional()
   @IsString({ message: "Name must be a string" })
   @MaxLength(30, { message: "Name cannot exceed 30 characters" })
-  name?: string;
+  username?: string;
 
   @Expose()
   @IsOptional()
@@ -47,7 +47,7 @@ export class UpdateProfileDTO {
   profileImage?: string; // S3 signed URL
 
   constructor(data?: Partial<UpdateProfileDTO>) {
-    this.name = data?.name;
+    this.username = data?.username;
     this.title = data?.title;
     this.bio = data?.bio;
     this.techStack = data?.techStack;

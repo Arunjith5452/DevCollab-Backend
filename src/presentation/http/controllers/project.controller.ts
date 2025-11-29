@@ -1,5 +1,9 @@
+import { ApplyToProjectDTO } from "@/application/dtos/project/apply-project.dto";
+import { ApproveApplicationDTO } from "@/application/dtos/project/approve-application.dto";
 import { CreateProjectDTO } from "@/application/dtos/project/createProject.dto";
+import { RejectApplicationDTO } from "@/application/dtos/project/reject-application.dto";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
+import { ApplicationEntity } from "@/domain/entities/application.entity";
 import { ProjectEntity } from "@/domain/entities/project.entity";
 import { ServerErrorStatus } from "@/domain/enums/status-codes/server-error-status.enum";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
@@ -15,7 +19,13 @@ export class ProjectController {
 
     constructor(@inject(PROJECT_TYPES.CreateProjectUseCase) private readonly _createProjectUseCase: IExecute<{ userId: string, dto: CreateProjectDTO }, { message: string }>,
         @inject(PROJECT_TYPES.ListProjectUseCase) private readonly _listProjectUseCase: IExecute<GetAllProjectsQuery, any>,
-        @inject(PROJECT_TYPES.ProjectDetailsUseCase) private readonly _projectDetailsUseCase: IExecute<string, { project: ProjectEntity[], message: string }>
+        @inject(PROJECT_TYPES.ProjectDetailsUseCase) private readonly _projectDetailsUseCase: IExecute<string, { project: ProjectEntity[], message: string }>,
+        @inject(PROJECT_TYPES.ApplyToProjectUseCase) private readonly _applyToProjectUseCase: IExecute<ApplyToProjectDTO, { message: string }>,
+        @inject(PROJECT_TYPES.GetPendingApplicationUseCase) private readonly _getPendingApplicationUseCase: IExecute<string, ApplicationEntity[]>,
+        @inject(PROJECT_TYPES.ApproveApplcationUseCase) private readonly _approveApplicationUseCase: IExecute<ApproveApplicationDTO, { message: string }>,
+        @inject(PROJECT_TYPES.RejectApplicationUseCase) private readonly _rejectApplicationUseCase: IExecute<RejectApplicationDTO, { message: string }>,
+        @inject(PROJECT_TYPES.GetMyCreatedProjectUseCase) private readonly _getMyCreatedProjectUseCase: IExecute<{ userId: string }, ProjectEntity[]>,
+        @inject(PROJECT_TYPES.GetMyAppliedProjectUseCase) private readonly _getMyAppliedProjectUseCase: IExecute<{ userId: string }, ApplicationEntity[]>
     ) { }
 
 
@@ -93,6 +103,7 @@ export class ProjectController {
      * @returns JSON response containing detailed project data.
      */
     async projectDetails(req: Request, res: Response) {
+
         try {
 
             const { projectId } = req.params
@@ -112,8 +123,121 @@ export class ProjectController {
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )
+        }
+    }
 
+    async applyToProject(req: Request, res: Response) {
+
+        try {
+
+            const { projectId } = req.params;
+            const userId = req.user.userId;
+
+            let result = await this._applyToProjectUseCase.execute({
+                ...req.body,
+                userId,
+                projectId,
+            });
+
+            return successResponse(res, result.message, result)
+
+        } catch (error) {
+            return errorResponse(res,
+                "applyProject details failed",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            )
+        }
+    }
+
+    async getPendingApplication(req: Request, res: Response) {
+        try {
+            const { projectId } = req.params
+            const result = await this._getPendingApplicationUseCase.execute(projectId)
+            return successResponse(res, "Pending applications fetched", result);
+        } catch (error) {
+            return errorResponse(res, "Failed to fetch applications", ServerErrorStatus.INTERNAL_SERVER_ERROR, error);
 
         }
+    }
+
+    async approveApplication(req: Request, res: Response) {
+        try {
+
+            const { projectId, applicationId } = req.params
+
+            let result = await this._approveApplicationUseCase.execute({ projectId, applicationId })
+
+            return successResponse(res, result.message)
+
+        } catch (error) {
+            return errorResponse(
+                res,
+                "Failed to approve application",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+        }
+    }
+
+    async rejectApplication(req: Request, res: Response) {
+
+        try {
+
+            const { applicationId } = req.params
+
+            let result = await this._rejectApplicationUseCase.execute({ applicationId })
+
+            return successResponse(res, result.message)
+
+        } catch (error) {
+            return errorResponse(
+                res,
+                "Failed to reject application",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+        }
+    }
+
+    async getMyCreatedProject(req: Request, res: Response) {
+
+        try {
+
+            let userId = req.user.userId
+            const result = await this._getMyCreatedProjectUseCase.execute({ userId })
+
+            return successResponse(res, '', result)
+
+        } catch (error) {
+
+            return errorResponse(
+                res,
+                "Failed to load created project",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+        }
+
+    }
+
+    async getMyAppliedProject(req: Request, res: Response) {
+
+        try {
+
+            let userId = req.user.userId
+            const result = await this._getMyAppliedProjectUseCase.execute({ userId })
+            return successResponse(res, '', result)
+
+        } catch (error) {
+
+            return errorResponse(
+                res,
+                "Failed to load created project",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+        }
+
     }
 }

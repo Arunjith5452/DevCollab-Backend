@@ -51,8 +51,6 @@ export class CreateProjectUseCase implements IExecute<{ userId: string, dto: Cre
                 ],
             });
 
-            console.log("project image",project)
-
             await this._projectRepository.createProject(project)
 
             return { message: "Project created successFully" }
