@@ -1,3 +1,5 @@
+import { Role } from "../enums/role.enum";
+
 export class ProjectEntity {
   private readonly _id?: string;
   private _creatorId: string;
@@ -154,6 +156,19 @@ export class ProjectEntity {
   updateProjectDetails(title?: string, description?: string) {
     if (title) this._title = title.trim();
     if (description) this._description = description.trim();
+    this._updatedAt = new Date();
+  }
+
+  addMember(userId: string, role: string = Role.CONTRIBUTER): void {
+    const exists = this._members.some(m => m.userId === userId);
+    if (!exists) {
+      this._members.push({
+        userId,
+        role,
+        joinedAt: new Date().toISOString(),
+        status: "active"
+      });
+    }
     this._updatedAt = new Date();
   }
 

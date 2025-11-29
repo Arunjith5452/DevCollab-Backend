@@ -8,6 +8,8 @@ import { AUTH_TYPES } from "@/infrastructure/di/types"
 export const BlockGuard = (roles: Array<string>) => async (req: Request, res: Response, next: NextFunction) => {
   try {
 
+    console.log("console.log")
+
     const checkUserBlockStatusUseCase = container.get<CheckUserBlockStatusUseCase>(AUTH_TYPES.CheckUserBlockStatusUseCase)
     const user = await checkUserBlockStatusUseCase.execute(req.user?.userId!);
     if (user.status === Status.BLOCK) {

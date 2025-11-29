@@ -7,7 +7,7 @@ import { UserPersistenceMapper } from "@/infrastructure/mappers/user-persistence
 
 @injectable()
 export class UserRepository extends BaseRepository<UserEntity> implements IUserRepositor<UserEntity> {
-    private readonly userPersistenceMapper : UserPersistenceMapper;
+    private readonly userPersistenceMapper: UserPersistenceMapper;
 
     constructor(@inject("UserModel") model: Model<UserEntity>, userPersistanceMapper: UserPersistenceMapper) {
         super(model)
@@ -16,7 +16,7 @@ export class UserRepository extends BaseRepository<UserEntity> implements IUserR
 
     async findByEmail(email: string): Promise<UserEntity | null> {
         const doc = await this.findOne({ email })
-        return doc ?  this.userPersistenceMapper.fromMongo(doc) : null
+        return doc ? this.userPersistenceMapper.fromMongo(doc) : null
     }
 
     async updatePassword(userId: string, password: string): Promise<void> {
@@ -29,11 +29,14 @@ export class UserRepository extends BaseRepository<UserEntity> implements IUserR
         return await this.userPersistenceMapper.fromMongo(createUser)
     }
 
-    async updateUser(userId : string , data:Partial<UserEntity>):Promise<UserEntity | null>{
-        const update = await this.update(userId,data)
+    async updateUser(userId: string, data: Partial<UserEntity>): Promise<UserEntity | null> {
+        const update = await this.update(userId, data)
         return update ? this.userPersistenceMapper.fromMongo(update) : null
     }
-   
-    
+    async findEntityById(id: string): Promise<UserEntity | null> {
+        const doc = await this.findById(id);
+        if (!doc) return null;
+        return this.userPersistenceMapper.fromMongo(doc);
+    }
 
 }

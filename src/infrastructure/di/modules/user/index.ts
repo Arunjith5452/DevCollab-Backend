@@ -5,7 +5,7 @@ import { Model } from "mongoose";
 import { userModel } from "@/infrastructure/db/models/user.model";
 import { GenerateSignedUrlUseCase } from "@/application/usecases/user/implementations/generateSignedUrl.usecase";
 import { GetUserProfileUseCase } from "@/application/usecases/user/implementations/user-profie.usecase";
-import { UpdateUserProfileUseCase } from "@/application/usecases/user/implementations/update-userProfile.usecase";
+import { UpdateUserProfileUseCase } from "@/application/usecases/user/implementations/update-user-profile.usecase";
 
 
 export const UserModule = new ContainerModule(({ bind }) => {

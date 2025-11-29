@@ -58,16 +58,16 @@ export class UserEntity {
     return new UserEntity(data.email, data.password, data.username, data.role, data.status, data.googleId, data.profileImage, data.githubProfile, data.id);
   }
   updateProfile(data: {
-    username?: string;
+    name?: string;
     bio?: string;
     title?: string;
     profileImage?: string;
     techStack?: string[];
   }) {
-    if (data.username) {
-      if (data.username.length < 3)
+    if (data.name) {
+      if (data.name.length < 3)
         throw new Error("Name must be at least 3 characters");
-      this._name = data.username;
+      this._name = data.name;
     }
 
     if (data.bio) {
