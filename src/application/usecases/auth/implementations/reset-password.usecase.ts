@@ -1,18 +1,18 @@
 import { ResetPasswordDTO } from "@/application/dtos/auth/resetPassword.dto";
 import { inject } from "inversify";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
-import { IUserRepositor } from "@/infrastructure/db/repository/interface/user.interface";
 import { UserEntity } from "@/domain/entities/user.entity";
 import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
 import { SuccessMessage } from "@/domain/enums/messages/success-message.enum";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
+import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
 
 
 
 
 export class ResetPasswordUseCase implements IExecute<ResetPasswordDTO, { message: string }> {
 
-    constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepositor<UserEntity>) { }
+    constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>) { }
 
     async execute({ email, newPassword, confirmPassword }: ResetPasswordDTO): Promise<{ message: string }> {
 

@@ -1,6 +1,5 @@
 import { RegisterDTO } from "@/application/dtos/auth/register.dto"
 import { inject, injectable } from "inversify"
-import { IUserRepositor } from "@/infrastructure/db/repository/interface/user.interface"
 import { USER_TYPES } from "@/infrastructure/di/types/user"
 import { generateOTP } from "@/shared/utils/otp-generator.util"
 import { redisClient } from "@/infrastructure/providers/redis/redis-client"
@@ -10,11 +9,11 @@ import { validateEmail } from "@/shared/utils/email-validate.util"
 import { ErrorMessage } from "@/domain/enums/messages/error-message.enum"
 import { UserEntity } from "@/domain/entities/user.entity"
 import { IExecute } from "@/application/interface/execute.usecase.interface"
+import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface"
 
-@injectable()
 export class RegiserUseCase implements IExecute<RegisterDTO,{token:string}> {
 
-    constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository:IUserRepositor<UserEntity>){}
+    constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository:IUserRepository<UserEntity>){}
 
     async execute({ name,email,password }: RegisterDTO): Promise<{token:string}> {
 

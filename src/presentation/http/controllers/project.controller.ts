@@ -1,6 +1,7 @@
 import { ApplyToProjectDTO } from "@/application/dtos/project/apply-project.dto";
 import { ApproveApplicationDTO } from "@/application/dtos/project/approve-application.dto";
 import { CreateProjectDTO } from "@/application/dtos/project/createProject.dto";
+import { UpdateProjectDTO } from "@/application/dtos/project/edit-project.dto";
 import { RejectApplicationDTO } from "@/application/dtos/project/reject-application.dto";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { ApplicationEntity } from "@/domain/entities/application.entity";
@@ -25,7 +26,9 @@ export class ProjectController {
         @inject(PROJECT_TYPES.ApproveApplcationUseCase) private readonly _approveApplicationUseCase: IExecute<ApproveApplicationDTO, { message: string }>,
         @inject(PROJECT_TYPES.RejectApplicationUseCase) private readonly _rejectApplicationUseCase: IExecute<RejectApplicationDTO, { message: string }>,
         @inject(PROJECT_TYPES.GetMyCreatedProjectUseCase) private readonly _getMyCreatedProjectUseCase: IExecute<{ userId: string }, ProjectEntity[]>,
-        @inject(PROJECT_TYPES.GetMyAppliedProjectUseCase) private readonly _getMyAppliedProjectUseCase: IExecute<{ userId: string }, ApplicationEntity[]>
+        @inject(PROJECT_TYPES.GetMyAppliedProjectUseCase) private readonly _getMyAppliedProjectUseCase: IExecute<{ userId: string }, ApplicationEntity[]>,
+        @inject(PROJECT_TYPES.UpdateProjectUseCase) private readonly _updateProjectUseCase: IExecute<{ userId: string, projectId: string, dto: UpdateProjectDTO }, { message: string }>,
+        @inject(PROJECT_TYPES.GetProjectForEditUseCase) private readonly _getProjectForEditUseCase: IExecute<{ userId: string, projectId: string }, ProjectEntity>
     ) { }
 
 
@@ -54,6 +57,46 @@ export class ProjectController {
         }
     }
 
+
+    async editProject(req: Request, res: Response) {
+        try {
+
+            let { projectId } = req.params
+            let userId = req.user.userId
+
+            let result = await this._updateProjectUseCase.execute({ userId, projectId, dto: req.body })
+
+            return successResponse(res, "", result)
+
+        } catch (error) {
+            console.log(error)
+            return errorResponse(res,
+                "Edit Project failed",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            )
+        }
+    }
+
+    async getProjectForEdit(req: Request, res: Response) {
+
+        try {
+
+            let { projectId } = req.params
+            let userId = req.user.userId
+
+            let result = await this._getProjectForEditUseCase.execute({ userId, projectId })
+
+            return successResponse(res, "", result)
+
+        } catch (error) {
+            return errorResponse(res,
+                "fetch Edit Project failed",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            )
+        }
+    }
 
     /**
          * Fetches all projects with optional filters and pagination.

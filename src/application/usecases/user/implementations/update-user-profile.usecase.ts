@@ -1,14 +1,14 @@
 import { UpdateProfileDTO } from "@/application/dtos/user/updateProfile.dto";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { UserEntity } from "@/domain/entities/user.entity";
-import { IUserRepositor } from "@/infrastructure/db/repository/interface/user.interface";
+import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
 import { inject, injectable } from "inversify";
 
 @injectable()
 export class UpdateUserProfileUseCase implements IExecute<{ userId: string, dto: UpdateProfileDTO }, UserEntity | null> {
 
-    constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepositor<UserEntity>
+    constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>
     ) { }
 
     async execute({ userId, dto }: { userId: string, dto: UpdateProfileDTO }): Promise<UserEntity | null> {

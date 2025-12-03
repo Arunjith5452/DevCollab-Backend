@@ -26,17 +26,12 @@ export class ApproveApplcationUseCase implements IExecute<ApproveApplicationDTO,
 
             const project = await this._projectRepository.findEntityById(projectId)
 
-            console.log("project", project)
-
-
             if (!project) {
                 throw new Error("Project not found");
             }
 
             project.addMember(application.userId.toString())
             let data = await this._projectRepository.updateEntity(project)
-
-            console.log("data", data)
 
             return { message: "Application approved and contributor added successfully" }
 

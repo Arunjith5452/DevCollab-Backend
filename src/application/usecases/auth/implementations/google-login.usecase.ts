@@ -7,18 +7,18 @@ import { Role } from "@/domain/enums/role.enum";
 import { Status } from "@/domain/enums/status.enums";
 import { AuthResult } from "@/domain/types/auth";
 import { randomBytes } from "crypto";
-import { IUserRepositor } from "@/infrastructure/db/repository/interface/user.interface";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
 import { redisClient } from "@/infrastructure/providers/redis/redis-client";
 import { validateEmail } from "@/shared/utils/email-validate.util";
 import { generateAccessToken, generateRefreshToken } from "@/shared/utils/jwt.util";
 import { inject, injectable } from "inversify";
+import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
 
 
 @injectable()
 export class GoogleLoginUseCase implements IExecute<GoogleLoginDTO, AuthResult> {
 
-    constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepositor<UserEntity>) { }
+    constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>) { }
 
     async execute({ email, name, googleId, image }: GoogleLoginDTO): Promise<AuthResult> {
 

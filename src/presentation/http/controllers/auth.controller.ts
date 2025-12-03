@@ -229,8 +229,6 @@ export class AuthController {
 
     async googleLogin(req: Request, res: Response) {
 
-        console.log("this is this body", req.body)
-
         try {
 
             const result = await this._googleLoginUseCase.execute(req.body)
@@ -265,8 +263,6 @@ export class AuthController {
     }
 
     async gitHubLogin(req: Request, res: Response) {
-
-        console.log("gibulogin",req.body)
 
         try {
 
