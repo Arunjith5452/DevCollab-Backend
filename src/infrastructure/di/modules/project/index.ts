@@ -15,6 +15,8 @@ import { RejectApplicationUseCase } from "@/application/usecases/project/impleme
 import { ApproveApplcationUseCase } from "@/application/usecases/project/implementations/approve-application.usecase";
 import { GetMyCreatedProjectUseCase } from "@/application/usecases/project/implementations/get-my-created-projects.usecase";
 import { GetMyAppliedProjectUseCase } from "@/application/usecases/project/implementations/get-my-applied-projects.usecase";
+import { UpdateProjectUseCase } from "@/application/usecases/project/implementations/edit-project.usecase";
+import { GetProjectForEditUseCase } from "@/application/usecases/project/implementations/get-project-forEdit.usecase";
 
 
 export const ProjectModule = new ContainerModule(({ bind }) => {
@@ -32,4 +34,6 @@ export const ProjectModule = new ContainerModule(({ bind }) => {
     bind<RejectApplicationUseCase>(PROJECT_TYPES.RejectApplicationUseCase).to(RejectApplicationUseCase)
     bind<GetMyCreatedProjectUseCase>(PROJECT_TYPES.GetMyCreatedProjectUseCase).to(GetMyCreatedProjectUseCase)
     bind<GetMyAppliedProjectUseCase>(PROJECT_TYPES.GetMyAppliedProjectUseCase).to(GetMyAppliedProjectUseCase)
+    bind<UpdateProjectUseCase>(PROJECT_TYPES.UpdateProjectUseCase).to(UpdateProjectUseCase)
+    bind<GetProjectForEditUseCase>(PROJECT_TYPES.GetProjectForEditUseCase).to(GetProjectForEditUseCase)
 })

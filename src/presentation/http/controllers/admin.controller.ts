@@ -10,7 +10,7 @@ import { inject, injectable } from "inversify";
 @injectable()
 export class AdminController {
     constructor(
-        @inject(ADMIN_TYPES.GetAllUsersUseCase) private readonly _getAllUserUseCase: IExecute<GetAllUsersQuery, any>,
+        @inject(ADMIN_TYPES.GetAllUsersUseCase) private readonly _getAllUsersUseCase: IExecute<GetAllUsersQuery, any>,
         @inject(ADMIN_TYPES.UpdateUserStatusUseCase) private readonly _updateUserStatusUseCase: IExecute<{ userId: string, newStatus: UpdateStatusDTO }, { message: string, newStatus: string }>
     ) { }
 
@@ -32,7 +32,7 @@ export class AdminController {
                 limit: Number(limit),
             };
 
-            const result = await this._getAllUserUseCase.execute(query);
+            const result = await this._getAllUsersUseCase.execute(query);
             return successResponse(res, result.message, {
                 users: result.users,
                 total: result.total,

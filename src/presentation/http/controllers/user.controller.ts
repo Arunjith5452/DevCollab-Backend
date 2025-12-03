@@ -8,10 +8,6 @@ import { inject, injectable } from "inversify";
 
 
 
-
-
-
-
 @injectable()
 export class UserController {
     constructor(@inject(USER_TYPES.GetUserProfileUseCase) private readonly _getUserProfileUseCase: IExecute<{ userId: string }, any>,

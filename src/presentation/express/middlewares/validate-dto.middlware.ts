@@ -19,6 +19,9 @@ import { ClientErrorStatus } from "@/domain/enums/status-codes/client-error-stat
 export const validateDTO = (dtoClass: any) => {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
+
+            console.log("req.body",req.body)
+
             const dtoInstance = plainToInstance(dtoClass, req.body, {
                 excludeExtraneousValues: true,
                 enableImplicitConversion: true,

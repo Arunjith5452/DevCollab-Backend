@@ -24,7 +24,6 @@ const getS3Client = () => {
     },
   });
 
-
 };
 
 

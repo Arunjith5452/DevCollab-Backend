@@ -6,7 +6,7 @@ import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
 import { Role } from "@/domain/enums/role.enum";
 import { Status } from "@/domain/enums/status.enums";
 import { IProjectRepository } from "@/infrastructure/db/repository/interface/project.interface";
-import { IUserRepositor } from "@/infrastructure/db/repository/interface/user.interface";
+import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
 import { inject } from "inversify";
@@ -15,7 +15,7 @@ import { inject } from "inversify";
 
 export class CreateProjectUseCase implements IExecute<{ userId: string, dto: CreateProjectDTO }, { message: string }> {
     constructor(@inject(PROJECT_TYPES.ProjectRepository) private readonly _projectRepository: IProjectRepository<ProjectEntity>,
-        @inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepositor<UserEntity>
+        @inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>
     ) { }
 
     async execute({ userId, dto }: { userId: string, dto: CreateProjectDTO }): Promise<{ message: string }> {
