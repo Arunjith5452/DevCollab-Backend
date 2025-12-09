@@ -4,7 +4,7 @@ import { UserApplicationMapper } from "@/application/mapper/user-application.map
 import { UserEntity } from "@/domain/entities/user.entity";
 import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
 import { SuccessMessage } from "@/domain/enums/messages/success-message.enum";
-import { IUserRepositor } from "@/infrastructure/db/repository/interface/user.interface";
+import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
 import { inject, injectable } from "inversify";
 
@@ -12,7 +12,7 @@ import { inject, injectable } from "inversify";
 export class UpdateUserStatusUseCase implements IExecute<{userId:string,newStatus:UpdateStatusDTO},{message:string,newStatus:string}>{
 
     constructor(
-        @inject(USER_TYPES.UserRepository) private readonly _userRepository:IUserRepositor<UserEntity> ,
+        @inject(USER_TYPES.UserRepository) private readonly _userRepository:IUserRepository<UserEntity> ,
     private readonly _userMapper:UserApplicationMapper){}
 
     async execute ({userId,newStatus}:{userId:string,newStatus:UpdateStatusDTO}) :Promise<{message:string; newStatus:string}>{

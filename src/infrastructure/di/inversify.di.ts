@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { Container } from 'inversify'
 import { AuthModule } from './modules/auth'
 import { UserModule } from './modules/user'
@@ -11,12 +12,12 @@ const container = new Container({
 })
 
 container.load(
-    AuthModule,
+    UserModule,    
+    AuthModule,      
+    AdminModule,    
     ProjectModule,
-    UserModule,
-    AdminModule,
     TaskModule
-)
+);
 
 
 export {container}

@@ -102,6 +102,35 @@ export class ProjectEntity {
     });
   }
 
+  updateProject(dto: Partial<{
+    title: string;
+    description: string;
+    githubRepo: string;
+    techStack: string[];
+    difficulty: string;
+    startDate?: Date;
+    endDate?: Date;
+    expectation: string;
+    visibility: string;
+    requiredRoles: { role: string; count: string; experience: string }[];
+    image: string;
+  }>) {
+    if (dto.title) this._title = dto.title.trim();
+    if (dto.description) this._description = dto.description.trim();
+    if (dto.githubRepo) this._githubRepo = dto.githubRepo;
+    if (dto.techStack) this._techStack = dto.techStack;
+    if (dto.difficulty) this._difficulty = dto.difficulty;
+    if (dto.startDate) this._startDate = dto.startDate;
+    if (dto.endDate) this._endDate = dto.endDate;
+    if (dto.expectation) this._expectation = dto.expectation;
+    if (dto.visibility) this._visibility = dto.visibility;
+    if (dto.requiredRoles) this._requiredRoles = dto.requiredRoles;
+    if (dto.image) this._image = dto.image;
+
+    this._updatedAt = new Date();
+  }
+
+
   get id(): string | undefined {
     return this._id;
   }
