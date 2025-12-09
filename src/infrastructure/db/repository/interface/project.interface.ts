@@ -1,6 +1,6 @@
 import { ProjectEntity } from "@/domain/entities/project.entity";
 import { IBaseRepository } from "./base-repository.interface";
-
+import { ProjectMemberNameOnly } from "@/application/dtos/tasks/res/get-project-members.dto";
 
 
 export interface IProjectRepository<T> extends IBaseRepository<T> {
@@ -10,4 +10,6 @@ export interface IProjectRepository<T> extends IBaseRepository<T> {
     updateEntity(project: ProjectEntity): Promise<T | null>
     findByCreatorId(userId: string): Promise<ProjectEntity[]>
     findByIdWithPopulation(projectId: string): Promise<ProjectEntity | null>;
+    getProjectMembersForAssignee(projectId: string): Promise<ProjectMemberNameOnly[]>;
+
 }

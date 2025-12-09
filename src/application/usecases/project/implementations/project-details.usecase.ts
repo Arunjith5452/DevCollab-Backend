@@ -25,8 +25,6 @@ export class ProjectDetailsUseCase implements IExecute<string, { project: Projec
                 message: SuccessMessage.PROJECT_FETCHED
             }
 
-
-
         } catch (error) {
 
             throw error

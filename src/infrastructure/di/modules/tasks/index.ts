@@ -6,6 +6,7 @@ import { CreateTaskUseCase } from "@/application/usecases/tasks/implementations/
 import { TASK_TYPES } from "../../types/tasks";
 import { GetCreatorTasksUseCase } from "@/application/usecases/tasks/implementations/get-creator-tasks.usecase";
 import { GetContributorTaskUseCase } from "@/application/usecases/tasks/implementations/get-contributor-tasks.usecase";
+import { GetProjectAssigneeUseCase } from "@/application/usecases/tasks/implementations/get-project-assigees.usecase";
 
 
 export const TaskModule = new ContainerModule(({ bind }) => {
@@ -15,4 +16,5 @@ export const TaskModule = new ContainerModule(({ bind }) => {
     bind<CreateTaskUseCase>(TASK_TYPES.CreateTaskUseCase).to(CreateTaskUseCase)
     bind<GetCreatorTasksUseCase>(TASK_TYPES.GetCreatorTasksUseCase).to(GetCreatorTasksUseCase)
     bind<GetContributorTaskUseCase>(TASK_TYPES.GetContributorTaskUseCase).to(GetContributorTaskUseCase)
+    bind<GetProjectAssigneeUseCase>(TASK_TYPES.GetProjectAssigneeUseCase).to(GetProjectAssigneeUseCase)
 })  

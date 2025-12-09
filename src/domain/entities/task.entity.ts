@@ -3,7 +3,7 @@ export class TaskEntity {
     private _title: string;
     private _projectId: string;
     private _assignedTo: string;
-    private _assigneeId:string;
+    private _assigneeId?:string;
     private _description: string;
     private _prLink?: string;
     private _feedBack?: string;
@@ -32,7 +32,7 @@ export class TaskEntity {
         title: string;
         projectId: string;
         assignedTo: string;
-        _assigneeId:string;
+        assigneeId?:string;
         description: string;
         prLink?: string;
         feedBack?: string;
@@ -50,7 +50,7 @@ export class TaskEntity {
         this._title = data.title;
         this._projectId = data.projectId;
         this._assignedTo = data.assignedTo;
-        this._assigneeId = data._assigneeId
+        this._assigneeId = data.assigneeId
         this._description = data.description;
         this._prLink = data.prLink;
         this._feedBack = data.feedBack;
@@ -70,7 +70,7 @@ export class TaskEntity {
         title: string;
         projectId: string;
         assignedTo: string;
-        assigneeId:string
+        assigneeId?:string
         description: string;
         prLink?: string;
         feedBack?: string;
@@ -92,7 +92,7 @@ export class TaskEntity {
             title: data.title.trim(),
             projectId: data.projectId,
             assignedTo: data.assignedTo,
-            _assigneeId:data.assigneeId,
+            assigneeId:data.assigneeId,
             description: data.description,
             prLink: data.prLink,
             feedBack: data.feedBack,
@@ -118,7 +118,7 @@ export class TaskEntity {
     get assignedTo(): string {
         return this._assignedTo;
     }
-      get assigneeId(): string {
+      get assigneeId(): string | undefined {
         return this._assigneeId;
     }
     get description(): string {
