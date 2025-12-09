@@ -16,10 +16,8 @@ container.load(
     AuthModule,      
     AdminModule,    
     ProjectModule,
-    UserModule,
-    AdminModule,
     TaskModule
-)
+);
 
 
 export {container}

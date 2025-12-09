@@ -31,6 +31,7 @@ export class ProjectController {
         @inject(PROJECT_TYPES.GetMyAppliedProjectUseCase) private readonly _getMyAppliedProjectUseCase: IExecute<{ userId: string }, ApplicationEntity[]>,
         @inject(PROJECT_TYPES.GetProjectMembersUseCase) private readonly _getProjectMembersUseCase: IExecute<GetProjectMembersQuery, ProjectEntity[]>,
         @inject(PROJECT_TYPES.DisableProjectUseCase) private readonly _disableProjectUseCase: IExecute<{ userId: string, projectId: string }, void>
+        @inject(PROJECT_TYPES.DisableProjectUseCase) private readonly _disableProjectUseCase: IExecute<{ userId: string, projectId: string }, void>,
         @inject(PROJECT_TYPES.UpdateProjectUseCase) private readonly _updateProjectUseCase: IExecute<{ userId: string, projectId: string, dto: UpdateProjectDTO }, { message: string }>,
         @inject(PROJECT_TYPES.GetProjectForEditUseCase) private readonly _getProjectForEditUseCase: IExecute<{ userId: string, projectId: string }, ProjectEntity>
     ) { }
