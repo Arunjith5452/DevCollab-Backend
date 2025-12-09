@@ -4,10 +4,10 @@ import { UserApplicationMapper } from "@/application/mapper/user-application.map
 import { UserEntity } from "@/domain/entities/user.entity";
 import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 
 
-
+@injectable()
 export class CheckUserBlockStatusUseCase implements IExecute<string, ResponseUserDto> {
     private _userMapper;
     constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>,

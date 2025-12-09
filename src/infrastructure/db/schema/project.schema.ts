@@ -40,7 +40,7 @@ export const projectSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ["active", "completed"],
+      enum: ["active", "completed", "disabled"],
       default: "active",
     },
     members: [

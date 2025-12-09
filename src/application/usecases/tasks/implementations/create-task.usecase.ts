@@ -2,14 +2,13 @@ import { CreateTaskDTO } from "@/application/dtos/tasks/create-task.dto";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { TaskEntity } from "@/domain/entities/task.entity";
 import { ITasksRepository } from "@/infrastructure/db/repository/interface/task.interface";
-import { TASK_TYPES } from "@/infrastructure/di/types";
+import { TASK_TYPES } from "@/infrastructure/di/types/tasks";
 import { inject, injectable } from "inversify";
 
 @injectable()
 export class CreateTaskUseCase implements IExecute<CreateTaskDTO, void> {
     constructor(
-        @inject(TASK_TYPES.TaskRepository)
-        private readonly _taskRepository: ITasksRepository<TaskEntity>
+        @inject(TASK_TYPES.TaskRepository) private readonly _taskRepository: ITasksRepository<TaskEntity>
     ) { }
 
     async execute(dto: CreateTaskDTO): Promise<void> {

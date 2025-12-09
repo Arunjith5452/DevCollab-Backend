@@ -38,7 +38,7 @@ export class RefreshTokenUseCase implements IExecute<string, RefreshResult> {
                 throw new Error("Admin blocked please try again")
             }
 
-            const newAccessToken = generateAccessToken({ userId: user.id!.toString(), email: user.email, role: user.role })
+            const newAccessToken = generateAccessToken({ userId: user.id!.toString(), name: user.username, email: user.email, role: user.role })
 
             return {
                 accessToken: newAccessToken,

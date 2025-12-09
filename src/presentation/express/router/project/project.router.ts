@@ -25,6 +25,8 @@ router.post("/application/:applicationId/approve/:projectId", AuthGuard([Role.AD
 router.post("/application/:applicationId/reject", AuthGuard([Role.ADMIN, Role.USER]), BlockGuard([Role.USER]), (req: Request, res: Response) => projectController.rejectApplication(req, res))
 router.get('/user/projects/created', AuthGuard([Role.ADMIN, Role.USER]), BlockGuard([Role.USER]), (req: Request, res: Response) => projectController.getMyCreatedProject(req, res))
 router.get('/user/projects/applied', AuthGuard([Role.ADMIN, Role.USER]), BlockGuard([Role.USER]), (req: Request, res: Response) => projectController.getMyAppliedProject(req, res))
+router.get('/projects/:projectId/members', AuthGuard([Role.ADMIN, Role.USER]), BlockGuard([Role.USER]), (req: Request, res: Response) => projectController.getProjectMember(req, res))
+router.patch('/projects/:projectId/disable', AuthGuard([Role.ADMIN, Role.USER]), BlockGuard([Role.USER]), (req: Request, res: Response) => projectController.disableProject(req, res))
 router.get('/projects/:projectId/edit', AuthGuard([Role.ADMIN, Role.USER]), BlockGuard([Role.USER]), (req: Request, res: Response) => projectController.getProjectForEdit(req, res))
 router.patch('/projects/:projectId/edit', AuthGuard([Role.ADMIN, Role.USER]), BlockGuard([Role.USER]), validateDTO(UpdateProjectDTO), (req: Request, res: Response) => projectController.editProject(req, res))
 

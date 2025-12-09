@@ -30,11 +30,16 @@ export abstract class BaseRepository<T> implements IBaseRepository<T> {
     await this.model.updateOne(filter, update);
   }
 
-  async find(filter: FilterQuery<T>, options: { skip: number, limit: number }): Promise<T[]> {
-    let query = this.model.find(filter).sort({ createdAt: -1 })
-    if (options.skip) query = query.skip(options.skip)
-    if (options.limit) query = query.limit(options.limit)
-    return await query
+  async find(filter: FilterQuery<T>, options: { skip: number; limit: number }): Promise<T[]> {
+    const docs = await this.model
+      .find(filter)
+      .sort({ createdAt: -1 })
+      .skip(options.skip)
+      .limit(options.limit)
+      .lean()
+      .exec();
+
+    return docs as unknown as T[];  
   }
 
   async delete(id: string): Promise<T | null> {

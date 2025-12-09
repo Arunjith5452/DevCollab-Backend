@@ -4,6 +4,8 @@ import { CreateProjectDTO } from "@/application/dtos/project/createProject.dto";
 import { UpdateProjectDTO } from "@/application/dtos/project/edit-project.dto";
 import { RejectApplicationDTO } from "@/application/dtos/project/reject-application.dto";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
+import { GetAllProjectsQuery } from "@/application/usecases/project/interface/project-listing.usecase.interface";
+import { GetProjectMembersQuery } from "@/application/usecases/project/interface/team-members-listing.usecase.interface";
 import { ApplicationEntity } from "@/domain/entities/application.entity";
 import { ProjectEntity } from "@/domain/entities/project.entity";
 import { ServerErrorStatus } from "@/domain/enums/status-codes/server-error-status.enum";
@@ -19,7 +21,7 @@ import { inject, injectable } from "inversify";
 export class ProjectController {
 
     constructor(@inject(PROJECT_TYPES.CreateProjectUseCase) private readonly _createProjectUseCase: IExecute<{ userId: string, dto: CreateProjectDTO }, { message: string }>,
-        @inject(PROJECT_TYPES.ListProjectUseCase) private readonly _listProjectUseCase: IExecute<GetAllProjectsQuery, any>,
+        @inject(PROJECT_TYPES.ListProjectUseCase) private readonly _listProjectUseCase: IExecute<GetAllProjectsQuery, { mesage: string, projects: ProjectEntity[], total: number }>,
         @inject(PROJECT_TYPES.ProjectDetailsUseCase) private readonly _projectDetailsUseCase: IExecute<string, { project: ProjectEntity[], message: string }>,
         @inject(PROJECT_TYPES.ApplyToProjectUseCase) private readonly _applyToProjectUseCase: IExecute<ApplyToProjectDTO, { message: string }>,
         @inject(PROJECT_TYPES.GetPendingApplicationUseCase) private readonly _getPendingApplicationUseCase: IExecute<string, ApplicationEntity[]>,
@@ -27,6 +29,8 @@ export class ProjectController {
         @inject(PROJECT_TYPES.RejectApplicationUseCase) private readonly _rejectApplicationUseCase: IExecute<RejectApplicationDTO, { message: string }>,
         @inject(PROJECT_TYPES.GetMyCreatedProjectUseCase) private readonly _getMyCreatedProjectUseCase: IExecute<{ userId: string }, ProjectEntity[]>,
         @inject(PROJECT_TYPES.GetMyAppliedProjectUseCase) private readonly _getMyAppliedProjectUseCase: IExecute<{ userId: string }, ApplicationEntity[]>,
+        @inject(PROJECT_TYPES.GetProjectMembersUseCase) private readonly _getProjectMembersUseCase: IExecute<GetProjectMembersQuery, ProjectEntity[]>,
+        @inject(PROJECT_TYPES.DisableProjectUseCase) private readonly _disableProjectUseCase: IExecute<{ userId: string, projectId: string }, void>
         @inject(PROJECT_TYPES.UpdateProjectUseCase) private readonly _updateProjectUseCase: IExecute<{ userId: string, projectId: string, dto: UpdateProjectDTO }, { message: string }>,
         @inject(PROJECT_TYPES.GetProjectForEditUseCase) private readonly _getProjectForEditUseCase: IExecute<{ userId: string, projectId: string }, ProjectEntity>
     ) { }
@@ -282,5 +286,53 @@ export class ProjectController {
             );
         }
 
+    }
+
+    async getProjectMember(req: Request, res: Response) {
+
+        try {
+
+            const { projectId } = req.params;
+            const { search, page, limit } = req.query;
+
+
+            let result = await this._getProjectMembersUseCase.execute({
+                projectId,
+                search: search as string,
+                page: parseInt(page as string),
+                limit: parseInt(limit as string)
+            })
+
+            return successResponse(res, 'Members fetched successfully', result)
+
+        } catch (error) {
+            return errorResponse(
+                res,
+                "Failed to load project members",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+        }
+    }
+
+    async disableProject(req: Request, res: Response) {
+        try {
+
+            const { projectId } = req.params
+            const userId = req.user.userId
+
+            const result = await this._disableProjectUseCase.execute({ userId, projectId })
+
+            return successResponse(res, '', result)
+
+        } catch (error) {
+            return errorResponse(
+                res,
+                "Failed to disable project",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+
+        }
     }
 }

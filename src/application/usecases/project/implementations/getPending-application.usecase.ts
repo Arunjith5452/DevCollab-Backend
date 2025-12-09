@@ -4,8 +4,9 @@ import { PendingApplicationMapper } from "@/application/mapper/project/pending-a
 import { ApplicationEntity } from "@/domain/entities/application.entity";
 import { IApplicationRepository } from "@/infrastructure/db/repository/interface/application.interface";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class GetPendingApplicationUseCase implements IExecute<string, ResponsePendingApplicationDto[]> {
     private readonly _applicationMapper = new PendingApplicationMapper();
 

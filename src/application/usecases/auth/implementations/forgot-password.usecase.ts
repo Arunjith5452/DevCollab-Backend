@@ -1,4 +1,4 @@
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
 import { forgotPasswordDTO } from "@/application/dtos/auth/forgotPassword.dto";
 import { generateOTP } from "@/shared/utils/otp-generator.util";
@@ -9,6 +9,7 @@ import { UserEntity } from "@/domain/entities/user.entity";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
 
+@injectable()
 export class ForgotPasswordUseCase implements IExecute<forgotPasswordDTO, void> {
 
   constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity  >) { }

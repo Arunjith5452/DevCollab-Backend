@@ -7,6 +7,7 @@ export class TaskPersistenceMapper {
             title: task.title,
             projectId: task.projectId,
             assignedTo: task.assignedTo,
+            assigneeId: task.assigneeId,
             description: task.description,
             prLink: task.prLink,
             feedBack: task.feedBack,
@@ -28,11 +29,13 @@ export class TaskPersistenceMapper {
     }
 
     async fromMongo(doc: any): Promise<TaskEntity> {
+
         return TaskEntity.create({
-            id: doc._id,
+            id: doc._id.toString(),
             title: doc.title,
-            projectId: doc.projectId,
+            projectId: doc.projectId.toString(),
             assignedTo: doc.assignedTo,
+            assigneeId: doc.assigneeId,
             description: doc.description,
             prLink: doc.prLink,
             feedBack: doc.feedBack,
@@ -40,7 +43,7 @@ export class TaskPersistenceMapper {
             deadline: doc.deadline,
             comments: doc.comments?.map((c: any) => ({
                 message: c.message,
-                userId: typeof c.userId === "string" ? c.userId : c.userId?._id,
+                userId: c.userId?._id?.toString() || c.userId,
                 createdAt: c.createdAt
             })),
             tags: doc.tags,
@@ -51,5 +54,4 @@ export class TaskPersistenceMapper {
             updatedAt: doc.updatedAt
         });
     }
-
 }

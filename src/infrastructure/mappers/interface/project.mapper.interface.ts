@@ -1,10 +1,17 @@
 import { ObjectId } from "mongodb";
 
+export interface MongoUser {
+  _id: string;
+  name: string;
+  email: string;
+  avatar?: string | null;
+}
+
 export interface MongoMember {
-  userId: string | ObjectId;
+  userId: string | MongoUser;
   role: string;
-  joinedAt: string;
   status: string;
+  joinedAt: Date;
 }
 
 export interface MongoProject {
@@ -25,4 +32,19 @@ export interface MongoProject {
   updatedAt?: Date;
   image?: string;
   members: MongoMember[];
+}
+
+export interface Member {
+  userId: string;
+  role: string;
+  status: string;
+  joinedAt: string;
+}
+
+export interface MemberWithUser extends Member {
+  user?: {
+    name: string;
+    email: string;
+    avatar?: string | null;
+  } | null;
 }

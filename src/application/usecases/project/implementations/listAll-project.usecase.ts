@@ -3,10 +3,11 @@ import { ProjectEntity } from "@/domain/entities/project.entity";
 import { SuccessMessage } from "@/domain/enums/messages/success-message.enum";
 import { IProjectRepository } from "@/infrastructure/db/repository/interface/project.interface";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
+import { GetAllProjectsQuery } from "../interface/project-listing.usecase.interface";
 
 
-
+@injectable()
 export class ListProjectUseCase implements IExecute<GetAllProjectsQuery, { mesage: string, projects: ProjectEntity[], total: number }> {
     constructor(@inject(PROJECT_TYPES.ProjectRepository) private readonly _projectRepository: IProjectRepository<ProjectEntity>) { }
 
@@ -16,7 +17,9 @@ export class ListProjectUseCase implements IExecute<GetAllProjectsQuery, { mesag
 
             const { search, techStack, roleNeeded, difficulty, page = 1, limit = 3 } = query
 
-            const filter: any = {}
+            const filter: any = {
+                status: { $ne: "disabled" } 
+            }
 
             if (search) {
                 filter.title = { $regex: search, $options: "i" }

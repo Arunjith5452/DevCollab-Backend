@@ -27,7 +27,7 @@ export class RegiserUseCase implements IExecute<RegisterDTO,{token:string}> {
             const existingUser = await this._userRepository.findByEmail(email)
             if (existingUser) throw new Error(ErrorMessage.EMAIL_ALREADY_EXISTS)
 
-            const otp = generateOTP()
+            const otp = generateOTP()  
             const expiryTime = 3 * 60
 
             // Generate a secure random token
@@ -44,7 +44,7 @@ export class RegiserUseCase implements IExecute<RegisterDTO,{token:string}> {
 
             console.log(`OTP for ${email}:`,otp)
 
-            return {token }
+            return {token}
 
         } catch (error) {
             throw error

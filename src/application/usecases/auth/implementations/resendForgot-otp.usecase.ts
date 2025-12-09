@@ -5,6 +5,7 @@ import { ResendOtp } from "@/application/dtos/auth/resend.dto";
 import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 
+
 export class ResendForgotOTPUseCase implements IExecute<ResendOtp, { message: string }> {
 
     async execute({ token }: ResendOtp): Promise<{ message: string }> {

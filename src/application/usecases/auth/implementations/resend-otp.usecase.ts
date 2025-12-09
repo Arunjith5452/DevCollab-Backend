@@ -4,7 +4,10 @@ import { sendOtpEmail } from "@/shared/utils/sent-otp.util";
 import { ResendOtp } from "@/application/dtos/auth/resend.dto";
 import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
+import { injectable } from "inversify";
 
+
+@injectable()
 export class ResendOtpUseCase implements IExecute<ResendOtp, { message: string }> {
 
     async execute({ token }: ResendOtp): Promise<{ message: string }> {

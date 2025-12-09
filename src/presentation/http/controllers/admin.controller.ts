@@ -1,6 +1,7 @@
 import { UpdateStatusDTO } from "@/application/dtos/admin/updateStatus.dto";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { GetAllUsersQuery } from "@/application/usecases/admin/interface/admin-usecase.interface";
+import { UserEntity } from "@/domain/entities/user.entity";
 import { ServerErrorStatus } from "@/domain/enums/status-codes/server-error-status.enum";
 import { ADMIN_TYPES } from "@/infrastructure/di/types";
 import { errorResponse, successResponse } from "@/shared/utils/response.util";
@@ -10,6 +11,7 @@ import { inject, injectable } from "inversify";
 @injectable()
 export class AdminController {
     constructor(
+        @inject(ADMIN_TYPES.GetAllUsersUseCase) private readonly _getAllUserUseCase: IExecute<GetAllUsersQuery, { message: string, users: UserEntity[], total: number }>,
         @inject(ADMIN_TYPES.GetAllUsersUseCase) private readonly _getAllUsersUseCase: IExecute<GetAllUsersQuery, any>,
         @inject(ADMIN_TYPES.UpdateUserStatusUseCase) private readonly _updateUserStatusUseCase: IExecute<{ userId: string, newStatus: UpdateStatusDTO }, { message: string, newStatus: string }>
     ) { }
@@ -45,7 +47,7 @@ export class AdminController {
                 error
             )
         }
-        }
+    }
 
     /**
      * Updates a user’s account status (e.g., active or blocked).
@@ -54,15 +56,15 @@ export class AdminController {
      * @returns JSON with update confirmation message and new status.
      */
     async UpdateUserStatus(req: Request, res: Response) {
-            try {
-                const { newStatus } = req.body;
-                const userId = req.params.id;
-                const result = await this._updateUserStatusUseCase.execute({ userId, newStatus });
+        try {
+            const { newStatus } = req.body;
+            const userId = req.params.id;
+            const result = await this._updateUserStatusUseCase.execute({ userId, newStatus });
 
-                return res.json(result);
-            } catch (error) {
-                const err = error as Error;
-                return res.status(500).json({ message: err.message });
-            }
+            return res.json(result);
+        } catch (error) {
+            const err = error as Error;
+            return res.status(500).json({ message: err.message });
         }
     }
+}

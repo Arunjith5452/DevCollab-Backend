@@ -30,4 +30,11 @@ app.use("/api", profileRouter)
 app.use("/api", projectRouter)
 app.use("/api", taskRouter)
 
+/* =====  GLOBAL DEBUG – remove when done  ===== */
+app.use((req, res, next) => {
+  console.log('🔥 GLOBAL – method:', req.method, '  url:', req.originalUrl);
+  next();        // continue to next middleware
+});
+/* ============================================ */
+
 export default app;

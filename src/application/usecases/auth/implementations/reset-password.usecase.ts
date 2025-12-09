@@ -1,5 +1,5 @@
 import { ResetPasswordDTO } from "@/application/dtos/auth/resetPassword.dto";
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
 import { UserEntity } from "@/domain/entities/user.entity";
 import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
@@ -9,7 +9,7 @@ import { IUserRepository } from "@/infrastructure/db/repository/interface/user.i
 
 
 
-
+@injectable()
 export class ResetPasswordUseCase implements IExecute<ResetPasswordDTO, { message: string }> {
 
     constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>) { }

@@ -9,10 +9,10 @@ import { IProjectRepository } from "@/infrastructure/db/repository/interface/pro
 import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 
 
-
+@injectable()
 export class CreateProjectUseCase implements IExecute<{ userId: string, dto: CreateProjectDTO }, { message: string }> {
     constructor(@inject(PROJECT_TYPES.ProjectRepository) private readonly _projectRepository: IProjectRepository<ProjectEntity>,
         @inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>

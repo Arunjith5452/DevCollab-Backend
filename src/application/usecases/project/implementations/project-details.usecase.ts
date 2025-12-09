@@ -3,11 +3,11 @@ import { ProjectEntity } from "@/domain/entities/project.entity";
 import { SuccessMessage } from "@/domain/enums/messages/success-message.enum";
 import { IProjectRepository } from "@/infrastructure/db/repository/interface/project.interface";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 
 
 
-
+@injectable()
 export class ProjectDetailsUseCase implements IExecute<string, { project: ProjectEntity, message: string }> {
     constructor(@inject(PROJECT_TYPES.ProjectRepository) private readonly _projectRepository: IProjectRepository<ProjectEntity>) { }
 

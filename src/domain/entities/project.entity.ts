@@ -1,3 +1,4 @@
+import { ProjectStatus } from "../enums/project/project-status.enum";
 import { Role } from "../enums/role.enum";
 
 export class ProjectEntity {
@@ -201,8 +202,8 @@ export class ProjectEntity {
     this._updatedAt = new Date();
   }
 
-  markAsInactive() {
-    this._status = "INACTIVE";
+  markAsDisable() {
+    this._status = ProjectStatus.DISABLED;
     this._updatedAt = new Date();
   }
 }

@@ -58,7 +58,7 @@ export class GoogleLoginUseCase implements IExecute<GoogleLoginDTO, AuthResult> 
 
             user.isBlocked()
 
-            const payload = { userId: user.id, email: user.email, role: user.role }
+            const payload = { userId: user.id, name: user.username, email: user.email, role: user.role }
 
             const accessToken = generateAccessToken(payload)
             const refreshToken = generateRefreshToken(payload)
