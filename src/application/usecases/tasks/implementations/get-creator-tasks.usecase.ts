@@ -8,17 +8,12 @@ import { SuccessMessage } from '@/domain/enums/messages/success-message.enum';
 import { TaskResponseMapper } from '@/application/mapper/tasks/task-response.mapper';
 import { TaskListItemDto } from '@/application/dtos/tasks/res/list-task.dto';
 import { Types } from 'mongoose';
+import { TaskEntity } from '@/domain/entities/task.entity';
 
 @injectable()
-export class GetCreatorTasksUseCase
-    implements
-    IExecute<
-        GetAllTaskQuery,
-        { message: string; tasks: TaskListItemDto[]; total: number }
-    > {
+export class GetCreatorTasksUseCase implements IExecute<GetAllTaskQuery,{ message: string; tasks: TaskListItemDto[]; total: number }> {
     constructor(
-        @inject(TASK_TYPES.TaskRepository)
-        private readonly _taskRepository: ITasksRepository<any>,
+        @inject(TASK_TYPES.TaskRepository) private readonly _taskRepository: ITasksRepository<any>,
     ) { }
 
     async execute(query: GetAllTaskQuery,): Promise<{ message: string; tasks: TaskListItemDto[]; total: number }> {

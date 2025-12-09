@@ -4,6 +4,7 @@ import { SuccessMessage } from "@/domain/enums/messages/success-message.enum";
 import { IProjectRepository } from "@/infrastructure/db/repository/interface/project.interface";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
 import { inject, injectable } from "inversify";
+import { GetAllProjectsQuery } from "../interface/project-listing.usecase.interface";
 
 
 @injectable()

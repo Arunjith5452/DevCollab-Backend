@@ -3,6 +3,8 @@ import { ApproveApplicationDTO } from "@/application/dtos/project/approve-applic
 import { CreateProjectDTO } from "@/application/dtos/project/createProject.dto";
 import { RejectApplicationDTO } from "@/application/dtos/project/reject-application.dto";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
+import { GetAllProjectsQuery } from "@/application/usecases/project/interface/project-listing.usecase.interface";
+import { GetProjectMembersQuery } from "@/application/usecases/project/interface/team-members-listing.usecase.interface";
 import { ApplicationEntity } from "@/domain/entities/application.entity";
 import { ProjectEntity } from "@/domain/entities/project.entity";
 import { ServerErrorStatus } from "@/domain/enums/status-codes/server-error-status.enum";
@@ -18,7 +20,7 @@ import { inject, injectable } from "inversify";
 export class ProjectController {
 
     constructor(@inject(PROJECT_TYPES.CreateProjectUseCase) private readonly _createProjectUseCase: IExecute<{ userId: string, dto: CreateProjectDTO }, { message: string }>,
-        @inject(PROJECT_TYPES.ListProjectUseCase) private readonly _listProjectUseCase: IExecute<GetAllProjectsQuery, any>,
+        @inject(PROJECT_TYPES.ListProjectUseCase) private readonly _listProjectUseCase: IExecute<GetAllProjectsQuery, { mesage: string, projects: ProjectEntity[], total: number }>,
         @inject(PROJECT_TYPES.ProjectDetailsUseCase) private readonly _projectDetailsUseCase: IExecute<string, { project: ProjectEntity[], message: string }>,
         @inject(PROJECT_TYPES.ApplyToProjectUseCase) private readonly _applyToProjectUseCase: IExecute<ApplyToProjectDTO, { message: string }>,
         @inject(PROJECT_TYPES.GetPendingApplicationUseCase) private readonly _getPendingApplicationUseCase: IExecute<string, ApplicationEntity[]>,
