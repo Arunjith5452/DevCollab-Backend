@@ -1,4 +1,4 @@
-interface GetAllProjectsQuery {
+export interface GetAllProjectsQuery {
   search?: string;
   techStack?: string;
   difficulty?: string;
