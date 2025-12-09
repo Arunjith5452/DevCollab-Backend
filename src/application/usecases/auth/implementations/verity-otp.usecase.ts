@@ -1,5 +1,5 @@
 import { VerifyOtpDTO } from "@/application/dtos/auth/verifyOtp.dto";
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
 import { IUserRepositor } from "@/infrastructure/db/repository/interface/user.interface";
 import { redisClient } from "@/infrastructure/providers/redis/redis-client";
@@ -8,7 +8,7 @@ import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 
 
-
+@injectable()
 export class VerifyOtpUseCase implements IExecute<VerifyOtpDTO,{message:string}> {
 
     constructor(

@@ -7,10 +7,10 @@ import { IApplicationRepository } from "@/infrastructure/db/repository/interface
 import { IUserRepositor } from "@/infrastructure/db/repository/interface/user.interface";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 
 
-
+@injectable()
 export class ApplyToProjectUseCase implements IExecute<ApplyToProjectDTO, { message: string }> {
     constructor(
         @inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepositor<UserEntity>,

@@ -1,5 +1,5 @@
 import { LogoutDTO } from "@/application/dtos/auth/logout.dto";
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
 import { IUserRepositor } from "@/infrastructure/db/repository/interface/user.interface";
 import { verifyToken } from "@/shared/utils/jwt.util";
@@ -8,7 +8,7 @@ import { UserEntity } from "@/domain/entities/user.entity";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 
 
-
+@injectable()
 export class LogoutUseCase implements IExecute<LogoutDTO, void> {
 
     constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepositor<UserEntity>) { }

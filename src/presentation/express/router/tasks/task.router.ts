@@ -15,6 +15,8 @@ const taskController = container.get(TaskController)
 
 
 router.post("/task", AuthGuard([Role.ADMIN, Role.USER]), BlockGuard([Role.USER]), validateDTO(CreateTaskDTO), (req: Request, res: Response) => taskController.createTask(req, res))
+router.get("/task", AuthGuard([Role.ADMIN, Role.USER]), BlockGuard([Role.USER]),(req: Request, res: Response) => taskController.getCreatorTasks(req, res))
+router.get("/project/:projectId/tasks/:status",AuthGuard([Role.ADMIN, Role.USER]), BlockGuard([Role.USER]),(req: Request, res: Response) => taskController.getContributerTasks(req, res))
 
 
 export { router as taskRouter }

@@ -1,5 +1,5 @@
 import { ProjectEntity } from "@/domain/entities/project.entity";
-import { MongoMember } from "./interface/project.mapper.interface";
+import { MemberWithUser, MongoMember } from "./interface/project.mapper.interface";
 
 export class ProjectPersistenceMapper {
   toMongo(project: ProjectEntity) {
@@ -24,6 +24,9 @@ export class ProjectPersistenceMapper {
   }
 
   fromMongo(doc: any): ProjectEntity {
+
+    const mongoMembers = doc.members as MongoMember[];
+
     return ProjectEntity.create({
       id: doc._id?.toString(),
       creatorId: doc.creatorId?.toString(),
@@ -41,13 +44,24 @@ export class ProjectPersistenceMapper {
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
       image: doc.image,
-      members: (doc.members as MongoMember[])?.map((m) => ({
-        userId: m.userId.toString(),
-        role: m.role,
-        joinedAt: m.joinedAt,
-        status: m.status
-      })) || []
+      members: mongoMembers.map((m): MemberWithUser => {
+        const base: MemberWithUser = {
+          userId: typeof m.userId === "object" ? m.userId._id.toString() : m.userId.toString(),
+          role: m.role,
+          status: m.status,
+          joinedAt: m.joinedAt? new Date(m.joinedAt).toISOString() : 'nothing',
+        };
 
+        if (typeof m.userId === "object") {
+          base.user = {
+            name: m.userId.name,
+            email: m.userId.email,
+            avatar: m.userId.avatar ?? null,
+          };
+        }
+
+        return base;
+      }),
     });
   }
 }

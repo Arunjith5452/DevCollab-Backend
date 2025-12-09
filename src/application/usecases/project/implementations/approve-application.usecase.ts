@@ -6,8 +6,10 @@ import { ApplicationStatus } from "@/domain/enums/project/application.enums";
 import { IApplicationRepository } from "@/infrastructure/db/repository/interface/application.interface";
 import { IProjectRepository } from "@/infrastructure/db/repository/interface/project.interface";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 
+
+@injectable()
 export class ApproveApplcationUseCase implements IExecute<ApproveApplicationDTO, { message: string }> {
 
     constructor(@inject(PROJECT_TYPES.ApplicationRepository) private readonly _applicationRepository: IApplicationRepository<ApplicationEntity>,

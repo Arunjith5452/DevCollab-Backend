@@ -34,7 +34,7 @@ export class LoginUseCase implements IExecute<LoginDTO, AuthResult> {
 
             if (!isPassword) throw new Error(ErrorMessage.INVALID_PASSWORD);
 
-            const payload = { userId: user.id, email: user.email, role: user.role }
+            const payload = { userId: user.id, name: user.username, email: user.email, role: user.role }
 
             const accessToken = generateAccessToken(payload);
             const refreshToken = generateRefreshToken(payload);

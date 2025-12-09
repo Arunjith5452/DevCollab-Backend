@@ -7,7 +7,7 @@ import { generateUploadSignedUrl } from "@/infrastructure/providers/s3-bucket/s3
 export class GenerateSignedUrlUseCase implements IExecute<{fileName:string,fileType:string}, SignedUrlResponse> {
     constructor() { }
 
-    async execute({ fileName, fileType }: {fileName:string,fileType:string}): Promise<SignedUrlResponse> {
+    async execute({ fileName, fileType }:{fileName:string,fileType:string}): Promise<SignedUrlResponse> {
         try {
 
             if (!fileName || !fileType) {
@@ -17,7 +17,6 @@ export class GenerateSignedUrlUseCase implements IExecute<{fileName:string,fileT
             const result = await generateUploadSignedUrl(fileName, fileType)
 
             return result
-
 
         } catch (error) {
 

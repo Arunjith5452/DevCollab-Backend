@@ -7,5 +7,7 @@ export enum SuccessMessage {
     LOGIN_SUCCESS = "Login successful",
     LOGOUT_SUCCESS = "Logout successful",
 
-    PROJECT_FETCHED = "Project Listed Successfully"
+    PROJECT_FETCHED = "Project Listed Successfully",
+
+    TASK_FETCHED = " Task fetched successfully"
 }

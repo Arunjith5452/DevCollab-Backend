@@ -54,4 +54,17 @@ export class ProjectRepository extends BaseRepository<ProjectEntity> implements 
         return docs.map(doc => this.projectPersistenceMapper.fromMongo(doc));
     }
 
+    async findByIdWithPopulation(projectId: string): Promise<ProjectEntity | null> {
+        const doc = await this.model
+            .findById(projectId)
+            .populate({
+                path: "members.userId",
+                select: "name email avatar",
+            })
+            .lean()
+            .exec();
+
+        return doc ? this.projectPersistenceMapper.fromMongo(doc) : null;
+    }
+
 }

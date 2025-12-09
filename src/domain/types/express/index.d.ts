@@ -5,11 +5,12 @@ declare global {
             user: {
                 userId: string,
                 email: string,
-                role:string,
+                username: string,
+                role: string,
                 iat?: number;
                 exp?: number;
             }
         }
     }
 }
-export {}
+export { }

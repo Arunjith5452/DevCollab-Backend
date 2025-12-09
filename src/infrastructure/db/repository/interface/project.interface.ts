@@ -9,5 +9,5 @@ export interface IProjectRepository<T> extends IBaseRepository<T> {
     findEntityById(id: string): Promise<T | null>
     updateEntity(project: ProjectEntity): Promise<T | null>
     findByCreatorId(userId: string): Promise<ProjectEntity[]>
-
+    findByIdWithPopulation(projectId: string): Promise<ProjectEntity | null>;
 }

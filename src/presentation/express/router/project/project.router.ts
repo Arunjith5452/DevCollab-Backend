@@ -24,7 +24,7 @@ router.post("/application/:applicationId/approve/:projectId", AuthGuard([Role.AD
 router.post("/application/:applicationId/reject", AuthGuard([Role.ADMIN, Role.USER]), BlockGuard([Role.USER]), (req: Request, res: Response) => projectController.rejectApplication(req, res))
 router.get('/user/projects/created', AuthGuard([Role.ADMIN, Role.USER]), BlockGuard([Role.USER]), (req: Request, res: Response) => projectController.getMyCreatedProject(req, res))
 router.get('/user/projects/applied', AuthGuard([Role.ADMIN, Role.USER]), BlockGuard([Role.USER]), (req: Request, res: Response) => projectController.getMyAppliedProject(req, res))
-
-
+router.get('/projects/:projectId/members', AuthGuard([Role.ADMIN, Role.USER]), BlockGuard([Role.USER]), (req: Request, res: Response) => projectController.getProjectMember(req, res))
+router.patch('/projects/:projectId/disable', AuthGuard([Role.ADMIN, Role.USER]), BlockGuard([Role.USER]), (req: Request, res: Response) => projectController.disableProject(req, res))
 
 export { router as projectRouter }

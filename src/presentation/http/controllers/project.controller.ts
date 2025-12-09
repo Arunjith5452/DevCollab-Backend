@@ -25,7 +25,9 @@ export class ProjectController {
         @inject(PROJECT_TYPES.ApproveApplcationUseCase) private readonly _approveApplicationUseCase: IExecute<ApproveApplicationDTO, { message: string }>,
         @inject(PROJECT_TYPES.RejectApplicationUseCase) private readonly _rejectApplicationUseCase: IExecute<RejectApplicationDTO, { message: string }>,
         @inject(PROJECT_TYPES.GetMyCreatedProjectUseCase) private readonly _getMyCreatedProjectUseCase: IExecute<{ userId: string }, ProjectEntity[]>,
-        @inject(PROJECT_TYPES.GetMyAppliedProjectUseCase) private readonly _getMyAppliedProjectUseCase: IExecute<{ userId: string }, ApplicationEntity[]>
+        @inject(PROJECT_TYPES.GetMyAppliedProjectUseCase) private readonly _getMyAppliedProjectUseCase: IExecute<{ userId: string }, ApplicationEntity[]>,
+        @inject(PROJECT_TYPES.GetProjectMembersUseCase) private readonly _getProjectMembersUseCase: IExecute<GetProjectMembersQuery, ProjectEntity[]>,
+        @inject(PROJECT_TYPES.DisableProjectUseCase) private readonly _disableProjectUseCase: IExecute<{ userId: string, projectId: string }, void>
     ) { }
 
 
@@ -239,5 +241,53 @@ export class ProjectController {
             );
         }
 
+    }
+
+    async getProjectMember(req: Request, res: Response) {
+
+        try {
+
+            const { projectId } = req.params;
+            const { search, page, limit } = req.query;
+
+
+            let result = await this._getProjectMembersUseCase.execute({
+                projectId,
+                search: search as string,
+                page: parseInt(page as string),
+                limit: parseInt(limit as string)
+            })
+
+            return successResponse(res, 'Members fetched successfully', result)
+
+        } catch (error) {
+            return errorResponse(
+                res,
+                "Failed to load project members",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+        }
+    }
+
+    async disableProject(req: Request, res: Response) {
+        try {
+
+            const { projectId } = req.params
+            const userId = req.user.userId
+
+            const result = await this._disableProjectUseCase.execute({ userId, projectId })
+
+            return successResponse(res, '', result)
+
+        } catch (error) {
+            return errorResponse(
+                res,
+                "Failed to disable project",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+
+        }
     }
 }
