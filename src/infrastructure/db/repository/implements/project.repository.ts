@@ -4,6 +4,7 @@ import { IProjectRepository } from "../interface/project.interface";
 import { inject, injectable } from "inversify";
 import { Model } from "mongoose";
 import { ProjectPersistenceMapper } from "@/infrastructure/mappers/project-persistence.mapper";
+type PopulatedUser = { _id: string; name: string };
 
 
 @injectable()
@@ -67,4 +68,23 @@ export class ProjectRepository extends BaseRepository<ProjectEntity> implements 
         return doc ? this.projectPersistenceMapper.fromMongo(doc) : null;
     }
 
+    async getProjectMembersForAssignee( projectId: string ): Promise<{ userId: string; name: string }[]> {
+
+        const projectDoc = await this.model
+            .findById(projectId)
+            .select("members")
+            .populate("members.userId", "name")
+            .lean()
+            .exec()
+
+        if (!projectDoc?.members) return []
+
+        return projectDoc.members.flatMap(m => {
+            if (m.userId && typeof m.userId === "object") {
+                const user = m.userId as PopulatedUser;
+                return [{ userId: user._id, name: user.name }]
+            }
+            return []
+        })
+    }
 }

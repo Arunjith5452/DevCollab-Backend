@@ -1,4 +1,3 @@
-// get-all-tasks.usecase.ts
 import { injectable, inject } from 'inversify';
 import { IExecute } from '@/application/interface/execute.usecase.interface';
 import { ITasksRepository } from '@/infrastructure/db/repository/interface/task.interface';
@@ -8,7 +7,6 @@ import { SuccessMessage } from '@/domain/enums/messages/success-message.enum';
 import { TaskResponseMapper } from '@/application/mapper/tasks/task-response.mapper';
 import { TaskListItemDto } from '@/application/dtos/tasks/res/list-task.dto';
 import { Types } from 'mongoose';
-import { TaskEntity } from '@/domain/entities/task.entity';
 
 @injectable()
 export class GetCreatorTasksUseCase implements IExecute<GetAllTaskQuery,{ message: string; tasks: TaskListItemDto[]; total: number }> {

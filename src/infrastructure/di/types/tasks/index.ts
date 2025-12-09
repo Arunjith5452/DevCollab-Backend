@@ -5,6 +5,7 @@ export const TASK_TYPES = {
     TaskRepository: Symbol.for("TaskRepository"),
     CreateTaskUseCase: Symbol.for("CreateTaskUseCase"),
     GetCreatorTasksUseCase: Symbol.for("GetCreatorTasksUseCase"),
-    GetContributorTaskUseCase: Symbol.for("GetContributorTaskUseCase")
+    GetContributorTaskUseCase: Symbol.for("GetContributorTaskUseCase"),
+    GetProjectAssigneeUseCase:Symbol.for("GetProjectAssigneeUseCase")
 
 }
