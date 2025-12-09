@@ -13,6 +13,7 @@ export const PROJECT_TYPES = {
     GetMyCreatedProjectUseCase: Symbol.for("GetMyCreatedProjectUseCase"),
     GetMyAppliedProjectUseCase: Symbol.for("GetMyAppliedProjectUseCase"),
     GetProjectMembersUseCase: Symbol.for("GetProjectMembersUseCase"),
-    DisableProjectUseCase:Symbol.for("DisableProjectUseCase")
+    DisableProjectUseCase:Symbol.for("DisableProjectUseCase"),
+    UpdateProjectUseCase: Symbol.for("UpdateProjectUseCase"),
+    GetProjectForEditUseCase:Symbol.for("GetProjectForEditUseCase")
 }
-

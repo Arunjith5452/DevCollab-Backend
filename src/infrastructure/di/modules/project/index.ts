@@ -17,6 +17,8 @@ import { GetMyCreatedProjectUseCase } from "@/application/usecases/project/imple
 import { GetMyAppliedProjectUseCase } from "@/application/usecases/project/implementations/get-my-applied-projects.usecase";
 import { GetProjectMembersUseCase } from "@/application/usecases/project/implementations/get-team-members.usecase";
 import { DisableProjectUseCase } from "@/application/usecases/project/implementations/disable-project.usecase";
+import { UpdateProjectUseCase } from "@/application/usecases/project/implementations/edit-project.usecase";
+import { GetProjectForEditUseCase } from "@/application/usecases/project/implementations/get-project-forEdit.usecase";
 
 
 export const ProjectModule = new ContainerModule(({ bind }) => {
@@ -36,4 +38,6 @@ export const ProjectModule = new ContainerModule(({ bind }) => {
     bind<GetMyAppliedProjectUseCase>(PROJECT_TYPES.GetMyAppliedProjectUseCase).to(GetMyAppliedProjectUseCase)
     bind<GetProjectMembersUseCase>(PROJECT_TYPES.GetProjectMembersUseCase).to(GetProjectMembersUseCase)
     bind<DisableProjectUseCase>(PROJECT_TYPES.DisableProjectUseCase).to(DisableProjectUseCase)
+    bind<UpdateProjectUseCase>(PROJECT_TYPES.UpdateProjectUseCase).to(UpdateProjectUseCase)
+    bind<GetProjectForEditUseCase>(PROJECT_TYPES.GetProjectForEditUseCase).to(GetProjectForEditUseCase)
 })

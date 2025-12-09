@@ -1,16 +1,15 @@
 import { inject, injectable } from "inversify";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
-import { IUserRepositor } from "@/infrastructure/db/repository/interface/user.interface";
 import { SuccessMessage } from "@/domain/enums/messages/success-message.enum";
 import { UserEntity } from "@/domain/entities/user.entity";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { GetAllUsersQuery } from "../interface/admin-usecase.interface";
+import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
 
 
-@injectable()
 export class GetAllUsersUseCase implements IExecute<GetAllUsersQuery, { message: string, users: UserEntity[], total: number }> {
 
-    constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepositor<UserEntity>) { }
+    constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>) { }
 
     async execute(query: GetAllUsersQuery): Promise<{ message: string; users: UserEntity[]; total: number }> {
         try {

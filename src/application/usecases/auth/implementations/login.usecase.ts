@@ -1,6 +1,5 @@
 import { inject, injectable } from "inversify";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
-import { IUserRepositor } from "@/infrastructure/db/repository/interface/user.interface";
 import { LoginDTO } from "@/application/dtos/auth/login.dto";
 import { validateEmail } from "@/shared/utils/email-validate.util";
 import { verify } from "@/shared/utils/password-hash.utils";
@@ -11,11 +10,12 @@ import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
 import { SuccessMessage } from "@/domain/enums/messages/success-message.enum";
 import { UserEntity } from "@/domain/entities/user.entity";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
+import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
 
 
 @injectable()
 export class LoginUseCase implements IExecute<LoginDTO, AuthResult> {
-    constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepositor<UserEntity>) { }
+    constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>) { }
 
     async execute({ email, password }: LoginDTO): Promise<AuthResult> {
 

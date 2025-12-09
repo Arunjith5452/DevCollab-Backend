@@ -1,18 +1,18 @@
 import { RefreshResult } from "@/domain/types/auth/refresh.types";
 import { inject, injectable } from "inversify";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
-import { IUserRepositor } from "@/infrastructure/db/repository/interface/user.interface";
 import { generateAccessToken, verifyToken } from "@/shared/utils/jwt.util";
 import { redisClient } from "@/infrastructure/providers/redis/redis-client";
 import { UserEntity } from "@/domain/entities/user.entity";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { Status } from "@/domain/enums/status.enums";
+import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
 
 @injectable()
 export class RefreshTokenUseCase implements IExecute<string, RefreshResult> {
 
     constructor(
-        @inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepositor<UserEntity>,
+        @inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>,
 
     ) { }
 
