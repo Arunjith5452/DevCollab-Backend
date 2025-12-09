@@ -8,12 +8,16 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "lint": "eslint ./src --ext .ts",
+    "lint:fix": "eslint ./src --ext .ts --fix "
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.931.0",
+    "@aws-sdk/s3-request-presigner": "^3.931.0",
     "argon2": "^0.44.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
@@ -21,9 +25,10 @@
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "deep-email-validator": "^0.1.21",
-    "dotenv": "^17.2.2",
+    "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "express-rate-limit": "^8.1.0",
+    "google-auth-library": "^10.5.0",
     "helmet": "^8.1.0",
     "hpp": "^0.2.3",
     "inversify": "^7.10.0",
@@ -31,10 +36,12 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.18.1",
     "multer": "^2.0.2",
+    "node-cron": "^4.2.1",
     "nodemailer": "^7.0.6",
     "reflect-metadata": "^0.2.2",
     "source-map-support": "^0.5.21",
-    "tsconfig-paths": "^4.2.0"
+    "tsconfig-paths": "^4.2.0",
+    "winston": "^3.18.3"
   },
   "devDependencies": {
     "@swc-node/register": "^1.11.1",
@@ -49,9 +56,13 @@
     "@types/multer": "^2.0.0",
     "@types/node": "^24.5.1",
     "@types/nodemailer": "^7.0.1",
-    "eslint": "^9.35.0",
+    "eslint": "^9.37.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
     "nodemon": "^3.1.10",
+    "prettier": "^3.6.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.46.0"
   }
 }

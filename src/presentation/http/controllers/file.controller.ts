@@ -1,0 +1,36 @@
+import { IExecute } from "@/application/interface/execute.usecase.interface";
+import { SignedUrlResponse } from "@/application/usecases/user/interfaces/signedUrl.usecase.interface";
+import { ServerErrorStatus } from "@/domain/enums/status-codes/server-error-status.enum";
+import { USER_TYPES } from "@/infrastructure/di/types/user";
+import { errorResponse, successResponse } from "@/shared/utils/response.util";
+import { Request, Response } from "express";
+import { inject, injectable } from "inversify";
+
+
+
+@injectable()
+export class FileController {
+    constructor(@inject(USER_TYPES.GenerateSignedUrlUseCase) private readonly _generateSignedUrlUseCase: IExecute<{fileName:string,fileType:string}, SignedUrlResponse>
+    ){}
+
+    async signedUrl(req: Request, res: Response) {
+
+        try {
+
+            const result = await this._generateSignedUrlUseCase.execute(req.body)
+
+            return successResponse(res, "", result)
+
+        } catch (error) {
+
+            return errorResponse(res, "signedUrl went wrong",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+
+
+        }
+    }
+
+
+}

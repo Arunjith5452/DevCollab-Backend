@@ -1,19 +1,19 @@
 import { RegisterDTO } from "@/application/dtos/auth/register.dto"
-import { validateEmail } from "@/shared/utils/email-validate.util"
 import { inject, injectable } from "inversify"
-import { IUserRepositor } from "@/infrastructure/db/repository/interface/user.interface"
-import { IUser } from "@/infrastructure/db/interface/user.inteface"
 import { USER_TYPES } from "@/infrastructure/di/types/user"
 import { generateOTP } from "@/shared/utils/otp-generator.util"
-import { redisClient } from "@/infrastructure/redis/redis-client"
+import { redisClient } from "@/infrastructure/providers/redis/redis-client"
 import { sendOtpEmail } from "@/shared/utils/sent-otp.util"
-import { IExecute } from "../interfaces/execute-usecase.interface"
 import { randomBytes } from "crypto"
+import { validateEmail } from "@/shared/utils/email-validate.util"
+import { ErrorMessage } from "@/domain/enums/messages/error-message.enum"
+import { UserEntity } from "@/domain/entities/user.entity"
+import { IExecute } from "@/application/interface/execute.usecase.interface"
+import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface"
 
-@injectable()
 export class RegiserUseCase implements IExecute<RegisterDTO,{token:string}> {
 
-    constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository:IUserRepositor<IUser>){}
+    constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository:IUserRepository<UserEntity>){}
 
     async execute({ name,email,password }: RegisterDTO): Promise<{token:string}> {
 
@@ -21,13 +21,13 @@ export class RegiserUseCase implements IExecute<RegisterDTO,{token:string}> {
             const isValidEmail = await validateEmail(email)
 
             if (!isValidEmail) {
-                throw new Error("Email is not valid")
+                throw new Error(ErrorMessage.EMAIL_INVALID)
             }
 
-            const existingUser = await this._userRepository.getUserByEmail(email)
-            if (existingUser) throw new Error("Email already registered")
+            const existingUser = await this._userRepository.findByEmail(email)
+            if (existingUser) throw new Error(ErrorMessage.EMAIL_ALREADY_EXISTS)
 
-            const otp = generateOTP()
+            const otp = generateOTP()  
             const expiryTime = 3 * 60
 
             // Generate a secure random token
@@ -49,7 +49,6 @@ export class RegiserUseCase implements IExecute<RegisterDTO,{token:string}> {
         } catch (error) {
             throw error
         }
-
 
     }
 

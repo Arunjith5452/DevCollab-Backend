@@ -1,7 +1,12 @@
-import { HydratedDocument } from "mongoose";
 import { UserEntity } from "@/domain/entities/user.entity";
+import { IBaseRepository } from "./base-repository.interface";
 
-export interface IUserRepositor<T> {
-    createUser(users: UserEntity): Promise<HydratedDocument<T>>;
-    getUserByEmail(email: string): Promise<HydratedDocument<T> | null>;
+
+export interface IUserRepository<T> extends IBaseRepository<T> {
+    findByEmail(email: string): Promise<T | null>
+    updatePassword(userId: string, password: string): Promise<void>
+    createUser(data: UserEntity): Promise<T>
+    updateUser(userId: string, data: Partial<UserEntity>): Promise<T | null>;
+    findEntityById(id: string): Promise<T | null>
+
 }

@@ -1,23 +1,42 @@
-import { HydratedDocument, Model } from "mongoose";
-import { IUser } from "../../interface/user.inteface";
-import { IUserRepositor } from "../interface/user.interface";
-import { UserEntity } from "@/domain/entities/user.entity";
+import { IUserRepository } from "../interface/user.interface";
 import { inject, injectable } from "inversify";
+import { BaseRepository } from "./base.repository";
+import { UserEntity } from "@/domain/entities/user.entity";
+import { Model } from "mongoose";
+import { UserPersistenceMapper } from "@/infrastructure/mappers/user-persistence.mapper";
 
 @injectable()
-export class UserRepository implements IUserRepositor<IUser>{
-    private readonly _model:Model<HydratedDocument<IUser>>
+export class UserRepository extends BaseRepository<UserEntity> implements IUserRepository<UserEntity> {
+    private readonly userPersistenceMapper: UserPersistenceMapper;
 
-    constructor(@inject("UserModel") model:Model<HydratedDocument<IUser>>){
-        this._model = model
+    constructor(@inject("UserModel") model: Model<UserEntity>, userPersistanceMapper: UserPersistenceMapper) {
+        super(model)
+        this.userPersistenceMapper = userPersistanceMapper
     }
 
-
-    async createUser({name,email,password}:UserEntity):Promise<HydratedDocument<IUser>>{
-        return await this._model.create({ name,email,password })
+    async findByEmail(email: string): Promise<UserEntity | null> {
+        const doc = await this.findOne({ email })
+        return doc ? this.userPersistenceMapper.fromMongo(doc) : null
     }
 
-    async getUserByEmail(email:string): Promise<HydratedDocument<IUser> | null>{
-        return await this._model.findOne({email})
+    async updatePassword(userId: string, password: string): Promise<void> {
+        await this.update(userId, { password })
     }
+
+    async createUser(data: UserEntity): Promise<UserEntity> {
+        const mongoData = this.userPersistenceMapper.toMongo(data)
+        const createUser = await this.create(mongoData)
+        return await this.userPersistenceMapper.fromMongo(createUser)
+    }
+
+    async updateUser(userId: string, data: Partial<UserEntity>): Promise<UserEntity | null> {
+        const update = await this.update(userId, data)
+        return update ? this.userPersistenceMapper.fromMongo(update) : null
+    }
+    async findEntityById(id: string): Promise<UserEntity | null> {
+        const doc = await this.findById(id);
+        if (!doc) return null;
+        return this.userPersistenceMapper.fromMongo(doc);
+    }
+
 }

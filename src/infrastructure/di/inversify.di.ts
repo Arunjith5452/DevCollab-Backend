@@ -1,16 +1,23 @@
+import "reflect-metadata";
 import { Container } from 'inversify'
 import { AuthModule } from './modules/auth'
 import { UserModule } from './modules/user'
+import { AdminModule } from './modules/admin'
+import { ProjectModule } from './modules/project'
+import { TaskModule } from './modules/tasks'
 
-const conatiner = new Container({
+const container = new Container({
     defaultScope:"Singleton",
     autobind:true
 })
 
-conatiner.load(
-    AuthModule,
-    UserModule
-)
+container.load(
+    UserModule,    
+    AuthModule,      
+    AdminModule,    
+    ProjectModule,
+    TaskModule
+);
 
 
-export {conatiner}
+export {container}

@@ -1,25 +1,28 @@
-import { RefreshDTO } from "@/application/dtos/auth/refresh.dto";
-import { IExecute } from "../interfaces/execute-usecase.interface";
 import { RefreshResult } from "@/domain/types/auth/refresh.types";
 import { inject, injectable } from "inversify";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
-import { IUserRepositor } from "@/infrastructure/db/repository/interface/user.interface";
-import { IUser } from "@/infrastructure/db/interface/user.inteface";
 import { generateAccessToken, verifyToken } from "@/shared/utils/jwt.util";
-import { redisClient } from "@/infrastructure/redis/redis-client";
+import { redisClient } from "@/infrastructure/providers/redis/redis-client";
+import { UserEntity } from "@/domain/entities/user.entity";
+import { IExecute } from "@/application/interface/execute.usecase.interface";
+import { Status } from "@/domain/enums/status.enums";
+import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
 
 @injectable()
-export class RefreshTokenUseCase implements IExecute<RefreshDTO, RefreshResult> {
+export class RefreshTokenUseCase implements IExecute<string, RefreshResult> {
 
-    constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepositor<IUser>) { }
+    constructor(
+        @inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>,
 
-    async execute({ refreshToken }: RefreshDTO): Promise<RefreshResult> {
+    ) { }
+
+    async execute(refreshToken: string): Promise<RefreshResult> {
 
         try {
-
             if (!refreshToken) throw new Error("Refresh token is missing")
 
             const decoded: any = verifyToken(refreshToken, "refresh")
+
             if (!decoded) throw new Error("Invalid or expired refresh token")
 
             const storedToken = await redisClient.get(`refresh:${decoded.email}`)
@@ -27,10 +30,15 @@ export class RefreshTokenUseCase implements IExecute<RefreshDTO, RefreshResult> 
                 throw new Error("Refrsh token not found or already revoked")
             }
 
-            const user = await this._userRepository.getUserByEmail(decoded.email);
+            const user = await this._userRepository.findByEmail(decoded.email);
             if (!user) throw new Error("User not found");
 
-            const newAccessToken = generateAccessToken({ userId: user._id.toString(), email: user.email })
+
+            if(user.status === Status.BLOCK){
+                throw new Error("Admin blocked please try again")
+            }
+
+            const newAccessToken = generateAccessToken({ userId: user.id!.toString(), name: user.username, email: user.email, role: user.role })
 
             return {
                 accessToken: newAccessToken,
