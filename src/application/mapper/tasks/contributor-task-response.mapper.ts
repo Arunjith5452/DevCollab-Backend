@@ -10,7 +10,7 @@ export class ContributorTaskMapper {
         return new TaskListItemDto({
             id: entity.id!,
             title: entity.title,
-            assignee: entity.assignedTo,
+            assignedId: entity.assignedId,
             deadline: entity.deadline,
             status: entity.status as TaskStatus,
             description: entity.description,

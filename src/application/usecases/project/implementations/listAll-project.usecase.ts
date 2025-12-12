@@ -17,9 +17,10 @@ export class ListProjectUseCase implements IExecute<GetAllProjectsQuery, { mesag
 
             const { search, techStack, roleNeeded, difficulty, page = 1, limit = 3 } = query
 
-            const filter: any = {
-                status: { $ne: "disabled" } 
-            }
+            const filter: Record<string, unknown> = {
+                status: { $ne: "disabled" }
+            };
+
 
             if (search) {
                 filter.title = { $regex: search, $options: "i" }

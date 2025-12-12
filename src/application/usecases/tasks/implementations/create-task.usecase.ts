@@ -18,7 +18,7 @@ export class CreateTaskUseCase implements IExecute<CreateTaskDTO, void> {
             const task = TaskEntity.create({
                 title: dto.title.trim(),
                 projectId: dto.projectId,
-                assignedTo: dto.assignedTo,
+                assignedId: dto.assignedId,
                 description: dto.description,
                 status: dto.status || "todo",
                 deadline: new Date(dto.deadline),

@@ -9,7 +9,7 @@ import { TaskListItemDto } from '@/application/dtos/tasks/res/list-task.dto';
 import { Types } from 'mongoose';
 
 @injectable()
-export class GetCreatorTasksUseCase implements IExecute<GetAllTaskQuery,{ message: string; tasks: TaskListItemDto[]; total: number }> {
+export class GetCreatorTasksUseCase implements IExecute<GetAllTaskQuery, { message: string; tasks: TaskListItemDto[]; total: number }> {
     constructor(
         @inject(TASK_TYPES.TaskRepository) private readonly _taskRepository: ITasksRepository<any>,
     ) { }
@@ -22,7 +22,7 @@ export class GetCreatorTasksUseCase implements IExecute<GetAllTaskQuery,{ messag
             throw new Error('projectId is required to fetch tasks');
         }
 
-        const filter: any = {
+        const filter: Record<string, unknown> = {
             projectId: new Types.ObjectId(projectId),
         };
 
@@ -31,11 +31,11 @@ export class GetCreatorTasksUseCase implements IExecute<GetAllTaskQuery,{ messag
             filter.$or = [
                 { title: regex },
                 { description: regex },
-                { assignedTo: regex },
+                { assignedId: regex },
             ];
         }
         if (assignee && assignee !== 'all') {
-            filter.assignedTo = assignee;
+            filter.assignedId = assignee;
         }
         if (status && status !== 'all') {
             filter.status = status;
@@ -46,6 +46,7 @@ export class GetCreatorTasksUseCase implements IExecute<GetAllTaskQuery,{ messag
         const [tasks, total] = await Promise.all([this._taskRepository.find(filter, { skip, limit }), this._taskRepository.count(filter),]);
 
         const tasksDto = TaskResponseMapper.toListItemArray(tasks);
+        console.log("taskdDto", tasksDto)
 
         return {
             message: SuccessMessage.TASK_FETCHED,

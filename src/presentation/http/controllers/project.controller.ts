@@ -20,7 +20,8 @@ import { inject, injectable } from "inversify";
 @injectable()
 export class ProjectController {
 
-    constructor(@inject(PROJECT_TYPES.CreateProjectUseCase) private readonly _createProjectUseCase: IExecute<{ userId: string, dto: CreateProjectDTO }, { message: string }>,
+    constructor(
+        @inject(PROJECT_TYPES.CreateProjectUseCase) private readonly _createProjectUseCase: IExecute<{ userId: string, dto: CreateProjectDTO }, { message: string }>,
         @inject(PROJECT_TYPES.ListProjectUseCase) private readonly _listProjectUseCase: IExecute<GetAllProjectsQuery, { mesage: string, projects: ProjectEntity[], total: number }>,
         @inject(PROJECT_TYPES.ProjectDetailsUseCase) private readonly _projectDetailsUseCase: IExecute<string, { project: ProjectEntity[], message: string }>,
         @inject(PROJECT_TYPES.ApplyToProjectUseCase) private readonly _applyToProjectUseCase: IExecute<ApplyToProjectDTO, { message: string }>,
@@ -30,7 +31,6 @@ export class ProjectController {
         @inject(PROJECT_TYPES.GetMyCreatedProjectUseCase) private readonly _getMyCreatedProjectUseCase: IExecute<{ userId: string }, ProjectEntity[]>,
         @inject(PROJECT_TYPES.GetMyAppliedProjectUseCase) private readonly _getMyAppliedProjectUseCase: IExecute<{ userId: string }, ApplicationEntity[]>,
         @inject(PROJECT_TYPES.GetProjectMembersUseCase) private readonly _getProjectMembersUseCase: IExecute<GetProjectMembersQuery, ProjectEntity[]>,
-        @inject(PROJECT_TYPES.DisableProjectUseCase) private readonly _disableProjectUseCase: IExecute<{ userId: string, projectId: string }, void>
         @inject(PROJECT_TYPES.DisableProjectUseCase) private readonly _disableProjectUseCase: IExecute<{ userId: string, projectId: string }, void>,
         @inject(PROJECT_TYPES.UpdateProjectUseCase) private readonly _updateProjectUseCase: IExecute<{ userId: string, projectId: string, dto: UpdateProjectDTO }, { message: string }>,
         @inject(PROJECT_TYPES.GetProjectForEditUseCase) private readonly _getProjectForEditUseCase: IExecute<{ userId: string, projectId: string }, ProjectEntity>
@@ -63,6 +63,12 @@ export class ProjectController {
     }
 
 
+    /**
+     * Updates a project based on projectId and logged-in userId.
+     * @param req - Express request containing projectId in params and updated data in body.
+     * @param res - Express response object.
+     * @returns JSON with updated project data.
+     */
     async editProject(req: Request, res: Response) {
         try {
 
@@ -83,6 +89,14 @@ export class ProjectController {
         }
     }
 
+
+    /**
+ * Fetches a project’s details for editing.
+ * Ensures the logged-in user owns the project.
+ * @param req - Express request containing projectId in params.
+ * @param res - Express response object.
+ * @returns JSON with editable project details.
+ */
     async getProjectForEdit(req: Request, res: Response) {
 
         try {
@@ -174,6 +188,12 @@ export class ProjectController {
         }
     }
 
+    /**
+ * Allows a user to apply to join a project.
+ * @param req - Express request containing projectId in params and application data in body.
+ * @param res - Express response object.
+ * @returns JSON with success message and application result.
+ */
     async applyToProject(req: Request, res: Response) {
 
         try {
@@ -198,6 +218,13 @@ export class ProjectController {
         }
     }
 
+
+    /**
+ * Fetches all pending applications for a project.
+ * @param req - Express request containing projectId in params.
+ * @param res - Express response object.
+ * @returns JSON list of pending applications.
+ */
     async getPendingApplication(req: Request, res: Response) {
         try {
             const { projectId } = req.params
@@ -209,6 +236,13 @@ export class ProjectController {
         }
     }
 
+
+    /**
+ * Approves a pending project application.
+ * @param req - Express request containing projectId and applicationId in params.
+ * @param res - Express response object.
+ * @returns JSON with approval message.
+ */
     async approveApplication(req: Request, res: Response) {
         try {
 
@@ -228,6 +262,14 @@ export class ProjectController {
         }
     }
 
+
+
+    /**
+     * Rejects a project application.
+     * @param req - Express request containing applicationId in params.
+     * @param res - Express response object.
+     * @returns JSON with rejection message.
+     */
     async rejectApplication(req: Request, res: Response) {
 
         try {
@@ -248,6 +290,14 @@ export class ProjectController {
         }
     }
 
+
+
+    /**
+ * Fetches all projects created by the logged-in user.
+ * @param req - Express request containing authenticated userId.
+ * @param res - Express response object.
+ * @returns JSON list of created projects.
+ */
     async getMyCreatedProject(req: Request, res: Response) {
 
         try {
@@ -269,6 +319,13 @@ export class ProjectController {
 
     }
 
+
+    /**
+ * Fetches all projects the user has applied to.
+ * @param req - Express request containing authenticated userId.
+ * @param res - Express response object.
+ * @returns JSON list of applied projects.
+ */
     async getMyAppliedProject(req: Request, res: Response) {
 
         try {
@@ -289,6 +346,12 @@ export class ProjectController {
 
     }
 
+    /**
+ * Fetches project members with optional filters like search & pagination.
+ * @param req - Express request containing projectId in params and query filters.
+ * @param res - Express response object.
+ * @returns JSON paginated list of project members.
+ */
     async getProjectMember(req: Request, res: Response) {
 
         try {
@@ -316,6 +379,13 @@ export class ProjectController {
         }
     }
 
+
+    /**
+ * Disables a project created by the logged-in user.
+ * @param req - Express request containing projectId in params.
+ * @param res - Express response object.
+ * @returns JSON confirmation of project disable action.
+ */
     async disableProject(req: Request, res: Response) {
         try {
 

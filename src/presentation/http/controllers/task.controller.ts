@@ -17,14 +17,23 @@ import { inject, injectable } from "inversify";
 @injectable()
 export class TaskController {
 
-    constructor(@inject(TASK_TYPES.CreateTaskUseCase) private readonly _createTaskUseCase: IExecute<CreateTaskDTO, void>,
+    constructor(
+        @inject(TASK_TYPES.CreateTaskUseCase) private readonly _createTaskUseCase: IExecute<CreateTaskDTO, void>,
         @inject(TASK_TYPES.GetCreatorTasksUseCase) private readonly _getCreatorTaskUseCase: IExecute<GetAllTaskQuery, { message: string, tasks: TaskEntity[], total: number }>,
         @inject(TASK_TYPES.GetContributorTaskUseCase) private readonly _getContributorUseCase: IExecute<GetContributorTasksQuery, TaskListItemDto[]>,
         @inject(TASK_TYPES.GetProjectAssigneeUseCase) private readonly _getProjectAssigneeUseCase: IExecute<string, ProjectMemberNameOnly[]>
     ) { }
 
+    /**
+     * Creates a new task.
+     * @param req - Express request containing task details in the body.
+     * @param res - Express response object.
+     * @returns JSON response with success message or error.
+     */
     async createTask(req: Request, res: Response) {
         try {
+
+            console.log("backend receving data of createTask >",req.body)
 
             const result = await this._createTaskUseCase.execute(req.body)
 
@@ -39,6 +48,13 @@ export class TaskController {
         }
     }
 
+    /**
+    * Fetches all tasks created by the task creator with optional filters
+    * like search, assignee, status, pagination, and projectId.
+    * @param req - Express request containing query parameters.
+    * @param res - Express response object.
+    * @returns JSON with paginated tasks list and total count.
+    */
     async getCreatorTasks(req: Request, res: Response) {
 
         try {
@@ -71,6 +87,14 @@ export class TaskController {
         }
     }
 
+
+    /**
+    * Fetches tasks assigned to a contributor (logged-in user) 
+    * filtered by projectId and optional status.
+    * @param req - Express request containing params projectId and status.
+    * @param res - Express response object.
+    * @returns JSON list of contributor tasks.
+    */
     async getContributerTasks(req: Request, res: Response) {
 
         try {
@@ -101,6 +125,13 @@ export class TaskController {
         }
     }
 
+    /**
+     * Fetches all project members who can be assigned tasks
+     * based on the provided projectId.
+     * @param req - Express request containing projectId in params.
+     * @param res - Express response object.
+     * @returns JSON list of assignee users (name only).
+     */
     async getProjectAssignee(req: Request, res: Response) {
         try {
 

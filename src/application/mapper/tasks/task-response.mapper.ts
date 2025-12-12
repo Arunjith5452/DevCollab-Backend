@@ -7,7 +7,7 @@ export interface LeanTask {
     title: string;
     description: string;
     status: string;
-    assignedTo: string;
+    assignedId: string;
     deadline?: Date;
     tags?: string[];
     payment?: { amount: number; advancePaid: number };
@@ -25,7 +25,7 @@ export class TaskResponseMapper {
             title: raw.title,
             description: raw.description,
             status: raw.status,
-            assignedTo: raw.assignedTo,
+            assignedId: raw.assignedId,
             deadline: raw.deadline?.toISOString() ?? null,
             tags: raw.tags ?? [],
             payment: raw.payment?.amount ?? 0,

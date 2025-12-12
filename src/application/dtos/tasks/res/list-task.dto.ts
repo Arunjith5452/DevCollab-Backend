@@ -9,7 +9,7 @@ export interface TaskListItemDto {
     title: string;
     description: string;
     status: string;
-    assignedTo: string;
+    assignedId: string;
     deadline: string | null;
     tags: string[];
     payment: number;

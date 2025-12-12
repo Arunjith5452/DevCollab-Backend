@@ -65,7 +65,7 @@ export class CreateTaskDTO {
 
     @Expose()
     @IsString({ message: "Assignee is required" })
-    assignedTo!: string;
+    assignedId!: string;
 
     @Expose()
     @IsString({ message: "Description is required" })

@@ -16,6 +16,13 @@ export class UserController {
         @inject(USER_TYPES.UpdateUserProfileUseCase) private readonly _updateUserProfileUseCase: IExecute<{ userId: string, dto: UpdateProfileDTO }, UserEntity | null>
     ) { }
 
+
+    /**
+    * Fetches the profile details of the logged-in user.
+    * @param req - Express request containing authenticated user details.
+    * @param res - Express response object.
+    * @returns JSON with the user's profile data.
+    */
     async getProfileHandler(req: Request, res: Response) {
 
         try {
@@ -38,6 +45,12 @@ export class UserController {
 
     }
 
+    /**
+   * Updates the profile of the logged-in user.
+   * @param req - Express request containing userId and updated profile data in the body.
+   * @param res - Express response object.
+   * @returns JSON with updated user profile or null if update fails.
+   */
     async updateProfile(req: Request, res: Response) {
         try {
 
