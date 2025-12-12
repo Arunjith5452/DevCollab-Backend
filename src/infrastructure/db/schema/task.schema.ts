@@ -12,14 +12,10 @@ export const taskSchema = new Schema({
         ref: "Project",
         required: true
     },
-    assignedTo: {
-        type: String,   
-        default: null
-    },
-    assigneeId: {
-        type: Schema.Types.ObjectId, 
+    assignedId: {
+        type: Schema.Types.ObjectId,
         ref: 'User',
-        default: null
+        required: true
     },
     description: {
         type: String

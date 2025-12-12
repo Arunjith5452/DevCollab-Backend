@@ -22,13 +22,12 @@ export class TaskRepository extends BaseRepository<TaskEntity> implements ITasks
     }
 
     async findByProjectAndStatus(projectId: string, status: string): Promise<TaskEntity[]> {
-        const docs = await this.model.find({ projectId, status }).lean().exec();
+        const docs = await this.model.find({ projectId, status }).sort({ createdAt: -1 }).lean().exec();
         return Promise.all(docs.map(doc => this.taskPersistenceMapper.fromMongo(doc)));
     }
 
     async findByProjectStatusAndAssignee(projectId: string, status: string, assigneeId: string): Promise<TaskEntity[]> {
-        const docs = await this.model.find({ projectId, status, assigneeId }).lean().exec();
-        console.log('MONGO FILTER → projectId:', projectId, 'status:', status, 'assigneeId:', assigneeId);
+        const docs = await this.model.find({ projectId, status, assigneeId }).sort({ createdAt: -1 }).lean().exec();
         return Promise.all(docs.map(doc => this.taskPersistenceMapper.fromMongo(doc)));
     }
 

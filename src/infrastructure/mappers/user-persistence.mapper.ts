@@ -1,5 +1,4 @@
 import { UserEntity } from "@/domain/entities/user.entity";
-import { MongoUser } from "./interface/user.mapper.interface";
 
 
 export class UserPersistenceMapper {

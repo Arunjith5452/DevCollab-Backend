@@ -2,8 +2,7 @@ export class TaskEntity {
     private readonly _id?: string;
     private _title: string;
     private _projectId: string;
-    private _assignedTo: string;
-    private _assigneeId?:string;
+    private _assignedId: string;
     private _description: string;
     private _prLink?: string;
     private _feedBack?: string;
@@ -31,8 +30,7 @@ export class TaskEntity {
         id?: string;
         title: string;
         projectId: string;
-        assignedTo: string;
-        assigneeId?:string;
+        assignedId: string;
         description: string;
         prLink?: string;
         feedBack?: string;
@@ -49,8 +47,7 @@ export class TaskEntity {
         this._id = data.id;
         this._title = data.title;
         this._projectId = data.projectId;
-        this._assignedTo = data.assignedTo;
-        this._assigneeId = data.assigneeId
+        this._assignedId = data.assignedId
         this._description = data.description;
         this._prLink = data.prLink;
         this._feedBack = data.feedBack;
@@ -69,8 +66,7 @@ export class TaskEntity {
         id?: string;
         title: string;
         projectId: string;
-        assignedTo: string;
-        assigneeId?:string
+        assignedId: string
         description: string;
         prLink?: string;
         feedBack?: string;
@@ -88,11 +84,10 @@ export class TaskEntity {
         if (!data.projectId) throw new Error("ProjectId is required");
 
         return new TaskEntity({
-            id:data.id,
+            id: data.id,
             title: data.title.trim(),
             projectId: data.projectId,
-            assignedTo: data.assignedTo,
-            assigneeId:data.assigneeId,
+            assignedId: data.assignedId,
             description: data.description,
             prLink: data.prLink,
             feedBack: data.feedBack,
@@ -115,11 +110,8 @@ export class TaskEntity {
     get projectId(): string {
         return this._projectId;
     }
-    get assignedTo(): string {
-        return this._assignedTo;
-    }
-      get assigneeId(): string | undefined {
-        return this._assigneeId;
+    get assignedId(): string  {
+        return this._assignedId;
     }
     get description(): string {
         return this._description;

@@ -1,27 +1,23 @@
-import { LogoutDTO } from "@/application/dtos/auth/logout.dto";
-import { inject, injectable } from "inversify";
-import { USER_TYPES } from "@/infrastructure/di/types/user";
 import { verifyToken } from "@/shared/utils/jwt.util";
 import { redisClient } from "@/infrastructure/providers/redis/redis-client";
-import { UserEntity } from "@/domain/entities/user.entity";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
-import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
 
 
-@injectable()
-export class LogoutUseCase implements IExecute<LogoutDTO, void> {
+export class LogoutUseCase implements IExecute<string , void> {
+    constructor() { }
 
-    constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>) { }
-
-    async execute({ refreshToken }: LogoutDTO): Promise<void> {
+    async execute(refreshToken: string): Promise<void> {
 
         try {
+            console.log("reaching thie usecase")
 
             if (!refreshToken) throw new Error("Refresh token missing")
 
-            if (!refreshToken) throw new Error("Refresh token missing")
+            console.log("refreshTolken", refreshToken)
 
             const decoded: any = verifyToken(refreshToken, "refresh")
+
+            console.log("decoded", decoded)
 
             if (!decoded) throw new Error("Invalid or expired refresh token")
 
@@ -30,7 +26,7 @@ export class LogoutUseCase implements IExecute<LogoutDTO, void> {
             console.log("Logout successfully")
 
         } catch (error) {
-          throw error
+            throw error
         }
 
     }

@@ -1,12 +1,14 @@
 import { ContainerModule } from "inversify";
-import {ADMIN_TYPES} from "../../types/index"
+import { ADMIN_TYPES } from "../../types/index"
 import { AdminController } from "@/presentation/http/controllers/admin.controller";
-import { GetAllUsersUseCase } from "@/application/usecases/admin/implementations/getAllUsers.usecase";
+import { GetAllUsersUseCase } from "@/application/usecases/admin/implementations/get-all-users.usecase";
 import { UpdateUserStatusUseCase } from "@/application/usecases/admin/implementations/updateUserStatus.usecase";
+import { GetAllProjectsUseCase } from "@/application/usecases/admin/implementations/get-all-projects.usecase";
 
 
-export const AdminModule = new ContainerModule(({bind})=>{
-bind<AdminController>(ADMIN_TYPES.AdminController).to(AdminController)
-bind<GetAllUsersUseCase>(ADMIN_TYPES.GetAllUsersUseCase).to(GetAllUsersUseCase)
-bind<UpdateUserStatusUseCase>(ADMIN_TYPES.UpdateUserStatusUseCase).to(UpdateUserStatusUseCase)
+export const AdminModule = new ContainerModule(({ bind }) => {
+    bind<AdminController>(ADMIN_TYPES.AdminController).to(AdminController)
+    bind<GetAllUsersUseCase>(ADMIN_TYPES.GetAllUsersUseCase).to(GetAllUsersUseCase)
+    bind<UpdateUserStatusUseCase>(ADMIN_TYPES.UpdateUserStatusUseCase).to(UpdateUserStatusUseCase)
+    bind<GetAllProjectsUseCase>(ADMIN_TYPES.GetAllProjectsUseCase).to(GetAllProjectsUseCase)
 })

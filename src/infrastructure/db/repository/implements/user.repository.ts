@@ -33,10 +33,10 @@ export class UserRepository extends BaseRepository<UserEntity> implements IUserR
         const update = await this.update(userId, data)
         return update ? this.userPersistenceMapper.fromMongo(update) : null
     }
+
     async findEntityById(id: string): Promise<UserEntity | null> {
         const doc = await this.findById(id);
         if (!doc) return null;
         return this.userPersistenceMapper.fromMongo(doc);
     }
-
 }

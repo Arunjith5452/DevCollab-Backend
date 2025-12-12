@@ -27,7 +27,8 @@ export class AuthController {
         @inject(AUTH_TYPES.VerifyForgotOtpUseCase) private readonly _verifyForgotOtpUseCase: IExecute<VerifyOtpDTO, { message: string }>,
         @inject(AUTH_TYPES.ResetPasswordUseCase) private readonly _resetPasswordUseCase: IExecute<ResetPasswordDTO, { message: string }>,
         @inject(AUTH_TYPES.GoogleLoginUseCase) private readonly _googleLoginUseCase: IExecute<GoogleLoginDTO, AuthResult>,
-        @inject(AUTH_TYPES.GitHubLoginUseCase) private readonly _gitHubLoginUseCase: IExecute<GithubLoginDTO, AuthResult>
+        @inject(AUTH_TYPES.GitHubLoginUseCase) private readonly _gitHubLoginUseCase: IExecute<GithubLoginDTO, AuthResult>,
+        @inject(AUTH_TYPES.LogoutUseCase) private readonly _logoutUseCase: IExecute<string , void>
     ) { }
 
     /**
@@ -37,6 +38,7 @@ export class AuthController {
      * @returns JSON with registration result.
      */
     async Register(req: Request, res: Response) {
+
         try {
             const result = await this._registerUseCase.execute(req.body);
             return successResponse(res, "", result.token);
@@ -229,6 +231,8 @@ export class AuthController {
 
     async googleLogin(req: Request, res: Response) {
 
+        console.log("googleauth", req.body)
+
         try {
 
             const result = await this._googleLoginUseCase.execute(req.body)
@@ -306,10 +310,14 @@ export class AuthController {
     async Logout(req: Request, res: Response) {
         try {
             const refreshToken = req.cookies.refreshToken;
-            const result = await this._loginUseCase.execute(refreshToken);
+
+           const result = await this._logoutUseCase.execute(refreshToken);
 
             res.clearCookie("refreshToken");
-            return res.json(result);
+            res.clearCookie("accessToken");
+
+            return successResponse(res, 'logout successfully', result)
+
         } catch (error) {
             return errorResponse(res,
                 "Logout failed",

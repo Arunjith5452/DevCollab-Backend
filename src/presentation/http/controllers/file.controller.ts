@@ -10,9 +10,16 @@ import { inject, injectable } from "inversify";
 
 @injectable()
 export class FileController {
-    constructor(@inject(USER_TYPES.GenerateSignedUrlUseCase) private readonly _generateSignedUrlUseCase: IExecute<{fileName:string,fileType:string}, SignedUrlResponse>
-    ){}
+    constructor(@inject(USER_TYPES.GenerateSignedUrlUseCase) private readonly _generateSignedUrlUseCase: IExecute<{ fileName: string, fileType: string }, SignedUrlResponse>
+    ) { }
 
+
+    /**
+     * Generates a pre-signed URL for secure file upload.
+     * @param req - Express request containing `fileName` and `fileType` in the body.
+     * @param res - Express response object.
+     * @returns JSON response with the generated signed URL.
+     */
     async signedUrl(req: Request, res: Response) {
 
         try {

@@ -7,18 +7,13 @@ export const AuthGuard = (roles: Array<string>) => (req: Request, res: Response,
 
     try {
 
-        console.log(":jasdgasdfsad")
-
-
         const token = req.cookies?.accessToken
-        console.log("token", token)
 
         if (!token) {
-            console.log("tokeninside", token)
             return res.status(ClientErrorStatus.UNAUTHORIZED).json({ success: false, message: "Token missing" })
         }
 
-        const verify = verifyToken(token, "access") as { email: string, userId: string, role: string, username: string }
+        const verify = verifyToken(token, "access") as { email: string, userId: string, role: string, username: string , profileImage : string }
 
         if (!verify) {
             return res.status(ClientErrorStatus.UNAUTHORIZED).json({ success: false, message: "Decode token failed" })

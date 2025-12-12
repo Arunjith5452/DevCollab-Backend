@@ -4,7 +4,7 @@ export class TaskListItemDto {
   id: string;
   title: string;
   description: string;
-  assignee: string;
+  assignedId: string;
   deadline: string; 
   status: TaskStatus;
   tags: string[];
@@ -16,7 +16,7 @@ export class TaskListItemDto {
   constructor(data: {
     id: string;
     title: string;
-    assignee: string;
+    assignedId: string;
     deadline: Date;
     status: TaskStatus;
     description?: string;
@@ -28,7 +28,7 @@ export class TaskListItemDto {
     this.id = data.id;
     this.title = data.title;
     this.description = data.description || "";
-    this.assignee = data.assignee;
+    this.assignedId = data.assignedId;
     this.deadline = data.deadline.toISOString();
     this.status = data.status;
     this.tags = data.tags || [];

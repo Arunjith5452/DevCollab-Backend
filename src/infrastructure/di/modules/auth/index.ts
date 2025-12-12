@@ -3,6 +3,7 @@ import { ForgotPasswordUseCase } from "@/application/usecases/auth/implementatio
 import { GitHubLoginUseCase } from "@/application/usecases/auth/implementations/github-login.usecase";
 import { GoogleLoginUseCase } from "@/application/usecases/auth/implementations/google-login.usecase";
 import { LoginUseCase } from "@/application/usecases/auth/implementations/login.usecase";
+import { LogoutUseCase } from "@/application/usecases/auth/implementations/logout.usecase";
 import { RefreshTokenUseCase } from "@/application/usecases/auth/implementations/refresh-token.usecase";
 import { RegiserUseCase } from "@/application/usecases/auth/implementations/register.usecase";
 import { ResendOtpUseCase } from "@/application/usecases/auth/implementations/resend-otp.usecase";
@@ -14,7 +15,7 @@ import { AuthController } from "@/presentation/http/controllers/auth.controller"
 import { ContainerModule } from "inversify";
 
 
-export const AuthModule = new ContainerModule(({bind})=>{
+export const AuthModule = new ContainerModule(({ bind }) => {
     bind<AuthController>(AUTH_TYPES.AuthController).to(AuthController)
     bind<RegiserUseCase>(AUTH_TYPES.RegisterUseCase).to(RegiserUseCase)
     bind<VerifyOtpUseCase>(AUTH_TYPES.VerifyOtpUseCase).to(VerifyOtpUseCase)
@@ -27,4 +28,5 @@ export const AuthModule = new ContainerModule(({bind})=>{
     bind<CheckUserBlockStatusUseCase>(AUTH_TYPES.CheckUserBlockStatusUseCase).to(CheckUserBlockStatusUseCase)
     bind<GoogleLoginUseCase>(AUTH_TYPES.GoogleLoginUseCase).to(GoogleLoginUseCase)
     bind<GitHubLoginUseCase>(AUTH_TYPES.GitHubLoginUseCase).to(GitHubLoginUseCase)
+    bind<LogoutUseCase>(AUTH_TYPES.LogoutUseCase).to(LogoutUseCase)
 })
