@@ -17,7 +17,7 @@ container.load(
     AdminModule,    
     ProjectModule,
     TaskModule
-)
+);
 
 
 export {container}
