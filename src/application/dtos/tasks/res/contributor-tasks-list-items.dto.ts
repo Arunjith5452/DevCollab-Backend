@@ -5,13 +5,17 @@ export class TaskListItemDto {
   title: string;
   description: string;
   assignedId: string;
-  deadline: string; 
+  deadline: string;
   status: TaskStatus;
   tags: string[];
   payment: number;
   advancePaid: number;
   approval?: "approved" | "improvement-needed";
   feedback?: string;
+  acceptanceCriteria?: { text: string; completed: boolean }[];
+
+  documents?: string[];
+  comments?: { createdAt: Date; message: string; userId: string }[];
 
   constructor(data: {
     id: string;
@@ -24,6 +28,10 @@ export class TaskListItemDto {
     payment?: number;
     advancePaid?: number;
     feedback?: string;
+    acceptanceCriteria?: { text: string; completed: boolean }[];
+
+    documents?: string[];
+    comments?: { createdAt: Date; message: string; userId: string }[];
   }) {
     this.id = data.id;
     this.title = data.title;
@@ -35,6 +43,10 @@ export class TaskListItemDto {
     this.payment = data.payment || 0;
     this.advancePaid = data.advancePaid || 0;
     this.feedback = data.feedback;
+    this.acceptanceCriteria = data.acceptanceCriteria;
+
+    this.documents = data.documents || [];
+    this.comments = data.comments;
 
     // Auto-detect approval status
     if (data.status === "done") {
