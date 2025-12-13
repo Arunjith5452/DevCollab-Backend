@@ -23,6 +23,8 @@ export class TaskEntity {
         amount: number;
     };
     private _documents?: string[];
+    private _approval?: "under-review" | "approved";
+    private _workDescription?: string;
     private readonly _createdAt: Date;
     private _updatedAt: Date;
 
@@ -41,6 +43,8 @@ export class TaskEntity {
         acceptanceCriteria: Array<{ text: string; completed: boolean }>
         payment?: { advancePaid: number; amount: number };
         documents?: string[];
+        approval?: "under-review" | "approved";
+        workDescription?: string;
         createdAt?: Date;
         updatedAt?: Date;
     }) {
@@ -58,6 +62,8 @@ export class TaskEntity {
         this._acceptanceCriteria = data.acceptanceCriteria || [];
         this._payment = data.payment || { advancePaid: 0, amount: 0 };
         this._documents = data.documents || [];
+        this._approval = data.approval;
+        this._workDescription = data.workDescription;
         this._createdAt = data.createdAt || new Date();
         this._updatedAt = data.updatedAt || new Date();
     }
@@ -77,6 +83,8 @@ export class TaskEntity {
         acceptanceCriteria: Array<{ text: string; completed: boolean }>;
         payment?: { advancePaid: number; amount: number };
         documents?: string[];
+        approval?: "under-review" | "approved";
+        workDescription?: string;
         createdAt?: Date;
         updatedAt?: Date;
     }): TaskEntity {
@@ -98,6 +106,10 @@ export class TaskEntity {
             acceptanceCriteria: data.acceptanceCriteria,
             payment: data.payment,
             documents: data.documents,
+            approval: data.approval,
+            workDescription: data.workDescription,
+            createdAt: data.createdAt,
+            updatedAt: data.updatedAt,
         });
     }
 
@@ -110,7 +122,7 @@ export class TaskEntity {
     get projectId(): string {
         return this._projectId;
     }
-    get assignedId(): string  {
+    get assignedId(): string {
         return this._assignedId;
     }
     get description(): string {
@@ -142,6 +154,12 @@ export class TaskEntity {
     }
     get documents(): string[] | undefined {
         return this._documents;
+    }
+    get approval(): "under-review" | "approved" | undefined {
+        return this._approval;
+    }
+    get workDescription(): string | undefined {
+        return this._workDescription;
     }
     get createdAt(): Date {
         return this._createdAt;
@@ -175,5 +193,26 @@ export class TaskEntity {
             this._acceptanceCriteria[index].completed = true;
             this._updatedAt = new Date();
         }
+    }
+
+    submitWork(prLink: string, workDescription?: string) {
+        this._prLink = prLink;
+        this._workDescription = workDescription;
+        this._status = "done";
+        this._approval = "under-review";
+        this._updatedAt = new Date();
+    }
+
+    approve() {
+        this._approval = "approved";
+        this._feedBack = undefined; // Clear any previous feedback
+        this._updatedAt = new Date();
+    }
+
+    requestImprovement(feedback: string) {
+        this._status = "in-progress";
+        this._approval = undefined;
+        this._feedBack = feedback;
+        this._updatedAt = new Date();
     }
 }

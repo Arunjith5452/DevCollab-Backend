@@ -15,5 +15,6 @@ export interface TaskListItemDto {
     payment: number;
     advancePaid: number;
     acceptanceCriteria: AcceptanceCriteriaDto[];
-    documents?: string[]
+    documents?: string[];
+    comments?: Array<{ createdAt: Date; message: string; userId: string }>;
 }

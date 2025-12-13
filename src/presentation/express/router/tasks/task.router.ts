@@ -18,6 +18,8 @@ router.post("/task", AuthGuard([Role.ADMIN, Role.USER]), BlockGuard([Role.USER])
 router.get("/task", AuthGuard([Role.ADMIN, Role.USER]), BlockGuard([Role.USER]), (req: Request, res: Response) => taskController.getCreatorTasks(req, res))
 router.get("/project/:projectId/tasks/:status", AuthGuard([Role.ADMIN, Role.USER]), BlockGuard([Role.USER]), (req: Request, res: Response) => taskController.getContributerTasks(req, res))
 router.get("/task/assignees/:projectId", AuthGuard([Role.ADMIN, Role.USER]), BlockGuard([Role.USER]), (req: Request, res: Response) => taskController.getProjectAssignee(req, res))
+router.patch("/tasks/:taskId/comment", AuthGuard([Role.ADMIN, Role.USER]), BlockGuard([Role.USER]), (req: Request, res: Response) => taskController.addComment(req, res))
+router.patch("/tasks/:taskId/start", AuthGuard([Role.ADMIN, Role.USER]), BlockGuard([Role.USER]), (req: Request, res: Response) => taskController.startTask(req, res))
 
 
 export { router as taskRouter }

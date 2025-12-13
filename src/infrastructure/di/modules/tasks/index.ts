@@ -9,6 +9,12 @@ import { GetContributorTaskUseCase } from "@/application/usecases/tasks/implemen
 import { GetProjectAssigneeUseCase } from "@/application/usecases/tasks/implementations/get-project-assigees.usecase";
 
 
+import { AddCommentUseCase } from "@/application/usecases/tasks/implementations/add-comment.usecase";
+import { StartTaskUseCase } from "@/application/usecases/tasks/implementations/start-task.usecase";
+import { SubmitWorkUseCase } from "@/application/usecases/tasks/implementations/submit-work.usecase";
+import { ApproveTaskUseCase } from "@/application/usecases/tasks/implementations/approve-task.usecase";
+import { RequestImprovementUseCase } from "@/application/usecases/tasks/implementations/request-improvement.usecase";
+
 export const TaskModule = new ContainerModule(({ bind }) => {
 
     bind<TaskRepository>(TASK_TYPES.TaskRepository).to(TaskRepository)
@@ -17,4 +23,9 @@ export const TaskModule = new ContainerModule(({ bind }) => {
     bind<GetCreatorTasksUseCase>(TASK_TYPES.GetCreatorTasksUseCase).to(GetCreatorTasksUseCase)
     bind<GetContributorTaskUseCase>(TASK_TYPES.GetContributorTaskUseCase).to(GetContributorTaskUseCase)
     bind<GetProjectAssigneeUseCase>(TASK_TYPES.GetProjectAssigneeUseCase).to(GetProjectAssigneeUseCase)
+    bind<AddCommentUseCase>(TASK_TYPES.AddCommentUseCase).to(AddCommentUseCase)
+    bind<StartTaskUseCase>(TASK_TYPES.StartTaskUseCase).to(StartTaskUseCase)
+    bind<SubmitWorkUseCase>(TASK_TYPES.SubmitWorkUseCase).to(SubmitWorkUseCase)
+    bind<ApproveTaskUseCase>(TASK_TYPES.ApproveTaskUseCase).to(ApproveTaskUseCase)
+    bind<RequestImprovementUseCase>(TASK_TYPES.RequestImprovementUseCase).to(RequestImprovementUseCase)
 })  

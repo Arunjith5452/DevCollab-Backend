@@ -16,5 +16,6 @@ export enum ErrorMessage {
     PROJECT_NAME_REQUIRED = "Project name is required",
     OWNER_ID_REQUIRED = "Owner ID is required",
     PROJECT_NOT_FOUND = 'Project not found',
+    TASK_NOT_FOUND = "Task not found"
 
 }

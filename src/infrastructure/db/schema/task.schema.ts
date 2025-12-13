@@ -83,6 +83,15 @@ export const taskSchema = new Schema({
         {
             type: String
         }
-    ]
+    ],
+
+    approval: {
+        type: String,
+        enum: ["under-review", "approved"]
+    },
+
+    workDescription: {
+        type: String
+    }
 
 }, { timestamps: true });

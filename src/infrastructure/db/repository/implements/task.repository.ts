@@ -15,6 +15,12 @@ export class TaskRepository extends BaseRepository<TaskEntity> implements ITasks
         this.taskPersistenceMapper = taskPersistenceMapper
     }
 
+    async findById(id: string): Promise<TaskEntity | null> {
+        const doc = await this.model.findById(id).lean().exec();
+        if (!doc) return null;
+        return this.taskPersistenceMapper.fromMongo(doc);
+    }
+
     async createTask(data: TaskEntity): Promise<TaskEntity> {
         const mongoData = this.taskPersistenceMapper.toMongo(data)
         const createTask = await this.create(mongoData)
@@ -27,7 +33,7 @@ export class TaskRepository extends BaseRepository<TaskEntity> implements ITasks
     }
 
     async findByProjectStatusAndAssignee(projectId: string, status: string, assigneeId: string): Promise<TaskEntity[]> {
-        const docs = await this.model.find({ projectId, status, assigneeId }).sort({ createdAt: -1 }).lean().exec();
+        const docs = await this.model.find({ projectId, status, assignedId: assigneeId }).sort({ createdAt: -1 }).lean().exec();
         return Promise.all(docs.map(doc => this.taskPersistenceMapper.fromMongo(doc)));
     }
 

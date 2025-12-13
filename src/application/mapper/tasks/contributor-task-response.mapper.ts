@@ -18,11 +18,14 @@ export class ContributorTaskMapper {
             payment: entity.payment.amount,
             advancePaid: entity.payment.advancePaid,
             feedback: entity.feedBack,
+            acceptanceCriteria: entity.acceptanceCriteria,
+            documents: entity.documents || [],
+            comments: entity.comments,
         });
     }
 
     static toList(entities: TaskEntity[]): TaskListItemDto[] {
-    
+
         return entities.map(this.toListItem);
     }
 }

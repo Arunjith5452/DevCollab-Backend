@@ -16,6 +16,7 @@ export interface LeanTask {
         completed?: boolean;
     }>;
     documents?: string[];
+    comments?: Array<{ createdAt: Date; message: string; userId: string }>;
 }
 
 export class TaskResponseMapper {
@@ -35,6 +36,7 @@ export class TaskResponseMapper {
                 completed: item.completed ?? false,
             })) ?? [],
             documents: raw.documents ?? [],
+            comments: raw.comments ?? [],
         };
     }
 

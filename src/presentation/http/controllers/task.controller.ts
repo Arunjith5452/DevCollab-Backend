@@ -1,4 +1,6 @@
 import { CreateTaskDTO } from "@/application/dtos/tasks/create-task.dto";
+import { AddCommentDTO } from "@/application/dtos/tasks/add-comment.dto";
+import { StartTaskDTO } from "@/application/dtos/tasks/start-task.dto";
 import { GetContributorTasksQuery } from "@/application/dtos/tasks/get-contributor-tasks.dto";
 import { TaskListItemDto } from "@/application/dtos/tasks/res/contributor-tasks-list-items.dto";
 import { ProjectMemberNameOnly } from "@/application/dtos/tasks/res/get-project-members.dto";
@@ -21,7 +23,9 @@ export class TaskController {
         @inject(TASK_TYPES.CreateTaskUseCase) private readonly _createTaskUseCase: IExecute<CreateTaskDTO, void>,
         @inject(TASK_TYPES.GetCreatorTasksUseCase) private readonly _getCreatorTaskUseCase: IExecute<GetAllTaskQuery, { message: string, tasks: TaskEntity[], total: number }>,
         @inject(TASK_TYPES.GetContributorTaskUseCase) private readonly _getContributorUseCase: IExecute<GetContributorTasksQuery, TaskListItemDto[]>,
-        @inject(TASK_TYPES.GetProjectAssigneeUseCase) private readonly _getProjectAssigneeUseCase: IExecute<string, ProjectMemberNameOnly[]>
+        @inject(TASK_TYPES.GetProjectAssigneeUseCase) private readonly _getProjectAssigneeUseCase: IExecute<string, ProjectMemberNameOnly[]>,
+        @inject(TASK_TYPES.AddCommentUseCase) private readonly _addCommentUseCase: IExecute<AddCommentDTO, void>,
+        @inject(TASK_TYPES.StartTaskUseCase) private readonly _startTaskUseCase: IExecute<StartTaskDTO, void>
     ) { }
 
     /**
@@ -33,7 +37,7 @@ export class TaskController {
     async createTask(req: Request, res: Response) {
         try {
 
-            console.log("backend receving data of createTask >",req.body)
+            console.log("backend receving data of createTask >", req.body)
 
             const result = await this._createTaskUseCase.execute(req.body)
 
@@ -147,6 +151,49 @@ export class TaskController {
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )
+        }
+    }
+
+    /**
+     * Adds a comment to a task.
+     * @param req - Express request containing taskId in params and message in body.
+     * @param res - Express response object.
+     * @returns JSON response with success message.
+     */
+    async addComment(req: Request, res: Response) {
+        try {
+            const { taskId } = req.params;
+            const { message } = req.body;
+            const userId = req.user.userId;
+
+            await this._addCommentUseCase.execute({ taskId, message, userId });
+
+            return successResponse(res, "Comment added successfully");
+        } catch (error) {
+            return errorResponse(
+                res,
+                "Failed to add comment",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+        }
+    }
+
+    async startTask(req: Request, res: Response) {
+        try {
+            const { taskId } = req.params;
+            const userId = req.user.userId;
+
+            await this._startTaskUseCase.execute({ taskId, userId });
+
+            return successResponse(res, "Task started successfully");
+        } catch (error) {
+            return errorResponse(
+                res,
+                "Failed to start task",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
         }
     }
 
