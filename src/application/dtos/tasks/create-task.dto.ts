@@ -122,21 +122,4 @@ export class CreateTaskDTO {
     @IsString({ each: true })
     documents?: string[];
 
-
-    // constructor() {
-    //     this.title = "";
-    //     this.projectId = "";
-    //     this.assignedTo = "";
-    //     this.description = "";
-    //     this.prLink = "";
-    //     this.feedBack = "";
-    //     this.status = TaskStatus.TODO;
-    //     this.deadline = "";
-    //     this.comments = [];
-    //     this.tags = [];
-    //     this.acceptanceCriteria = [];
-    //     this.payment = new PaymentDTO(); 
-    //     this.documents = [];
-    // }
-
 }

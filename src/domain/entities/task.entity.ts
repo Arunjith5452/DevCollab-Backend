@@ -1,3 +1,6 @@
+import { ApprovalStatus } from "../enums/tasks/approval-status.enum";
+import { TaskStatus } from "../enums/tasks/task-status.enums";
+
 export class TaskEntity {
     private readonly _id?: string;
     private _title: string;
@@ -23,7 +26,7 @@ export class TaskEntity {
         amount: number;
     };
     private _documents?: string[];
-    private _approval?: "under-review" | "approved";
+    private _approval?: ApprovalStatus;
     private _workDescription?: string;
     private readonly _createdAt: Date;
     private _updatedAt: Date;
@@ -43,7 +46,7 @@ export class TaskEntity {
         acceptanceCriteria: Array<{ text: string; completed: boolean }>
         payment?: { advancePaid: number; amount: number };
         documents?: string[];
-        approval?: "under-review" | "approved";
+        approval?: ApprovalStatus;
         workDescription?: string;
         createdAt?: Date;
         updatedAt?: Date;
@@ -55,7 +58,7 @@ export class TaskEntity {
         this._description = data.description;
         this._prLink = data.prLink;
         this._feedBack = data.feedBack;
-        this._status = data.status || "todo";
+        this._status = data.status
         this._deadline = data.deadline;
         this._comments = data.comments || [];
         this._tags = data.tags || [];
@@ -83,7 +86,7 @@ export class TaskEntity {
         acceptanceCriteria: Array<{ text: string; completed: boolean }>;
         payment?: { advancePaid: number; amount: number };
         documents?: string[];
-        approval?: "under-review" | "approved";
+        approval?: ApprovalStatus
         workDescription?: string;
         createdAt?: Date;
         updatedAt?: Date;
@@ -155,7 +158,7 @@ export class TaskEntity {
     get documents(): string[] | undefined {
         return this._documents;
     }
-    get approval(): "under-review" | "approved" | undefined {
+    get approval(): ApprovalStatus | undefined {
         return this._approval;
     }
     get workDescription(): string | undefined {
@@ -198,21 +201,21 @@ export class TaskEntity {
     submitWork(prLink: string, workDescription?: string) {
         this._prLink = prLink;
         this._workDescription = workDescription;
-        this._status = "done";
-        this._approval = "under-review";
+        this._status = TaskStatus.DONE
+        this._approval = ApprovalStatus.UNDER_REVIEW
         this._updatedAt = new Date();
     }
 
     approve() {
-        this._approval = "approved";
-        this._feedBack = undefined; // Clear any previous feedback
+        this._approval = ApprovalStatus.APPROVED
+        this._feedBack = undefined;
         this._updatedAt = new Date();
     }
 
-    requestImprovement(feedback: string) {
-        this._status = "in-progress";
+    requestImprovement(feedBack: string) {
+        this._status = TaskStatus.IN_PROGRESS;
         this._approval = undefined;
-        this._feedBack = feedback;
+        this._feedBack = feedBack;
         this._updatedAt = new Date();
     }
 }

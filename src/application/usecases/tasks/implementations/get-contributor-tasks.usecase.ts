@@ -1,7 +1,7 @@
 import { GetContributorTasksQuery } from "@/application/dtos/tasks/get-contributor-tasks.dto";
-import { TaskListItemDto } from "@/application/dtos/tasks/res/contributor-tasks-list-items.dto";
+import { TaskListItemDto } from "@/application/dtos/tasks/res/list-task.dto";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
-import { ContributorTaskMapper } from "@/application/mapper/tasks/contributor-task-response.mapper";
+import { TaskResponseMapper } from "@/application/mapper/tasks/task-response.mapper";
 import { ProjectEntity } from "@/domain/entities/project.entity";
 import { TaskEntity } from "@/domain/entities/task.entity";
 import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
@@ -28,7 +28,6 @@ export class GetContributorTaskUseCase implements IExecute<GetContributorTasksQu
             const { projectId, userId, status } = query
 
             const project = await this._projectRepository.findEntityById(projectId)
-            console.log("project",project) 
 
             if (!project?.members.some(m => m.userId === userId && m.status === "active")) {
                 throw new Error(ErrorMessage.UNAUTHORIZED);
@@ -37,14 +36,14 @@ export class GetContributorTaskUseCase implements IExecute<GetContributorTasksQu
             let tasks: TaskEntity[]
 
             if (status === TaskStatus.TODO) {
-                tasks = await this._taskRepository.findByProjectAndStatus(projectId, "todo");
+                tasks = await this._taskRepository.findByProjectAndStatus(projectId, "todo")
                 console.log("todo:", tasks)
             } else {
-                tasks = await this._taskRepository.findByProjectStatusAndAssignee(projectId, status, userId);
+                tasks = await this._taskRepository.findByProjectStatusAndAssignee(projectId, status, userId)
                 console.log("AllTabs:", tasks)
             }
 
-            return ContributorTaskMapper.toList(tasks);
+            return TaskResponseMapper.toList(tasks)
 
         } catch (error) {
             throw error

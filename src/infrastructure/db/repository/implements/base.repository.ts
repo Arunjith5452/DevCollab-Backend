@@ -1,9 +1,11 @@
 import { Model, UpdateQuery, FilterQuery } from "mongoose";
 import { IBaseRepository } from "../interface/base-repository.interface";
+import { IBaseMapper } from "@/domain/interface/mappers/base-repository-mappers.interface";
 
 export abstract class BaseRepository<T> implements IBaseRepository<T> {
 
-  constructor(protected readonly model: Model<T>) { }
+  constructor(protected readonly model: Model<T>,
+  ) { }
 
   async create(item: Partial<T>): Promise<T> {
     return await this.model.create(item);

@@ -13,7 +13,6 @@ export class CreateTaskUseCase implements IExecute<CreateTaskDTO, void> {
 
     async execute(dto: CreateTaskDTO): Promise<void> {
         try {
-            console.log("dto in usecase", dto);
 
             const task = TaskEntity.create({
                 title: dto.title.trim(),
@@ -32,11 +31,10 @@ export class CreateTaskUseCase implements IExecute<CreateTaskDTO, void> {
                     }
                     : undefined,
             });
-            console.log("after create usecase",task)
+            console.log("after create usecase", task)
 
-            await this._taskRepository.createTask(task);
+            await this._taskRepository.createTask(task)
         } catch (error) {
-            console.error("CreateTaskUseCase error:", error);
             throw error;
         }
     }

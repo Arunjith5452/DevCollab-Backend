@@ -31,7 +31,7 @@ export const taskSchema = new Schema({
 
     status: {
         type: String,
-        enum: ["todo", "in-progress", "done", "improvement-needed"],
+        enum: ["todo", "in-progress", "done"],
         default: "todo"
     },
 

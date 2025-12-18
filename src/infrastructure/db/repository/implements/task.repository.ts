@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 import { BaseRepository } from "./base.repository";
-import { Model } from "mongoose";
+import { FilterQuery, Model } from "mongoose";
 import { TaskEntity } from "@/domain/entities/task.entity";
 import { ITasksRepository } from "../interface/task.interface";
 import { TaskPersistenceMapper } from "@/infrastructure/mappers/task-persistence.mapper";
@@ -13,6 +13,21 @@ export class TaskRepository extends BaseRepository<TaskEntity> implements ITasks
     constructor(@inject("TaskModel") model: Model<TaskEntity>, taskPersistenceMapper: TaskPersistenceMapper) {
         super(model)
         this.taskPersistenceMapper = taskPersistenceMapper
+    }
+
+    async findTask(filter: FilterQuery<TaskEntity>, options: { skip: number; limit: number }): Promise<TaskEntity[]> {
+
+        const docs = await this.model
+            .find(filter)
+            .sort({ createdAt: -1 })
+            .skip(options.skip)
+            .limit(options.limit)
+            .lean()
+            .exec();
+
+        return Promise.all(
+            docs.map(doc => this.taskPersistenceMapper.fromMongo(doc))
+        );
     }
 
     async findById(id: string): Promise<TaskEntity | null> {
@@ -39,11 +54,11 @@ export class TaskRepository extends BaseRepository<TaskEntity> implements ITasks
 
     async updateTask(task: TaskEntity): Promise<TaskEntity> {
         const mongoData = this.taskPersistenceMapper.toMongo(task);
+        console.log("mongodataupdateTask", mongoData)
         const updated = await this.model
             .findByIdAndUpdate(task.id, mongoData, { new: true })
             .lean()
             .exec();
         return this.taskPersistenceMapper.fromMongo(updated!);
     }
-
 }

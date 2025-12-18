@@ -2,7 +2,6 @@ import { CreateTaskDTO } from "@/application/dtos/tasks/create-task.dto";
 import { AddCommentDTO } from "@/application/dtos/tasks/add-comment.dto";
 import { StartTaskDTO } from "@/application/dtos/tasks/start-task.dto";
 import { GetContributorTasksQuery } from "@/application/dtos/tasks/get-contributor-tasks.dto";
-import { TaskListItemDto } from "@/application/dtos/tasks/res/contributor-tasks-list-items.dto";
 import { ProjectMemberNameOnly } from "@/application/dtos/tasks/res/get-project-members.dto";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { GetAllTaskQuery } from "@/application/usecases/tasks/interface/task-usecase.interface";
@@ -13,6 +12,9 @@ import { TASK_TYPES } from "@/infrastructure/di/types/tasks";
 import { errorResponse, successResponse } from "@/shared/utils/response.util";
 import { Request, Response } from "express";
 import { inject, injectable } from "inversify";
+import { SubmitWorkDTO } from "@/application/dtos/tasks/submit-work.dto";
+import { TaskListItemDto } from "@/application/dtos/tasks/res/list-task.dto";
+import { RequestImprovementDTO } from "@/application/dtos/tasks/request-improvement.dto";
 
 
 
@@ -25,7 +27,10 @@ export class TaskController {
         @inject(TASK_TYPES.GetContributorTaskUseCase) private readonly _getContributorUseCase: IExecute<GetContributorTasksQuery, TaskListItemDto[]>,
         @inject(TASK_TYPES.GetProjectAssigneeUseCase) private readonly _getProjectAssigneeUseCase: IExecute<string, ProjectMemberNameOnly[]>,
         @inject(TASK_TYPES.AddCommentUseCase) private readonly _addCommentUseCase: IExecute<AddCommentDTO, void>,
-        @inject(TASK_TYPES.StartTaskUseCase) private readonly _startTaskUseCase: IExecute<StartTaskDTO, void>
+        @inject(TASK_TYPES.StartTaskUseCase) private readonly _startTaskUseCase: IExecute<StartTaskDTO, void>,
+        @inject(TASK_TYPES.SubmitWorkUseCase) private readonly _submitWorkUseCase: IExecute<{ userId: string, taskId: string, data: SubmitWorkDTO }, void>,
+        @inject(TASK_TYPES.RequestImprovementUseCase) private readonly _requestImprovementUseCase: IExecute<{ userId: string, taskId: string, data: RequestImprovementDTO }, void>,
+        @inject(TASK_TYPES.ApproveTaskUseCase) private readonly _approveTaskUseCase: IExecute<{ userId: string, taskId: string }, void>
     ) { }
 
     /**
@@ -196,5 +201,68 @@ export class TaskController {
             );
         }
     }
+
+
+    async submitTask(req: Request, res: Response) {
+        try {
+            const { taskId } = req.params;
+            const userId = req.user.userId;
+
+            await this._submitWorkUseCase.execute({ taskId, userId, data: req.body });
+
+            return successResponse(res, "Task submited successfully");
+        } catch (error) {
+            return errorResponse(
+                res,
+                "Failed to submit task",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+        }
+    }
+
+    async requestImprovement(req: Request, res: Response) {
+        try {
+
+            let { taskId } = req.params
+            let userId = req.user.userId
+
+            console.log(taskId, req.body)
+
+            await this._requestImprovementUseCase.execute({ userId, taskId, data: req.body })
+
+            return successResponse(res, 'Task request-improvement successfull')
+
+        } catch (error) {
+            return errorResponse(
+                res,
+                "Failed to task request-improvement",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+        }
+    }
+
+    async approveTask(req: Request, res: Response) {
+        try {
+
+            let { taskId } = req.params
+            let userId = req.user.userId
+
+            await this._approveTaskUseCase.execute({ userId, taskId })
+
+            return successResponse(res, 'Task approval successfull')
+
+        } catch (error) {
+            return errorResponse(
+                res,
+                "Failed to task approval",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+        }
+    }
+
+
 
 }
