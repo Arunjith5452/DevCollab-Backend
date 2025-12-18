@@ -1,46 +1,35 @@
 
 import { TaskListItemDto } from "@/application/dtos/tasks/res/list-task.dto";
-
-export interface LeanTask {
-    id?: string;
-    _id?: { toString(): string };
-    title: string;
-    description: string;
-    status: string;
-    assignedId: string;
-    deadline?: Date;
-    tags?: string[];
-    payment?: { amount: number; advancePaid: number };
-    acceptanceCriteria?: Array<{
-        text: string;
-        completed?: boolean;
-    }>;
-    documents?: string[];
-    comments?: Array<{ createdAt: Date; message: string; userId: string }>;
-}
+import { TaskEntity } from "@/domain/entities/task.entity";
+import { TaskStatus } from "@/domain/enums/tasks/task-status.enums";
 
 export class TaskResponseMapper {
-    static toListItem(raw: LeanTask): TaskListItemDto {
-        return {
-            id: (raw.id || raw._id?.toString()) ?? '',
-            title: raw.title,
-            description: raw.description,
-            status: raw.status,
-            assignedId: raw.assignedId,
-            deadline: raw.deadline?.toISOString() ?? null,
-            tags: raw.tags ?? [],
-            payment: raw.payment?.amount ?? 0,
-            advancePaid: raw.payment?.advancePaid ?? 0,
-            acceptanceCriteria: raw.acceptanceCriteria?.map(item => ({
-                text: item.text,
-                completed: item.completed ?? false,
-            })) ?? [],
-            documents: raw.documents ?? [],
-            comments: raw.comments ?? [],
-        };
+    static toListItem(entity: TaskEntity): TaskListItemDto {
+        if (!entity.id) {
+            console.log('entity.id',entity.id)
+            throw new Error("TaskEntity ID is missing");
+        }
+        return new TaskListItemDto({
+            id: entity.id,
+            title: entity.title,
+            description: entity.description,
+            status: entity.status as TaskStatus,
+            assignedId: entity.assignedId,
+            deadline: entity.deadline,
+            tags: entity.tags,
+            payment: entity.payment.amount,
+            advancePaid: entity.payment.advancePaid,
+            acceptanceCriteria: entity.acceptanceCriteria,
+            documents: entity.documents ?? [],
+            comments: entity.comments ?? [],
+            prLink: entity.prLink,
+            workDescription: entity.workDescription,
+            approval: entity.approval,
+            feedback: entity.feedBack,
+        });
     }
 
-    static toListItemArray(list: LeanTask[]): TaskListItemDto[] {
-        return list.map(this.toListItem);
+    static toList(entities: TaskEntity[]): TaskListItemDto[] {
+        return entities.map(this.toListItem);
     }
 }

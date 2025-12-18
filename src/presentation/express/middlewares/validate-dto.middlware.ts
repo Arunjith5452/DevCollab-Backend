@@ -20,8 +20,6 @@ export const validateDTO = (dtoClass: any) => {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
 
-            console.log("req.body validate dtgo",req.body)
-
             const dtoInstance = plainToInstance(dtoClass, req.body, {
                 excludeExtraneousValues: true,
                 enableImplicitConversion: true,

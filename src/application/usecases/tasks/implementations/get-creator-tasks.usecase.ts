@@ -43,9 +43,9 @@ export class GetCreatorTasksUseCase implements IExecute<GetAllTaskQuery, { messa
 
         const skip = (page - 1) * limit;
 
-        const [tasks, total] = await Promise.all([this._taskRepository.find(filter, { skip, limit }), this._taskRepository.count(filter),]);
+        const [tasks, total] = await Promise.all([this._taskRepository.findTask(filter, { skip, limit }), this._taskRepository.count(filter)]);
 
-        const tasksDto = TaskResponseMapper.toListItemArray(tasks);
+        const tasksDto = TaskResponseMapper.toList(tasks);
         console.log("taskdDto", tasksDto)
 
         return {

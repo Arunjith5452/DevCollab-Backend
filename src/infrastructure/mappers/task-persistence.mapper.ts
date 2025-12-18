@@ -10,6 +10,8 @@ export class TaskPersistenceMapper {
             description: task.description,
             prLink: task.prLink,
             feedBack: task.feedBack,
+            approval:task.approval,
+            workDescription:task.workDescription,
             status: task.status,
             deadline: task.deadline,
             comments: task.comments?.map(c => ({
@@ -28,7 +30,6 @@ export class TaskPersistenceMapper {
     }
 
     async fromMongo(doc: any): Promise<TaskEntity> {
-
         return TaskEntity.create({
             id: doc._id.toString(),
             title: doc.title,
@@ -36,6 +37,8 @@ export class TaskPersistenceMapper {
             assignedId: doc.assignedId,
             description: doc.description,
             prLink: doc.prLink,
+            approval:doc.approval,
+            workDescription:doc.workDescription,
             feedBack: doc.feedBack,
             status: doc.status,
             deadline: doc.deadline,

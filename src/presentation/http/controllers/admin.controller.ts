@@ -82,6 +82,7 @@ export class AdminController {
      * @param res - Express response object.
      * @returns JSON with paginated user list.
      */
+
     async getAllProjects(req: Request, res: Response) {
         try {
 
@@ -112,3 +113,5 @@ export class AdminController {
         }
     }
 }
+
+

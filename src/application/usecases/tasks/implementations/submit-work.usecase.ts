@@ -5,32 +5,35 @@ import { ITasksRepository } from "@/infrastructure/db/repository/interface/task.
 import { TaskEntity } from "@/domain/entities/task.entity";
 import { TASK_TYPES } from "@/infrastructure/di/types/tasks";
 import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
+import { TaskStatus } from "@/domain/enums/tasks/task-status.enums";
 
 @injectable()
-export class SubmitWorkUseCase implements IExecute<SubmitWorkDTO, void> {
+export class SubmitWorkUseCase implements IExecute<{ userId: string, taskId: string, data: SubmitWorkDTO }, void> {
     constructor(
         @inject(TASK_TYPES.TaskRepository) private readonly _taskRepository: ITasksRepository<TaskEntity>
     ) { }
 
-    async execute(data: SubmitWorkDTO): Promise<void> {
-        const { taskId, userId, prLink, workDescription } = data;
+    async execute({ userId, taskId, data }: { userId: string, taskId: string, data: SubmitWorkDTO }): Promise<void> {
+        const { prLink, workDescription } = data;
 
-        const task = await this._taskRepository.findById(taskId);
+        const task = await this._taskRepository.findById(taskId)
 
         if (!task) {
             throw new Error(ErrorMessage.TASK_NOT_FOUND);
         }
 
-        if (task.assignedId !== userId) {
+        if (task.assignedId.toString() !== userId) {
             throw new Error(ErrorMessage.UNAUTHORIZED);
         }
 
-        if (task.status !== "in-progress") {
+        if (task.status !== TaskStatus.IN_PROGRESS) {
             throw new Error("Task must be in progress to submit work");
         }
 
         task.submitWork(prLink, workDescription);
 
-        await this._taskRepository.updateTask(task);
+        let submitdescription = await this._taskRepository.updateTask(task);
+
+        console.log("this is the submiting des", submitdescription)
     }
 }

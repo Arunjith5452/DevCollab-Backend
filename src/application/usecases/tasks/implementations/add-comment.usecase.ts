@@ -14,15 +14,15 @@ export class AddCommentUseCase implements IExecute<AddCommentDTO, void> {
 
     async execute(data: AddCommentDTO): Promise<void> {
         try {
-            const task = await this._taskRepository.findById(data.taskId);
+            const task = await this._taskRepository.findById(data.taskId)
 
             if (!task) {
-                throw new Error(ErrorMessage.TASK_NOT_FOUND);
+                throw new Error(ErrorMessage.TASK_NOT_FOUND)
             }
 
-            task.addComment({ message: data.message, userId: data.userId });
+            task.addComment({ message: data.message, userId: data.userId })
 
-            await this._taskRepository.updateTask(task);
+            await this._taskRepository.updateTask(task)
 
         } catch (error) {
             throw error;
