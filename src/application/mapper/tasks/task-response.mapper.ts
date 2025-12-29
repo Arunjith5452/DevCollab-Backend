@@ -6,7 +6,7 @@ import { TaskStatus } from "@/domain/enums/tasks/task-status.enums";
 export class TaskResponseMapper {
     static toListItem(entity: TaskEntity): TaskListItemDto {
         if (!entity.id) {
-            console.log('entity.id',entity.id)
+            console.log('entity.id', entity.id)
             throw new Error("TaskEntity ID is missing");
         }
         return new TaskListItemDto({
@@ -26,6 +26,7 @@ export class TaskResponseMapper {
             workDescription: entity.workDescription,
             approval: entity.approval,
             feedback: entity.feedBack,
+            escrowStatus: entity.payment.escrowStatus,
         });
     }
 

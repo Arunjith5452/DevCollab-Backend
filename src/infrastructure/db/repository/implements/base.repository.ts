@@ -1,6 +1,5 @@
 import { Model, UpdateQuery, FilterQuery } from "mongoose";
 import { IBaseRepository } from "../interface/base-repository.interface";
-import { IBaseMapper } from "@/domain/interface/mappers/base-repository-mappers.interface";
 
 export abstract class BaseRepository<T> implements IBaseRepository<T> {
 
@@ -41,7 +40,7 @@ export abstract class BaseRepository<T> implements IBaseRepository<T> {
       .lean()
       .exec();
 
-    return docs as unknown as T[];  
+    return docs as unknown as T[];
   }
 
   async delete(id: string): Promise<T | null> {
