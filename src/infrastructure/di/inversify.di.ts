@@ -5,19 +5,21 @@ import { UserModule } from './modules/user'
 import { AdminModule } from './modules/admin'
 import { ProjectModule } from './modules/project'
 import { TaskModule } from './modules/tasks'
+import { PaymentModule } from "./modules/payment/payment";
 
 const container = new Container({
-    defaultScope:"Singleton",
-    autobind:true
+    defaultScope: "Singleton",
+    autobind: true
 })
 
 container.load(
-    UserModule,    
-    AuthModule,      
-    AdminModule,    
+    UserModule,
+    AuthModule,
+    AdminModule,
     ProjectModule,
-    TaskModule
+    TaskModule,
+    PaymentModule
 );
 
 
-export {container}
+export { container }

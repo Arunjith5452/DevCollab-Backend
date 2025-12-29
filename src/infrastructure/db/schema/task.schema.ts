@@ -38,7 +38,6 @@ export const taskSchema = new Schema({
     deadline: {
         type: Date
     },
-
     comments: [
         {
             createdAt: {
@@ -67,24 +66,27 @@ export const taskSchema = new Schema({
             completed: { type: Boolean, default: false }
         }
     ],
-
     payment: {
+        totalAmount: {
+            type: Number,
+            required: true,
+        },
         advancePaid: {
             type: Number,
-            default: 0
+            default: 0,
         },
-        amount: {
-            type: Number,
-            default: 0
-        }
-    },
-
+        escrowStatus: {
+            type: String,
+            enum: ["not-paid", "held", "released"],
+            default: "not-paid",
+        },
+    }
+    ,
     documents: [
         {
             type: String
         }
     ],
-
     approval: {
         type: String,
         enum: ["under-review", "approved"]

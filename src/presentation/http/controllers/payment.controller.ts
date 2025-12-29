@@ -1,0 +1,67 @@
+import { Request, Response } from "express";
+import { injectable, inject } from "inversify";
+import { PAYMENT_TYPES } from "@/infrastructure/di/types/payment";
+import { IExecute } from "@/application/interface/execute.usecase.interface";
+import Stripe from "stripe";
+import { errorResponse, successResponse } from "@/shared/utils/response.util";
+import { ServerErrorStatus } from "@/domain/enums/status-codes/server-error-status.enum";
+import { CreateCheckoutSessionDTO } from "@/application/dtos/payment/create-checkout-session.dto";
+import { WebhookDTO } from "@/application/dtos/payment/webhook.dto";
+
+@injectable()
+export class PaymentController {
+    constructor(
+        @inject(PAYMENT_TYPES.CreateCheckoutSessionUseCase) private readonly _createCheckoutSessionUseCase: IExecute<CreateCheckoutSessionDTO, Stripe.Checkout.Session>,
+        @inject(PAYMENT_TYPES.HandleWebhookUseCase) private readonly _handleWebhookUseCase: IExecute<WebhookDTO, { received: boolean; eventType?: string }>
+    ) { }
+
+    async createCheckoutSession(req: Request, res: Response) {
+        console.log("reached")
+        try {
+            const { amount, metadata } = req.body;
+
+            console.log("payment controllet:", req.body)
+
+            const baseUrl = (process.env.FRONTEND_URL || 'http://localhost:3000').trim(); // e.g., https://yourapp.com
+
+            const session = await this._createCheckoutSessionUseCase.execute({
+                amount,
+                metadata,
+                success_url: `${baseUrl}/create-task?projectId=${metadata.project_id}&session_id={CHECKOUT_SESSION_ID}`,
+                cancel_url: `${baseUrl}/create-task?projectId=${metadata.project_id}`,
+            });
+
+            return successResponse(res, "Checkout session created", {
+                url: session.url,
+                id: session.id,
+            })
+
+        } catch (error) {
+            return errorResponse(res,
+                "Failed to create checkout session",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+        }
+    }
+
+    async handleWebhook(req: Request, res: Response) {
+        try {
+            const signature = req.headers['stripe-signature'];
+
+            if (!signature) {
+                return errorResponse(res, "Missing stripe-signature header", ServerErrorStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            const result = await this._handleWebhookUseCase.execute({
+                payload: req.body,
+                signature: signature as string
+            });
+
+            return successResponse(res, "Webhook received", result);
+        } catch (error: any) {
+            console.error('Webhook error:', error.message);
+            return errorResponse(res, error.message || "Webhook processing failed", ServerErrorStatus.INTERNAL_SERVER_ERROR, error);
+        }
+    }
+}

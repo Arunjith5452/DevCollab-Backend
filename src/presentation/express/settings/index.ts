@@ -1,6 +1,4 @@
-import { config } from "dotenv";
-config({ quiet: true });
-
+import "dotenv/config"; 
 import "reflect-metadata";
 import "source-map-support";
 import app from "./app";

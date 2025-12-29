@@ -22,8 +22,9 @@ export class TaskListItemDto {
   comments: { createdAt: Date; message: string; userId: string }[];
   prLink?: string;
   workDescription?: string;
-  approval?: ApprovalStatus;  
-  feedback?: string;        
+  approval?: ApprovalStatus;
+  feedback?: string;
+  escrowStatus?: "not-paid" | "held" | "released";
 
   constructor(data: {
     id: string;
@@ -42,6 +43,7 @@ export class TaskListItemDto {
     workDescription?: string;
     approval?: ApprovalStatus;
     feedback?: string;
+    escrowStatus?: "not-paid" | "held" | "released";
   }) {
     this.id = data.id;
     this.title = data.title;
@@ -59,5 +61,6 @@ export class TaskListItemDto {
     this.workDescription = data.workDescription;
     this.approval = data.approval;
     this.feedback = data.feedback;
+    this.escrowStatus = data.escrowStatus;
   }
 }

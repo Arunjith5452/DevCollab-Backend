@@ -28,7 +28,7 @@ export class AuthController {
         @inject(AUTH_TYPES.ResetPasswordUseCase) private readonly _resetPasswordUseCase: IExecute<ResetPasswordDTO, { message: string }>,
         @inject(AUTH_TYPES.GoogleLoginUseCase) private readonly _googleLoginUseCase: IExecute<GoogleLoginDTO, AuthResult>,
         @inject(AUTH_TYPES.GitHubLoginUseCase) private readonly _gitHubLoginUseCase: IExecute<GithubLoginDTO, AuthResult>,
-        @inject(AUTH_TYPES.LogoutUseCase) private readonly _logoutUseCase: IExecute<string , void>
+        @inject(AUTH_TYPES.LogoutUseCase) private readonly _logoutUseCase: IExecute<string, void>
     ) { }
 
     /**
@@ -106,14 +106,14 @@ export class AuthController {
 
             res.cookie("refreshToken", result.refreshToken, {
                 httpOnly: true,
-                sameSite: "strict",
+                sameSite: "lax",
                 maxAge: Number(process.env.REFRESH_TOKEN_MAX_AGE),
             });
 
             res.cookie("accessToken", result.accessToken, {
 
                 httpOnly: true,
-                sameSite: "strict",
+                sameSite: "lax",
                 maxAge: Number(process.env.ACCESS_TOKEN_MAX_AGE),
             });
 
@@ -144,7 +144,7 @@ export class AuthController {
 
             res.cookie("accessToken", result.accessToken, {
                 httpOnly: true,
-                sameSite: "strict",
+                sameSite: "lax",
                 maxAge: Number(process.env.ACCESS_TOKEN_MAX_AGE),
             });
 
@@ -239,13 +239,13 @@ export class AuthController {
 
             res.cookie("refreshToken", result.refreshToken, {
                 httpOnly: true,
-                sameSite: "strict",
+                sameSite: "lax",
                 maxAge: Number(process.env.REFRESH_TOKEN_MAX_AGE),
             });
 
             res.cookie("accessToken", result.accessToken, {
                 httpOnly: true,
-                sameSite: "strict",
+                sameSite: "lax",
                 maxAge: Number(process.env.ACCESS_TOKEN_MAX_AGE),
             });
 
@@ -274,13 +274,13 @@ export class AuthController {
 
             res.cookie("refreshToken", result.refreshToken, {
                 httpOnly: true,
-                sameSite: "strict",
+                sameSite: "lax",
                 maxAge: Number(process.env.REFRESH_TOKEN_MAX_AGE),
             });
 
             res.cookie("accessToken", result.accessToken, {
                 httpOnly: true,
-                sameSite: "strict",
+                sameSite: "lax",
                 maxAge: Number(process.env.ACCESS_TOKEN_MAX_AGE),
             });
 
@@ -311,7 +311,7 @@ export class AuthController {
         try {
             const refreshToken = req.cookies.refreshToken;
 
-           const result = await this._logoutUseCase.execute(refreshToken);
+            const result = await this._logoutUseCase.execute(refreshToken);
 
             res.clearCookie("refreshToken");
             res.clearCookie("accessToken");

@@ -50,6 +50,11 @@ class PaymentDTO {
     @Expose()
     @IsNumber({}, { message: "Amount must be a valid number" })
     amount!: number;
+
+    @Expose()
+    @IsOptional()
+    @IsString()
+    sessionId?: string;
 }
 
 export class CreateTaskDTO {

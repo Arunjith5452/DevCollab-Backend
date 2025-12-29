@@ -10,8 +10,8 @@ export class TaskPersistenceMapper {
             description: task.description,
             prLink: task.prLink,
             feedBack: task.feedBack,
-            approval:task.approval,
-            workDescription:task.workDescription,
+            approval: task.approval,
+            workDescription: task.workDescription,
             status: task.status,
             deadline: task.deadline,
             comments: task.comments?.map(c => ({
@@ -23,7 +23,8 @@ export class TaskPersistenceMapper {
             acceptanceCriteria: task.acceptanceCriteria,
             payment: {
                 advancePaid: task.payment?.advancePaid,
-                amount: task.payment?.amount
+                totalAmount: task.payment?.amount, // Map amount to totalAmount for Mongoose
+                escrowStatus: task.payment?.escrowStatus // Persist escrow status
             },
             documents: task.documents
         }
@@ -37,8 +38,8 @@ export class TaskPersistenceMapper {
             assignedId: doc.assignedId,
             description: doc.description,
             prLink: doc.prLink,
-            approval:doc.approval,
-            workDescription:doc.workDescription,
+            approval: doc.approval,
+            workDescription: doc.workDescription,
             feedBack: doc.feedBack,
             status: doc.status,
             deadline: doc.deadline,
@@ -49,7 +50,11 @@ export class TaskPersistenceMapper {
             })),
             tags: doc.tags,
             acceptanceCriteria: doc.acceptanceCriteria,
-            payment: doc.payment,
+            payment: doc.payment ? {
+                amount: doc.payment.totalAmount, // Map totalAmount back to amount for Entity
+                advancePaid: doc.payment.advancePaid,
+                escrowStatus: doc.payment.escrowStatus
+            } : undefined,
             documents: doc.documents,
             createdAt: doc.createdAt,
             updatedAt: doc.updatedAt
