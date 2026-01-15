@@ -43,11 +43,6 @@ class CommentDTO {
 
 class PaymentDTO {
     @Expose()
-    @IsNumber({}, { message: 'Advance paid must be a number' })
-    @Min(0, { message: 'Advance paid cannot be negative' })
-    advancePaid!: number;
-
-    @Expose()
     @IsNumber({}, { message: "Amount must be a valid number" })
     amount!: number;
 

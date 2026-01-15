@@ -32,7 +32,7 @@ export class StripeProvider {
                             name: 'Task Advance Payment',
                             description: metadata.task_title || 'Advance for freelance task',
                         },
-                        unit_amount: Math.round(amount), 
+                        unit_amount: Math.round(amount),
                     },
                     quantity: 1,
                 },

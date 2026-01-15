@@ -23,9 +23,9 @@ export class CreateTaskUseCase implements IExecute<CreateTaskDTO, void> {
         try {
             let stripePaymentIntentId: string | undefined;
 
-            if (dto.payment && dto.payment.advancePaid > 0) {
+            if (dto.payment && dto.payment.amount > 0) {
                 if (!dto.payment.sessionId) {
-                    throw new Error("Session ID is required for advance payment");
+                    throw new Error("Session ID is required for payment");
                 }
 
                 const session = await this._stripeProvider.retrieveCheckoutSession(dto.payment.sessionId);
@@ -50,17 +50,16 @@ export class CreateTaskUseCase implements IExecute<CreateTaskDTO, void> {
                 payment: dto.payment
                     ? {
                         amount: dto.payment.amount,
-                        advancePaid: dto.payment.advancePaid,
                     }
                     : undefined,
             });
 
             const createdTask = await this._taskRepository.createTask(task);
 
-            if (dto.payment && dto.payment.advancePaid > 0 && dto.payment.sessionId && stripePaymentIntentId) {
+            if (dto.payment && dto.payment.amount > 0 && dto.payment.sessionId && stripePaymentIntentId) {
                 const paymentEntity = PaymentEntity.create({
                     userId: dto.assignedId,
-                    amount: dto.payment.advancePaid,
+                    amount: dto.payment.amount,
                     purpose: PaymentPurpose.TASK_ESCROW,
                     stripePaymentIntentId: stripePaymentIntentId,
                     stripeSessionId: dto.payment.sessionId,

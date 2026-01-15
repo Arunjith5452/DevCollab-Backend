@@ -22,7 +22,6 @@ export class TaskPersistenceMapper {
             tags: task.tags,
             acceptanceCriteria: task.acceptanceCriteria,
             payment: {
-                advancePaid: task.payment?.advancePaid,
                 totalAmount: task.payment?.amount, // Map amount to totalAmount for Mongoose
                 escrowStatus: task.payment?.escrowStatus // Persist escrow status
             },
@@ -52,7 +51,6 @@ export class TaskPersistenceMapper {
             acceptanceCriteria: doc.acceptanceCriteria,
             payment: doc.payment ? {
                 amount: doc.payment.totalAmount, // Map totalAmount back to amount for Entity
-                advancePaid: doc.payment.advancePaid,
                 escrowStatus: doc.payment.escrowStatus
             } : undefined,
             documents: doc.documents,

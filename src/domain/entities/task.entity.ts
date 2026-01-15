@@ -22,7 +22,6 @@ export class TaskEntity {
         completed: boolean;
     }>
     private _payment: {
-        advancePaid: number;
         amount: number;
         escrowStatus?: "not-paid" | "held" | "released";
     };
@@ -45,7 +44,7 @@ export class TaskEntity {
         comments?: Array<{ createdAt: Date; message: string; userId: string }>;
         tags: string[];
         acceptanceCriteria: Array<{ text: string; completed: boolean }>
-        payment?: { advancePaid: number; amount: number; escrowStatus?: "not-paid" | "held" | "released" };
+        payment?: { amount: number; escrowStatus?: "not-paid" | "held" | "released" };
         documents?: string[];
         approval?: ApprovalStatus;
         workDescription?: string;
@@ -64,7 +63,7 @@ export class TaskEntity {
         this._comments = data.comments || [];
         this._tags = data.tags || [];
         this._acceptanceCriteria = data.acceptanceCriteria || [];
-        this._payment = data.payment || { advancePaid: 0, amount: 0, escrowStatus: "not-paid" };
+        this._payment = data.payment || { amount: 0, escrowStatus: "not-paid" };
         this._documents = data.documents || [];
         this._approval = data.approval;
         this._workDescription = data.workDescription;
@@ -85,7 +84,7 @@ export class TaskEntity {
         comments?: Array<{ createdAt: Date; message: string; userId: string }>;
         tags: string[];
         acceptanceCriteria: Array<{ text: string; completed: boolean }>;
-        payment?: { advancePaid: number; amount: number; escrowStatus?: "not-paid" | "held" | "released" };
+        payment?: { amount: number; escrowStatus?: "not-paid" | "held" | "released" };
         documents?: string[];
         approval?: ApprovalStatus
         workDescription?: string;
@@ -187,8 +186,8 @@ export class TaskEntity {
         this._updatedAt = new Date();
     }
 
-    updatePayment(amount: number, advancePaid: number, escrowStatus?: "not-paid" | "held" | "released") {
-        this._payment = { amount, advancePaid, escrowStatus: escrowStatus || "not-paid" };
+    updatePayment(amount: number, escrowStatus?: "not-paid" | "held" | "released") {
+        this._payment = { amount, escrowStatus: escrowStatus || "not-paid" };
         this._updatedAt = new Date();
     }
 
@@ -210,7 +209,9 @@ export class TaskEntity {
     approve() {
         this._approval = ApprovalStatus.APPROVED
         this._feedBack = undefined;
-        this._payment.escrowStatus = "released"; 
+        if (this._payment) {
+            this._payment.escrowStatus = "released";
+        }
         this._updatedAt = new Date();
     }
 

@@ -1,4 +1,5 @@
-import { ObjectId } from "mongodb";
+import { Types } from "mongoose";
+type ObjectId = Types.ObjectId;
 
 export interface MongoUser {
   _id: string;
