@@ -1,17 +1,21 @@
-import "dotenv/config"; 
+import "dotenv/config";
 import "reflect-metadata";
 import "source-map-support";
 import app from "./app";
 import { DatabaseService } from "@/infrastructure/db/mongoose/connect.db";
+import { SignalingGateway } from "../../socket/signaling.gateway";
 
 
 const PORT = process.env.PORT;
 
 const bootstrap = async () => {
   await DatabaseService.connect()
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     console.log(`🚀 Server started on http://localhost:${PORT}`);
   });
+
+  // Initialize Socket.io Signaling Gateway
+  new SignalingGateway(server);
 };
 
 bootstrap()
