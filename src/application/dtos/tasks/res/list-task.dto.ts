@@ -16,7 +16,6 @@ export class TaskListItemDto {
   deadline: string | null;
   tags: string[];
   payment: number;
-  advancePaid: number;
   acceptanceCriteria: AcceptanceCriteriaDto[];
   documents: string[];
   comments: { createdAt: Date; message: string; userId: string }[];
@@ -35,7 +34,6 @@ export class TaskListItemDto {
     deadline: Date | null;
     tags?: string[];
     payment?: number;
-    advancePaid?: number;
     acceptanceCriteria?: AcceptanceCriteriaDto[];
     documents?: string[];
     comments?: { createdAt: Date; message: string; userId: string }[];
@@ -53,7 +51,6 @@ export class TaskListItemDto {
     this.deadline = data.deadline ? new Date(data.deadline).toISOString() : null;
     this.tags = data.tags ?? [];
     this.payment = data.payment ?? 0;
-    this.advancePaid = data.advancePaid ?? 0;
     this.acceptanceCriteria = data.acceptanceCriteria ?? [];
     this.documents = data.documents ?? [];
     this.comments = data.comments ?? [];

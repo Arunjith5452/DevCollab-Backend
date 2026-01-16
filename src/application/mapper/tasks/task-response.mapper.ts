@@ -18,7 +18,6 @@ export class TaskResponseMapper {
             deadline: entity.deadline,
             tags: entity.tags,
             payment: entity.payment.amount,
-            advancePaid: entity.payment.advancePaid,
             acceptanceCriteria: entity.acceptanceCriteria,
             documents: entity.documents ?? [],
             comments: entity.comments ?? [],
