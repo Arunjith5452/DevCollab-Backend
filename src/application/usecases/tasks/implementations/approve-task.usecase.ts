@@ -35,6 +35,7 @@ export class ApproveTaskUseCase implements IExecute<{ userId: string, taskId: st
         }
 
         task.approve();
+        console.log("Task approved, new state:", JSON.stringify(task));
 
         await this._taskRepository.updateTask(task);
     }

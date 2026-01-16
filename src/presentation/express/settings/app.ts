@@ -1,16 +1,12 @@
 import express from 'express'
 const app = express()
-import { authRouter } from '../router/auth/auth.router'
 import compression from 'compression'
 import cors from "cors"
 import cookieParser from "cookie-parser"
-import { profileRouter } from '../router/auth/profile.router'
-import { adminRouter } from '../router/admin/admin.router'
-import { projectRouter } from '../router/project/project.router'
-import { s3Router } from '../router/user/file.router'
-import { userRouter } from '../router/user/user.router'
-import { taskRouter } from '../router/tasks/task.router'
-import { paymentRouter } from '../router/payment/payment.router'
+import { appRouter } from '../router/index'
+import { AppError } from '@/shared/utils/appError'
+// import { globalErrorHandler } from '@/presentation/express/middlewares/global-ErrorHandler.middlware'
+
 
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
@@ -23,14 +19,7 @@ app.use(compression())
 app.use(express.json())
 
 
-app.use("/api", adminRouter)
-app.use("/api", userRouter)
-app.use("/api", authRouter)
-app.use("/api", s3Router)
-app.use("/api", profileRouter)
-app.use("/api", projectRouter)
-app.use("/api", taskRouter)
-app.use("/api", paymentRouter)
+app.use("/api", appRouter)
 
 /* =====  GLOBAL DEBUG – remove when done  ===== */
 app.use((req, res, next) => {
@@ -38,5 +27,14 @@ app.use((req, res, next) => {
   next();        // continue to next middleware
 });
 /* ============================================ */
+
+
+// // Handle 404 - Not Found
+// app.use((req, res, next) => {
+//   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+// });
+
+// // Global Error Handling Middleware
+// app.use(globalErrorHandler);
 
 export default app;

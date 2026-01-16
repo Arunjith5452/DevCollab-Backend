@@ -38,7 +38,7 @@ export class TaskRepository extends BaseRepository<TaskEntity> implements ITasks
 
     async createTask(data: TaskEntity): Promise<TaskEntity> {
         const mongoData = this.taskPersistenceMapper.toMongo(data)
-        const createTask = await this.create(mongoData)
+        const createTask = await this.create(mongoData as any)
         return await this.taskPersistenceMapper.fromMongo(createTask)
     }
 
@@ -54,7 +54,7 @@ export class TaskRepository extends BaseRepository<TaskEntity> implements ITasks
 
     async updateTask(task: TaskEntity): Promise<TaskEntity> {
         const mongoData = this.taskPersistenceMapper.toMongo(task);
-        console.log("mongodataupdateTask", mongoData)
+        console.log("TaskRepository.updateTask - mongoData:", JSON.stringify(mongoData, null, 2));
         const updated = await this.model
             .findByIdAndUpdate(task.id, mongoData, { new: true })
             .lean()

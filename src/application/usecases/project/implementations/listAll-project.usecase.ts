@@ -21,7 +21,6 @@ export class ListProjectUseCase implements IExecute<GetAllProjectsQuery, { mesag
                 status: { $ne: "disabled" }
             };
 
-
             if (search) {
                 filter.title = { $regex: search, $options: "i" }
             }
