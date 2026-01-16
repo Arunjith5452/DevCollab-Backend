@@ -1,4 +1,5 @@
 import { UpdateProfileDTO } from "@/application/dtos/user/updateProfile.dto";
+import { deleteFile } from "@/infrastructure/providers/s3-bucket/s3Service";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { UserEntity } from "@/domain/entities/user.entity";
 import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
@@ -16,6 +17,8 @@ export class UpdateUserProfileUseCase implements IExecute<{ userId: string, dto:
 
             let user = await this._userRepository.findEntityById(userId)
 
+            const oldProfileImage = user?.profileImage;
+
             user?.updateProfile(dto)
 
             // console.log("DTO:", dto);
@@ -29,6 +32,10 @@ export class UpdateUserProfileUseCase implements IExecute<{ userId: string, dto:
                 techStack: dto.techStack,
                 profileImage: user?.profileImage,
             })
+
+            if (dto.profileImage && oldProfileImage && dto.profileImage !== oldProfileImage) {
+                await deleteFile(oldProfileImage);
+            }
 
             // console.log("updated",updated)
 

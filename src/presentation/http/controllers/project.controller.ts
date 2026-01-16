@@ -13,6 +13,7 @@ import { PROJECT_TYPES } from "@/infrastructure/di/types";
 import { errorResponse, successResponse } from "@/shared/utils/response.util";
 import { Request, Response } from "express";
 import { inject, injectable } from "inversify";
+import { MESSAGES } from "@/shared/constants/messages";
 
 
 
@@ -43,7 +44,7 @@ export class ProjectController {
     * @param res - Express response object.
     * @returns JSON response with success message upon successful project creation.
     */
-    async createProject(req: Request, res: Response) {
+    async createProject(req: Request, res: Response): Promise<Response> {
         try {
 
             const userId = req.user?.userId
@@ -54,7 +55,7 @@ export class ProjectController {
         } catch (error) {
             console.log(error)
             return errorResponse(res,
-                "Project creation failed",
+                MESSAGES.PROJECT.ERROR.CREATION_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )
@@ -69,7 +70,7 @@ export class ProjectController {
      * @param res - Express response object.
      * @returns JSON with updated project data.
      */
-    async editProject(req: Request, res: Response) {
+    async editProject(req: Request, res: Response): Promise<Response> {
         try {
 
             let { projectId } = req.params
@@ -82,7 +83,7 @@ export class ProjectController {
         } catch (error) {
             console.log(error)
             return errorResponse(res,
-                "Edit Project failed",
+                MESSAGES.PROJECT.ERROR.EDIT_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )
@@ -97,7 +98,7 @@ export class ProjectController {
  * @param res - Express response object.
  * @returns JSON with editable project details.
  */
-    async getProjectForEdit(req: Request, res: Response) {
+    async getProjectForEdit(req: Request, res: Response): Promise<Response> {
 
         try {
 
@@ -110,7 +111,7 @@ export class ProjectController {
 
         } catch (error) {
             return errorResponse(res,
-                "fetch Edit Project failed",
+                MESSAGES.PROJECT.ERROR.FETCH_EDIT_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )
@@ -123,7 +124,7 @@ export class ProjectController {
          * @param res - Express response object.
          * @returns JSON response containing a list of projects and total count.
          */
-    async getAllProjects(req: Request, res: Response) {
+    async getAllProjects(req: Request, res: Response): Promise<Response> {
 
         try {
 
@@ -150,7 +151,7 @@ export class ProjectController {
 
             return errorResponse(
                 res,
-                "Failed to fetch users",
+                MESSAGES.PROJECT.ERROR.USERS_FETCH_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )
@@ -164,7 +165,7 @@ export class ProjectController {
      * @param res - Express response object.
      * @returns JSON response containing detailed project data.
      */
-    async projectDetails(req: Request, res: Response) {
+    async projectDetails(req: Request, res: Response): Promise<Response> {
 
         try {
 
@@ -181,7 +182,7 @@ export class ProjectController {
         } catch (error) {
 
             return errorResponse(res,
-                "Project details failed",
+                MESSAGES.PROJECT.ERROR.DETAILS_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )
@@ -194,7 +195,7 @@ export class ProjectController {
  * @param res - Express response object.
  * @returns JSON with success message and application result.
  */
-    async applyToProject(req: Request, res: Response) {
+    async applyToProject(req: Request, res: Response): Promise<Response> {
 
         try {
 
@@ -211,7 +212,7 @@ export class ProjectController {
 
         } catch (error) {
             return errorResponse(res,
-                "applyProject details failed",
+                MESSAGES.PROJECT.ERROR.APPLY_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )
@@ -225,13 +226,13 @@ export class ProjectController {
  * @param res - Express response object.
  * @returns JSON list of pending applications.
  */
-    async getPendingApplication(req: Request, res: Response) {
+    async getPendingApplication(req: Request, res: Response): Promise<Response> {
         try {
             const { projectId } = req.params
             const result = await this._getPendingApplicationUseCase.execute(projectId)
-            return successResponse(res, "Pending applications fetched", result);
+            return successResponse(res, MESSAGES.PROJECT.SUCCESS.APPLICATIONS_FETCHED, result);
         } catch (error) {
-            return errorResponse(res, "Failed to fetch applications", ServerErrorStatus.INTERNAL_SERVER_ERROR, error);
+            return errorResponse(res, MESSAGES.PROJECT.ERROR.APPLICATIONS_FETCH_FAILED, ServerErrorStatus.INTERNAL_SERVER_ERROR, error);
 
         }
     }
@@ -243,7 +244,7 @@ export class ProjectController {
  * @param res - Express response object.
  * @returns JSON with approval message.
  */
-    async approveApplication(req: Request, res: Response) {
+    async approveApplication(req: Request, res: Response): Promise<Response> {
         try {
 
             const { projectId, applicationId } = req.params
@@ -255,7 +256,7 @@ export class ProjectController {
         } catch (error) {
             return errorResponse(
                 res,
-                "Failed to approve application",
+                MESSAGES.PROJECT.ERROR.APPROVE_APPLICATION_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             );
@@ -270,7 +271,7 @@ export class ProjectController {
      * @param res - Express response object.
      * @returns JSON with rejection message.
      */
-    async rejectApplication(req: Request, res: Response) {
+    async rejectApplication(req: Request, res: Response): Promise<Response> {
 
         try {
 
@@ -283,7 +284,7 @@ export class ProjectController {
         } catch (error) {
             return errorResponse(
                 res,
-                "Failed to reject application",
+                MESSAGES.PROJECT.ERROR.REJECT_APPLICATION_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             );
@@ -298,7 +299,7 @@ export class ProjectController {
  * @param res - Express response object.
  * @returns JSON list of created projects.
  */
-    async getMyCreatedProject(req: Request, res: Response) {
+    async getMyCreatedProject(req: Request, res: Response): Promise<Response> {
 
         try {
 
@@ -311,7 +312,7 @@ export class ProjectController {
 
             return errorResponse(
                 res,
-                "Failed to load created project",
+                MESSAGES.PROJECT.ERROR.LOAD_CREATED_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             );
@@ -326,7 +327,7 @@ export class ProjectController {
  * @param res - Express response object.
  * @returns JSON list of applied projects.
  */
-    async getMyAppliedProject(req: Request, res: Response) {
+    async getMyAppliedProject(req: Request, res: Response): Promise<Response> {
 
         try {
 
@@ -338,7 +339,7 @@ export class ProjectController {
 
             return errorResponse(
                 res,
-                "Failed to load created project",
+                MESSAGES.PROJECT.ERROR.LOAD_CREATED_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             );
@@ -352,7 +353,7 @@ export class ProjectController {
  * @param res - Express response object.
  * @returns JSON paginated list of project members.
  */
-    async getProjectMember(req: Request, res: Response) {
+    async getProjectMember(req: Request, res: Response): Promise<Response> {
 
         try {
 
@@ -367,12 +368,12 @@ export class ProjectController {
                 limit: parseInt(limit as string)
             })
 
-            return successResponse(res, 'Members fetched successfully', result)
+            return successResponse(res, MESSAGES.PROJECT.SUCCESS.MEMBERS_FETCHED, result)
 
         } catch (error) {
             return errorResponse(
                 res,
-                "Failed to load project members",
+                MESSAGES.PROJECT.ERROR.LOAD_MEMBERS_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             );
@@ -386,7 +387,7 @@ export class ProjectController {
  * @param res - Express response object.
  * @returns JSON confirmation of project disable action.
  */
-    async disableProject(req: Request, res: Response) {
+    async disableProject(req: Request, res: Response): Promise<Response> {
         try {
 
             const { projectId } = req.params
@@ -399,7 +400,7 @@ export class ProjectController {
         } catch (error) {
             return errorResponse(
                 res,
-                "Failed to disable project",
+                MESSAGES.PROJECT.ERROR.DISABLE_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             );

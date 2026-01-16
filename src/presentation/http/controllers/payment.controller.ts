@@ -7,6 +7,7 @@ import { errorResponse, successResponse } from "@/shared/utils/response.util";
 import { ServerErrorStatus } from "@/domain/enums/status-codes/server-error-status.enum";
 import { CreateCheckoutSessionDTO } from "@/application/dtos/payment/create-checkout-session.dto";
 import { WebhookDTO } from "@/application/dtos/payment/webhook.dto";
+import { MESSAGES } from "@/shared/constants/messages";
 
 @injectable()
 export class PaymentController {
@@ -15,7 +16,7 @@ export class PaymentController {
         @inject(PAYMENT_TYPES.HandleWebhookUseCase) private readonly _handleWebhookUseCase: IExecute<WebhookDTO, { received: boolean; eventType?: string }>
     ) { }
 
-    async createCheckoutSession(req: Request, res: Response) {
+    async createCheckoutSession(req: Request, res: Response): Promise<Response> {
         console.log("reached")
         try {
             const { amount, metadata } = req.body;
@@ -31,21 +32,21 @@ export class PaymentController {
                 cancel_url: `${baseUrl}/create-task?projectId=${metadata.project_id}`,
             });
 
-            return successResponse(res, "Checkout session created", {
+            return successResponse(res, MESSAGES.PAYMENT.SUCCESS.CHECKOUT_SESSION_CREATED, {
                 url: session.url,
                 id: session.id,
             })
 
         } catch (error) {
             return errorResponse(res,
-                "Failed to create checkout session",
+                MESSAGES.PAYMENT.ERROR.CHECKOUT_SESSION_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             );
         }
     }
 
-    async handleWebhook(req: Request, res: Response) {
+    async handleWebhook(req: Request, res: Response): Promise<Response> {
         try {
             const signature = req.headers['stripe-signature'];
 
@@ -58,10 +59,10 @@ export class PaymentController {
                 signature: signature as string
             });
 
-            return successResponse(res, "Webhook received", result);
+            return successResponse(res, MESSAGES.PAYMENT.SUCCESS.WEBHOOK_RECEIVED, result);
         } catch (error: any) {
             console.error('Webhook error:', error.message);
-            return errorResponse(res, error.message || "Webhook processing failed", ServerErrorStatus.INTERNAL_SERVER_ERROR, error);
+            return errorResponse(res, error.message || MESSAGES.PAYMENT.ERROR.WEBHOOK_FAILED, ServerErrorStatus.INTERNAL_SERVER_ERROR, error);
         }
     }
 }

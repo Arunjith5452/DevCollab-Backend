@@ -1,4 +1,5 @@
 import { UpdateProjectDTO } from "@/application/dtos/project/edit-project.dto";
+import { deleteFile } from "@/infrastructure/providers/s3-bucket/s3Service";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { ProjectEntity } from "@/domain/entities/project.entity";
 import { UserEntity } from "@/domain/entities/user.entity";
@@ -29,6 +30,8 @@ export class UpdateProjectUseCase implements IExecute<{ userId: string; projectI
                 throw new Error(ErrorMessage.UNAUTHORIZED);
             }
 
+            const oldImage = project.image;
+
             project.updateProject({
                 ...dto,
                 requiredRoles: dto.requiredRoles?.map(r => ({
@@ -42,6 +45,10 @@ export class UpdateProjectUseCase implements IExecute<{ userId: string; projectI
 
 
             await this._projectRepository.updateEntity(project);
+
+            if (dto.image && oldImage && dto.image !== oldImage) {
+                await deleteFile(oldImage);
+            }
 
             return { message: "Project updated successfully" };
         } catch (error) {
