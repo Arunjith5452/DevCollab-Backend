@@ -13,6 +13,7 @@ import { AUTH_TYPES } from "@/infrastructure/di/types";
 import { errorResponse, successResponse } from "@/shared/utils/response.util";
 import { Request, Response } from "express";
 import { inject, injectable } from "inversify";
+import { MESSAGES } from "@/shared/constants/messages";
 
 
 @injectable()
@@ -37,14 +38,14 @@ export class AuthController {
      * @param res - Express response object.
      * @returns JSON with registration result.
      */
-    async Register(req: Request, res: Response) {
+    async Register(req: Request, res: Response): Promise<Response> {
 
         try {
             const result = await this._registerUseCase.execute(req.body);
             return successResponse(res, "", result.token);
         } catch (error) {
             return errorResponse(res,
-                "Registration failed",
+                MESSAGES.AUTH.ERROR.REGISTRATION_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )
@@ -57,13 +58,13 @@ export class AuthController {
      * @param res - Express response object.
      * @returns JSON with OTP verification message.
      */
-    async VerifyOtp(req: Request, res: Response) {
+    async VerifyOtp(req: Request, res: Response): Promise<Response> {
         try {
             const result = await this._verifyOtpUseCase.execute(req.body);
             return successResponse(res, result.message)
         } catch (error) {
             return errorResponse(res,
-                "Otp verification failed",
+                MESSAGES.AUTH.ERROR.OTP_VERIFICATION_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )
@@ -76,7 +77,7 @@ export class AuthController {
      * @param res - Express response object.
      * @returns JSON with OTP verification message.
      */
-    async VerifyForgotOtp(req: Request, res: Response) {
+    async VerifyForgotOtp(req: Request, res: Response): Promise<Response> {
         try {
             const result = await this._verifyForgotOtpUseCase.execute(req.body)
 
@@ -85,7 +86,7 @@ export class AuthController {
         } catch (error) {
 
             return errorResponse(res,
-                "VerifiyForgotOtp failed",
+                MESSAGES.AUTH.ERROR.FORGOT_OTP_VERIFICATION_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )
@@ -100,7 +101,7 @@ export class AuthController {
      * @returns JSON with user role, message, and token.
      */
 
-    async Login(req: Request, res: Response) {
+    async Login(req: Request, res: Response): Promise<Response> {
         try {
             const result = await this._loginUseCase.execute(req.body);
 
@@ -124,7 +125,7 @@ export class AuthController {
         } catch (error) {
             return errorResponse(
                 res,
-                "Login failed",
+                MESSAGES.AUTH.ERROR.LOGIN_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             );
@@ -137,7 +138,7 @@ export class AuthController {
      * @param res - Express response for sending new access token.
      * @returns JSON with new access token.
      */
-    async RefreshToken(req: Request, res: Response) {
+    async RefreshToken(req: Request, res: Response): Promise<Response> {
         try {
             const refreshToken = req.cookies?.refreshToken;
             const result = await this._refreshTokenUseCase.execute(refreshToken);
@@ -154,9 +155,9 @@ export class AuthController {
 
         } catch (error) {
 
-            errorResponse(
+            return errorResponse(
                 res,
-                "RefreshToken failed",
+                MESSAGES.AUTH.ERROR.REFRESH_TOKEN_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )
@@ -170,7 +171,7 @@ export class AuthController {
      * @param res - Express response object.
      * @returns JSON with resend OTP message.
      */
-    async ResendOtp(req: Request, res: Response) {
+    async ResendOtp(req: Request, res: Response): Promise<Response> {
         try {
             const result = await this._resendOtpUseCase.execute(req.body);
 
@@ -179,7 +180,7 @@ export class AuthController {
         } catch (error) {
 
             return errorResponse(res,
-                "Resend otp failed",
+                MESSAGES.AUTH.ERROR.RESEND_OTP_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )
@@ -193,15 +194,15 @@ export class AuthController {
      * @param res - Express response object.
      * @returns JSON with forgot password result.
      */
-    async ForgotPassword(req: Request, res: Response) {
+    async ForgotPassword(req: Request, res: Response): Promise<Response> {
         try {
             const result = await this._forgotPasswordUseCase.execute(req.body);
 
-            successResponse(res, '')
+            return successResponse(res, '')
 
         } catch (error) {
             return errorResponse(res,
-                "forgotPassword failed",
+                MESSAGES.AUTH.ERROR.FORGOT_PASSWORD_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )
@@ -214,7 +215,7 @@ export class AuthController {
      * @param res - Express response object.
      * @returns JSON with password reset result.
      */
-    async ResetPassword(req: Request, res: Response) {
+    async ResetPassword(req: Request, res: Response): Promise<Response> {
         try {
             const result = await this._resetPasswordUseCase.execute(req.body);
 
@@ -222,14 +223,14 @@ export class AuthController {
 
         } catch (error) {
             return errorResponse(res,
-                "reset password failed",
+                MESSAGES.AUTH.ERROR.RESET_PASSWORD_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )
         }
     }
 
-    async googleLogin(req: Request, res: Response) {
+    async googleLogin(req: Request, res: Response): Promise<Response> {
 
         console.log("googleauth", req.body)
 
@@ -257,7 +258,7 @@ export class AuthController {
 
             return errorResponse(
                 res,
-                "Gogle Authentication failed",
+                MESSAGES.AUTH.ERROR.GOOGLE_AUTH_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             );
@@ -266,7 +267,7 @@ export class AuthController {
 
     }
 
-    async gitHubLogin(req: Request, res: Response) {
+    async gitHubLogin(req: Request, res: Response): Promise<Response> {
 
         try {
 
@@ -293,7 +294,7 @@ export class AuthController {
 
             return errorResponse(
                 res,
-                "GitHub Authentication failed",
+                MESSAGES.AUTH.ERROR.GITHUB_AUTH_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             );
@@ -307,7 +308,7 @@ export class AuthController {
      * @param res - Express response object.
      * @returns JSON with logout result.
      */
-    async Logout(req: Request, res: Response) {
+    async Logout(req: Request, res: Response): Promise<Response> {
         try {
             const refreshToken = req.cookies.refreshToken;
 
@@ -316,11 +317,11 @@ export class AuthController {
             res.clearCookie("refreshToken");
             res.clearCookie("accessToken");
 
-            return successResponse(res, 'logout successfully', result)
+            return successResponse(res, MESSAGES.AUTH.SUCCESS.LOGOUT, result)
 
         } catch (error) {
             return errorResponse(res,
-                "Logout failed",
+                MESSAGES.AUTH.ERROR.LOGOUT_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )

@@ -15,6 +15,7 @@ import { inject, injectable } from "inversify";
 import { SubmitWorkDTO } from "@/application/dtos/tasks/submit-work.dto";
 import { TaskListItemDto } from "@/application/dtos/tasks/res/list-task.dto";
 import { RequestImprovementDTO } from "@/application/dtos/tasks/request-improvement.dto";
+import { MESSAGES } from "@/shared/constants/messages";
 
 
 
@@ -39,18 +40,18 @@ export class TaskController {
      * @param res - Express response object.
      * @returns JSON response with success message or error.
      */
-    async createTask(req: Request, res: Response) {
+    async createTask(req: Request, res: Response): Promise<Response> {
         try {
 
             console.log("backend receving data of createTask >", req.body)
 
             const result = await this._createTaskUseCase.execute(req.body)
 
-            return successResponse(res, "Task created successfully", result)
+            return successResponse(res, MESSAGES.TASK.SUCCESS.CREATED, result)
 
         } catch (error) {
             return errorResponse(res,
-                "Task creation failed",
+                MESSAGES.TASK.ERROR.CREATION_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )
@@ -64,7 +65,7 @@ export class TaskController {
     * @param res - Express response object.
     * @returns JSON with paginated tasks list and total count.
     */
-    async getCreatorTasks(req: Request, res: Response) {
+    async getCreatorTasks(req: Request, res: Response): Promise<Response> {
 
         try {
 
@@ -89,7 +90,7 @@ export class TaskController {
         } catch (error) {
             return errorResponse(
                 res,
-                "Failed to fetch tasks",
+                MESSAGES.TASK.ERROR.FETCH_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )
@@ -104,7 +105,7 @@ export class TaskController {
     * @param res - Express response object.
     * @returns JSON list of contributor tasks.
     */
-    async getContributerTasks(req: Request, res: Response) {
+    async getContributerTasks(req: Request, res: Response): Promise<Response> {
 
         try {
 
@@ -127,7 +128,7 @@ export class TaskController {
             console.log("console.ller", error)
             return errorResponse(
                 res,
-                "Failed to fetch tasks",
+                MESSAGES.TASK.ERROR.FETCH_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )
@@ -141,7 +142,7 @@ export class TaskController {
      * @param res - Express response object.
      * @returns JSON list of assignee users (name only).
      */
-    async getProjectAssignee(req: Request, res: Response) {
+    async getProjectAssignee(req: Request, res: Response): Promise<Response> {
         try {
 
             let { projectId } = req.params
@@ -152,7 +153,7 @@ export class TaskController {
         } catch (error) {
             return errorResponse(
                 res,
-                "Failed to fetch Project contributers",
+                MESSAGES.TASK.ERROR.CONTRIBUTORS_FETCH_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )
@@ -165,7 +166,7 @@ export class TaskController {
      * @param res - Express response object.
      * @returns JSON response with success message.
      */
-    async addComment(req: Request, res: Response) {
+    async addComment(req: Request, res: Response): Promise<Response> {
         try {
             const { taskId } = req.params;
             const { message } = req.body;
@@ -173,29 +174,29 @@ export class TaskController {
 
             await this._addCommentUseCase.execute({ taskId, message, userId });
 
-            return successResponse(res, "Comment added successfully");
+            return successResponse(res, MESSAGES.TASK.SUCCESS.COMMENT_ADDED);
         } catch (error) {
             return errorResponse(
                 res,
-                "Failed to add comment",
+                MESSAGES.TASK.ERROR.COMMENT_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             );
         }
     }
 
-    async startTask(req: Request, res: Response) {
+    async startTask(req: Request, res: Response): Promise<Response> {
         try {
             const { taskId } = req.params;
             const userId = req.user.userId;
 
             await this._startTaskUseCase.execute({ taskId, userId });
 
-            return successResponse(res, "Task started successfully");
+            return successResponse(res, MESSAGES.TASK.SUCCESS.STARTED);
         } catch (error) {
             return errorResponse(
                 res,
-                "Failed to start task",
+                MESSAGES.TASK.ERROR.START_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             );
@@ -203,25 +204,25 @@ export class TaskController {
     }
 
 
-    async submitTask(req: Request, res: Response) {
+    async submitTask(req: Request, res: Response): Promise<Response> {
         try {
             const { taskId } = req.params;
             const userId = req.user.userId;
 
             await this._submitWorkUseCase.execute({ taskId, userId, data: req.body });
 
-            return successResponse(res, "Task submited successfully");
+            return successResponse(res, MESSAGES.TASK.SUCCESS.SUBMITTED);
         } catch (error) {
             return errorResponse(
                 res,
-                "Failed to submit task",
+                MESSAGES.TASK.ERROR.SUBMIT_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             );
         }
     }
 
-    async requestImprovement(req: Request, res: Response) {
+    async requestImprovement(req: Request, res: Response): Promise<Response> {
         try {
 
             let { taskId } = req.params
@@ -231,19 +232,19 @@ export class TaskController {
 
             await this._requestImprovementUseCase.execute({ userId, taskId, data: req.body })
 
-            return successResponse(res, 'Task request-improvement successfull')
+            return successResponse(res, MESSAGES.TASK.SUCCESS.REQUEST_IMPROVEMENT)
 
         } catch (error) {
             return errorResponse(
                 res,
-                "Failed to task request-improvement",
+                MESSAGES.TASK.ERROR.REQUEST_IMPROVEMENT_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             );
         }
     }
 
-    async approveTask(req: Request, res: Response) {
+    async approveTask(req: Request, res: Response): Promise<Response> {
         try {
 
             let { taskId } = req.params
@@ -251,12 +252,12 @@ export class TaskController {
 
             await this._approveTaskUseCase.execute({ userId, taskId })
 
-            return successResponse(res, 'Task approval successfull')
+            return successResponse(res, MESSAGES.TASK.SUCCESS.APPROVED)
 
         } catch (error) {
             return errorResponse(
                 res,
-                "Failed to task approval",
+                MESSAGES.TASK.ERROR.APPROVAL_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             );

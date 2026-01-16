@@ -6,6 +6,7 @@ import { USER_TYPES } from "@/infrastructure/di/types/user";
 import { errorResponse, successResponse } from "@/shared/utils/response.util";
 import { Request, Response } from "express";
 import { inject, injectable } from "inversify";
+import { MESSAGES } from "@/shared/constants/messages";
 
 
 
@@ -23,7 +24,7 @@ export class UserController {
     * @param res - Express response object.
     * @returns JSON with the user's profile data.
     */
-    async getProfileHandler(req: Request, res: Response) {
+    async getProfileHandler(req: Request, res: Response): Promise<Response> {
 
         try {
 
@@ -36,7 +37,7 @@ export class UserController {
 
             return errorResponse(
                 res,
-                "userProfile error",
+                MESSAGES.USER.ERROR.PROFILE_ERROR,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )
@@ -51,7 +52,7 @@ export class UserController {
    * @param res - Express response object.
    * @returns JSON with updated user profile or null if update fails.
    */
-    async updateProfile(req: Request, res: Response) {
+    async updateProfile(req: Request, res: Response): Promise<Response> {
         try {
 
             let userId = req.user?.userId
@@ -60,7 +61,7 @@ export class UserController {
             return successResponse(res, "", result)
         } catch (error) {
             return errorResponse(res,
-                "updteUserProfile failed",
+                MESSAGES.USER.ERROR.UPDATE_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )

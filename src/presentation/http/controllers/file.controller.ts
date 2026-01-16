@@ -5,6 +5,7 @@ import { USER_TYPES } from "@/infrastructure/di/types/user";
 import { errorResponse, successResponse } from "@/shared/utils/response.util";
 import { Request, Response } from "express";
 import { inject, injectable } from "inversify";
+import { MESSAGES } from "@/shared/constants/messages";
 
 
 
@@ -20,7 +21,7 @@ export class FileController {
      * @param res - Express response object.
      * @returns JSON response with the generated signed URL.
      */
-    async signedUrl(req: Request, res: Response) {
+    async signedUrl(req: Request, res: Response): Promise<Response> {
 
         try {
 
@@ -30,7 +31,7 @@ export class FileController {
 
         } catch (error) {
 
-            return errorResponse(res, "signedUrl went wrong",
+            return errorResponse(res, MESSAGES.FILE.ERROR.SIGNED_URL_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             );
