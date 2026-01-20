@@ -5,13 +5,18 @@ import { IProjectRepository } from "@/infrastructure/db/repository/interface/pro
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
 import { inject, injectable } from "inversify";
 import { GetAllProjectsQuery } from "../interface/project-listing.usecase.interface";
+import { ProjectResponseDTO } from "@/application/dtos/project/res/project-response.dto";
+import { ProjectPresentationMapper } from "@/infrastructure/mappers/project-presentation.mapper";
 
 
 @injectable()
-export class ListProjectUseCase implements IExecute<GetAllProjectsQuery, { mesage: string, projects: ProjectEntity[], total: number }> {
-    constructor(@inject(PROJECT_TYPES.ProjectRepository) private readonly _projectRepository: IProjectRepository<ProjectEntity>) { }
+export class ListProjectUseCase implements IExecute<GetAllProjectsQuery, { message: string, projects: ProjectResponseDTO[], total: number }> {
+    constructor(
+        @inject(PROJECT_TYPES.ProjectRepository) private readonly _projectRepository: IProjectRepository<ProjectEntity>,
+        @inject(ProjectPresentationMapper) private readonly _projectMapper: ProjectPresentationMapper
+    ) { }
 
-    async execute(query: GetAllProjectsQuery): Promise<{ mesage: string; projects: ProjectEntity[]; total: number }> {
+    async execute(query: GetAllProjectsQuery): Promise<{ message: string; projects: ProjectResponseDTO[]; total: number }> {
 
         try {
 
@@ -47,8 +52,8 @@ export class ListProjectUseCase implements IExecute<GetAllProjectsQuery, { mesag
 
             return {
                 total,
-                mesage: SuccessMessage.PROJECT_FETCHED,
-                projects,
+                message: SuccessMessage.PROJECT_FETCHED,
+                projects: projects.map(p => this._projectMapper.toResponseDTO(p)),
             };
 
         } catch (error) {
