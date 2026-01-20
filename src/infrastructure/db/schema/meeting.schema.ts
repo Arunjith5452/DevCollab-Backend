@@ -16,7 +16,7 @@ export const meetingSchema = new Schema(
 
     link: {
       type: String,
-      required: true,
+      required: false,
     },
 
     date: {

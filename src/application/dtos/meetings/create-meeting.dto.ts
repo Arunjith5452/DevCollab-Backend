@@ -22,10 +22,9 @@ export class CreateMeetingDTO {
     @IsOptional()
     public readonly createdBy?: string;
 
-    @Expose()
     @IsString()
-    @IsNotEmpty()
-    public readonly link: string;
+    @IsOptional()
+    public readonly link?: string;
 
     @Expose()
     @IsEnum(["single", "group"])

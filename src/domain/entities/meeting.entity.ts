@@ -4,7 +4,7 @@ export class MeetingEntity {
     private readonly _id?: string;
     private _projectId: string;
     private _title: string;
-    private _link: string;
+    private _link?: string;
     private _date: Date;
     private _type: "single" | "group";
     private _createdBy: string;
@@ -17,7 +17,7 @@ export class MeetingEntity {
         id?: string;
         projectId: string;
         title: string;
-        link: string;
+        link?: string;
         date: Date;
         type: "single" | "group";
         createdBy: string;
@@ -43,7 +43,7 @@ export class MeetingEntity {
         id?: string;
         projectId: string;
         title: string;
-        link: string;
+        link?: string;
         date: Date;
         type: "single" | "group";
         createdBy: string;
@@ -54,7 +54,6 @@ export class MeetingEntity {
     }): MeetingEntity {
         if (!data.title?.trim()) throw new Error("Meeting title is required");
         if (!data.projectId) throw new Error("ProjectId is required");
-        if (!data.link) throw new Error("Meeting link is required");
 
         return new MeetingEntity({
             ...data,
@@ -74,7 +73,7 @@ export class MeetingEntity {
         return this._title;
     }
 
-    get link(): string {
+    get link(): string | undefined {
         return this._link;
     }
 

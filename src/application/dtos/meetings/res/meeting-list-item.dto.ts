@@ -5,7 +5,7 @@ export class MeetingListItemDto {
     _id: string; // For frontend compatibility
     projectId: string;
     title: string;
-    link: string;
+    link?: string;
     date: string;
     type: "single" | "group";
     createdBy: string;
@@ -16,7 +16,7 @@ export class MeetingListItemDto {
         id: string;
         projectId: string;
         title: string;
-        link: string;
+        link?: string;
         date: Date;
         type: "single" | "group";
         createdBy: string;
