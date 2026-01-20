@@ -5,7 +5,7 @@ export interface MongoUser {
   _id: string;
   name: string;
   email: string;
-  avatar?: string | null;
+  profileImage?: string | null;
 }
 
 export interface MongoMember {

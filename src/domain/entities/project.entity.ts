@@ -26,6 +26,12 @@ export class ProjectEntity {
     status: string;
   }[];
 
+  private _creator?: {
+    name: string;
+    email: string;
+    avatar?: string | null;
+  };
+
   private constructor(data: {
     creatorId: string;
     title: string;
@@ -48,6 +54,11 @@ export class ProjectEntity {
       joinedAt: string;
       status: string;
     }[];
+    creator?: {
+      name: string;
+      email: string;
+      avatar?: string | null;
+    };
     id?: string;
   }) {
     this._creatorId = data.creatorId;
@@ -66,6 +77,7 @@ export class ProjectEntity {
     this._updatedAt = data.updatedAt;
     this._image = data.image
     this._members = data.members;
+    this._creator = data.creator;
     this._id = data.id;
   }
 
@@ -91,6 +103,11 @@ export class ProjectEntity {
       joinedAt: string;
       status: string;
     }[];
+    creator?: {
+      name: string;
+      email: string;
+      avatar?: string | null;
+    };
     id?: string;
   }): ProjectEntity {
     if (!data.title?.trim()) throw new Error("Project title is required");
@@ -181,6 +198,10 @@ export class ProjectEntity {
   }
   get members() {
     return this._members;
+  }
+
+  get creator() {
+    return this._creator;
   }
 
   updateProjectDetails(title?: string, description?: string) {

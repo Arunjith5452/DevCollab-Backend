@@ -19,9 +19,13 @@ import { GetProjectMembersUseCase } from "@/application/usecases/project/impleme
 import { DisableProjectUseCase } from "@/application/usecases/project/implementations/disable-project.usecase";
 import { UpdateProjectUseCase } from "@/application/usecases/project/implementations/edit-project.usecase";
 import { GetProjectForEditUseCase } from "@/application/usecases/project/implementations/get-project-forEdit.usecase";
+import { ProjectPresentationMapper } from "@/infrastructure/mappers/project-presentation.mapper";
+import { ProjectPersistenceMapper } from "@/infrastructure/mappers/project-persistence.mapper";
 
 
 export const ProjectModule = new ContainerModule(({ bind }) => {
+    bind<ProjectPresentationMapper>(ProjectPresentationMapper).toSelf().inSingletonScope()
+    bind<ProjectPersistenceMapper>(ProjectPersistenceMapper).toSelf().inSingletonScope()
     bind<ProjectRepository>(PROJECT_TYPES.ProjectRepository).to(ProjectRepository)
     bind<Model<any>>("ProjectModel").toConstantValue(projectModel)
     bind<ProjectController>(PROJECT_TYPES.ProjectController).to(ProjectController)
