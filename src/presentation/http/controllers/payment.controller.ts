@@ -23,7 +23,7 @@ export class PaymentController {
 
             console.log("payment controllet:", req.body)
 
-            const baseUrl = (process.env.FRONTEND_URL || 'http://localhost:3000').trim(); // e.g., https://yourapp.com
+            const baseUrl = (process.env.FRONTEND_URL || 'http://localhost:3000').trim(); 
 
             const session = await this._createCheckoutSessionUseCase.execute({
                 amount,
@@ -60,9 +60,8 @@ export class PaymentController {
             });
 
             return successResponse(res, MESSAGES.PAYMENT.SUCCESS.WEBHOOK_RECEIVED, result);
-        } catch (error: any) {
-            console.error('Webhook error:', error.message);
-            return errorResponse(res, error.message || MESSAGES.PAYMENT.ERROR.WEBHOOK_FAILED, ServerErrorStatus.INTERNAL_SERVER_ERROR, error);
+        } catch (error) {
+            return errorResponse(res, MESSAGES.PAYMENT.ERROR.WEBHOOK_FAILED, ServerErrorStatus.INTERNAL_SERVER_ERROR, error);
         }
     }
 }

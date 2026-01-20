@@ -31,7 +31,8 @@ export class HandleWebhookUseCase implements IExecute<WebhookDTO, { received: bo
                     dto.signature,
                     webhookSecret
                 );
-            } catch (err: any) {
+            } catch (error) {
+                let err = error as Error
                 console.error('Webhook signature verification failed:', err.message);
                 throw new Error(`Webhook Error: ${err.message}`);
             }
