@@ -21,10 +21,6 @@ export class UpdateUserProfileUseCase implements IExecute<{ userId: string, dto:
 
             user?.updateProfile(dto)
 
-            // console.log("DTO:", dto);
-            // console.log("Saving username:", dto.username);
-
-
             const updated = await this._userRepository.updateUser(userId, {
                 username: dto?.username,
                 bio: dto?.bio,
@@ -33,11 +29,14 @@ export class UpdateUserProfileUseCase implements IExecute<{ userId: string, dto:
                 profileImage: user?.profileImage,
             })
 
+            console.log("dto.profileImage:",dto.profileImage,":oldProfileImage:",oldProfileImage)
+
             if (dto.profileImage && oldProfileImage && dto.profileImage !== oldProfileImage) {
+                console.log("indside",oldProfileImage)
                 await deleteFile(oldProfileImage);
             }
 
-            // console.log("updated",updated)
+            console.log("updated",updated)
 
             return updated;
 
