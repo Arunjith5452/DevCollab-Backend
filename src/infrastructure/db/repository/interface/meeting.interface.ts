@@ -6,4 +6,5 @@ export interface IMeetingRepository<T> extends IBaseRepository<any> {
     createMeeting(data: MeetingEntity): Promise<MeetingEntity>;
     findByProjectId(projectId: string): Promise<MeetingEntity[]>;
     updateStatus(meetingId: string, status: MeetingStatus): Promise<void>;
+    findByProjectIdAndStatus(projectId: string, status?: string): Promise<T[]>;
 }

@@ -33,4 +33,16 @@ export class MeetingRepository extends BaseRepository<IMeeting> implements IMeet
     async updateStatus(meetingId: string, status: MeetingStatus): Promise<void> {
         await this.model.findByIdAndUpdate(meetingId, { status });
     }
+
+    async findByProjectIdAndStatus(projectId: string, status?: string): Promise<MeetingEntity[]> {
+        const query: any = { projectId: new Types.ObjectId(projectId) };
+
+        if (status) {
+            const statusArray = status.split(',').map(s => s.trim());
+            query.status = { $in: statusArray };
+        }
+
+        const meetings = await this.model.find(query).sort({ date: 1 }).lean();
+        return meetings.map(meeting => this.meetingPersistenceMapper.fromMongo(meeting));
+    }
 }

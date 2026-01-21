@@ -7,13 +7,13 @@ import { MeetingListItemDto } from "@/application/dtos/meetings/res/meeting-list
 import { MeetingResponseMapper } from "@/application/mapper/meetings/meeting-response.mapper";
 
 @injectable()
-export class GetProjectMeetingsUseCase implements IExecute<string, MeetingListItemDto[]> {
+export class GetProjectMeetingsUseCase implements IExecute<{ projectId: string, status?: string }, MeetingListItemDto[]> {
     constructor(
         @inject(MEETING_TYPES.MeetingRepository) private readonly _meetingRepository: IMeetingRepository<MeetingEntity>
     ) { }
 
-    async execute(projectId: string): Promise<MeetingListItemDto[]> {
-        const meetings = await this._meetingRepository.findByProjectId(projectId);
+    async execute(data: { projectId: string, status?: string }): Promise<MeetingListItemDto[]> {
+        const meetings = await this._meetingRepository.findByProjectIdAndStatus(data.projectId, data.status);
         return MeetingResponseMapper.toList(meetings);
     }
 }
