@@ -13,7 +13,7 @@ import { MeetingListItemDto } from "@/application/dtos/meetings/res/meeting-list
 export class MeetingController {
     constructor(
         @inject(MEETING_TYPES.ScheduleMeetingUseCase) private readonly _scheduleMeetingUseCase: IExecute<CreateMeetingDTO, void>,
-        @inject(MEETING_TYPES.GetProjectMeetingsUseCase) private readonly _getProjectMeetingsUseCase: IExecute<string, MeetingListItemDto[]>,
+        @inject(MEETING_TYPES.GetProjectMeetingsUseCase) private readonly _getProjectMeetingsUseCase: IExecute<{ projectId: string, status?: string }, MeetingListItemDto[]>,
         @inject(MEETING_TYPES.UpdateMeetingStatusUseCase) private readonly _updateMeetingStatusUseCase: IExecute<{ meetingId: string, status: string }, void>
     ) { }
 
@@ -35,7 +35,9 @@ export class MeetingController {
     async getProjectMeetings(req: Request, res: Response): Promise<Response> {
         try {
             const { projectId } = req.params;
-            const result = await this._getProjectMeetingsUseCase.execute(projectId);
+            const { status } = req.query;
+
+            const result = await this._getProjectMeetingsUseCase.execute({ projectId, status: status as string });
 
             return successResponse(res, "Meetings fetched successfully", result);
         } catch (error) {

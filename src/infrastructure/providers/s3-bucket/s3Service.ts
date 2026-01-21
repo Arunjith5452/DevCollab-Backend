@@ -62,22 +62,10 @@ export const deleteFile = async (fileUrl: string): Promise<void> => {
   const s3 = getS3Client();
   const bucketName = process.env.AWS_BUCKET_NAME;
 
-  if (!bucketName) {
-    throw new Error("AWS_BUCKET_NAME is not set.");
-  }
-
   try {
     const url = new URL(fileUrl);
-    // Pathname starts with /, so slice(1) removes it
-    // Based on line 52: `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`
-    // The pathname will be `/${key}`.
 
-    const key = url.pathname.slice(1); // Remove leading slash
-
-    if (!key) {
-      console.warn("Could not extract key from file URL:", fileUrl);
-      return;
-    }
+    const key = decodeURIComponent(url.pathname.slice(1));
 
     const command = new DeleteObjectCommand({
       Bucket: bucketName,

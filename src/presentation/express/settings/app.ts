@@ -16,25 +16,33 @@ app.use(cors({
 
 app.use(cookieParser())
 app.use(compression())
-app.use(express.json())
+
+// Use express.json() for all routes EXCEPT the stripe webhook
+
+app.use((req, res, next) => {
+  if (req.originalUrl === "/api/payment/webhook") {
+    next()
+    } else {
+    express.json()(req, res, next)
+  }
+})
 
 
 app.use("/api", appRouter)
 
-/* =====  GLOBAL DEBUG – remove when done  ===== */
+/* =====  GLOBAL DEBUG  ===== */
 app.use((req, res, next) => {
-  console.log('🔥 GLOBAL – method:', req.method, '  url:', req.originalUrl);
-  next();        // continue to next middleware
-});
-/* ============================================ */
+  console.log(' GLOBAL – method:', req.method, '  url:', req.originalUrl)
+  next()     
+})
 
 
 // // Handle 404 - Not Found
 // app.use((req, res, next) => {
-//   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+//   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404))
 // });
 
 // // Global Error Handling Middleware
-// app.use(globalErrorHandler);
+// app.use(globalErrorHandler)
 
 export default app;

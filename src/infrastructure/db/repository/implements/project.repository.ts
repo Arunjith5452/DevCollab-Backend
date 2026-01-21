@@ -10,49 +10,69 @@ type PopulatedUser = { _id: string; name: string };
 @injectable()
 export class ProjectRepository extends BaseRepository<ProjectEntity> implements IProjectRepository<ProjectEntity> {
 
-    private readonly projectPersistenceMapper: ProjectPersistenceMapper;
 
-    constructor(@inject("ProjectModel") model: Model<ProjectEntity>, projectPersistenceMapper: ProjectPersistenceMapper) {
+    constructor(
+        @inject("ProjectModel") model: Model<ProjectEntity>,
+        @inject(ProjectPersistenceMapper) private readonly _projectPersistenceMapper: ProjectPersistenceMapper
+    ) {
         super(model)
-        this.projectPersistenceMapper = projectPersistenceMapper
+    }
+
+    async find(filter: any, options: { skip: number; limit: number }): Promise<ProjectEntity[]> {
+        const docs = await this.model
+            .find(filter)
+            .populate("creatorId", "name email profileImage")
+            .sort({ createdAt: -1 })
+            .skip(options.skip)
+            .limit(options.limit)
+            .lean()
+            .exec();
+
+        return (docs as any[]).map(doc => this._projectPersistenceMapper.fromMongo(doc));
     }
 
     async createProject(data: ProjectEntity): Promise<ProjectEntity> {
-        const mongoData = this.projectPersistenceMapper.toMongo(data)
+        const mongoData = this._projectPersistenceMapper.toMongo(data)
         const createProject = await this.create(mongoData)
-        return await this.projectPersistenceMapper.fromMongo(createProject)
+        return await this._projectPersistenceMapper.fromMongo(createProject)
     }
 
     async findByIdWithCreator(id: string): Promise<ProjectEntity | null> {
-        const project = await this.findById(id)
-        return project ? this.projectPersistenceMapper.fromMongo(project) : null
+        const doc = await this.model
+            .findById(id)
+            .populate("creatorId", "name email profileImage")
+            .lean()
+            .exec();
+
+        return doc ? this._projectPersistenceMapper.fromMongo(doc) : null
     }
 
     async findEntityById(id: string): Promise<ProjectEntity | null> {
-        const doc = await this.findById(id);
+        const doc = await this.model.findById(id).lean().exec();
         if (!doc) return null;
-        return this.projectPersistenceMapper.fromMongo(doc);
+        return this._projectPersistenceMapper.fromMongo(doc);
     }
     async updateEntity(project: ProjectEntity): Promise<ProjectEntity | null> {
-        const mongoData = this.projectPersistenceMapper.toMongo(project);
+        const mongoData = this._projectPersistenceMapper.toMongo(project);
 
         const updatedDoc = await this.model.findByIdAndUpdate(
             project.id,
             mongoData,
             { new: true }
-        );
+        ).lean().exec();
 
         return updatedDoc
-            ? this.projectPersistenceMapper.fromMongo(updatedDoc)
+            ? this._projectPersistenceMapper.fromMongo(updatedDoc)
             : null;
     }
 
     async findByCreatorId(userId: string): Promise<ProjectEntity[]> {
         const docs = await this.model.find({ creatorId: userId })
             .sort({ createdAt: -1 })
-            .lean();
+            .lean()
+            .exec();
 
-        return docs.map(doc => this.projectPersistenceMapper.fromMongo(doc));
+        return docs.map(doc => this._projectPersistenceMapper.fromMongo(doc));
     }
 
     async findByIdWithPopulation(projectId: string): Promise<ProjectEntity | null> {
@@ -65,10 +85,10 @@ export class ProjectRepository extends BaseRepository<ProjectEntity> implements 
             .lean()
             .exec();
 
-        return doc ? this.projectPersistenceMapper.fromMongo(doc) : null;
+        return doc ? this._projectPersistenceMapper.fromMongo(doc) : null;
     }
 
-    async getProjectMembersForAssignee( projectId: string ): Promise<{ userId: string; name: string }[]> {
+    async getProjectMembersForAssignee(projectId: string): Promise<{ userId: string; name: string }[]> {
 
         const projectDoc = await this.model
             .findById(projectId)

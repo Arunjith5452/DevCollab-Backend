@@ -1,6 +1,8 @@
 import { ProjectEntity } from "@/domain/entities/project.entity";
-import { MemberWithUser, MongoMember } from "./interface/project.mapper.interface";
+import { MemberWithUser, MongoMember, MongoUser } from "./interface/project.mapper.interface";
+import { injectable } from "inversify";
 
+@injectable()
 export class ProjectPersistenceMapper {
   toMongo(project: ProjectEntity) {
     return {
@@ -29,7 +31,7 @@ export class ProjectPersistenceMapper {
 
     return ProjectEntity.create({
       id: doc._id?.toString(),
-      creatorId: doc.creatorId?.toString(),
+      creatorId: typeof doc.creatorId === "object" && doc.creatorId ? doc.creatorId._id?.toString() : doc.creatorId?.toString(),
       title: doc.title,
       description: doc.description,
       githubRepo: doc.githubRepo,
@@ -44,19 +46,25 @@ export class ProjectPersistenceMapper {
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
       image: doc.image,
+      creator: typeof doc.creatorId === "object" && doc.creatorId ? {
+        name: doc.creatorId.name,
+        email: doc.creatorId.email,
+        avatar: doc.creatorId.profileImage ?? null,
+      } : undefined,
       members: mongoMembers.map((m): MemberWithUser => {
         const base: MemberWithUser = {
           userId: typeof m.userId === "object" ? m.userId._id.toString() : m.userId.toString(),
           role: m.role,
           status: m.status,
-          joinedAt: m.joinedAt? new Date(m.joinedAt).toISOString() : 'nothing',
+          joinedAt: m.joinedAt ? new Date(m.joinedAt).toISOString() : 'nothing',
         };
 
-        if (typeof m.userId === "object") {
+        if (typeof m.userId === "object" && m.userId !== null) {
+          const user = m.userId as MongoUser;
           base.user = {
-            name: m.userId.name,
-            email: m.userId.email,
-            avatar: m.userId.avatar ?? null,
+            name: user.name,
+            email: user.email,
+            avatar: user.profileImage ?? null,
           };
         }
 

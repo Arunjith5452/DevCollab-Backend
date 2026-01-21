@@ -2,18 +2,22 @@ import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { ProjectEntity } from "@/domain/entities/project.entity";
 import { IProjectRepository } from "@/infrastructure/db/repository/interface/project.interface";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 import { GetAllProjectsQuery } from "../interface/projects-usecase.interface";
 import { SuccessMessage } from "@/domain/enums/messages/success-message.enum";
+import { ProjectResponseDTO } from "@/application/dtos/project/res/project-response.dto";
+import { ProjectPresentationMapper } from "@/infrastructure/mappers/project-presentation.mapper";
 
 
-export class GetAllProjectsUseCase implements IExecute<GetAllProjectsQuery, { message: string, projects: ProjectEntity[], total: number }> {
+@injectable()
+export class GetAllProjectsUseCase implements IExecute<GetAllProjectsQuery, { message: string, projects: ProjectResponseDTO[], total: number }> {
 
     constructor(
-        @inject(PROJECT_TYPES.ProjectRepository) private readonly _projectRepository: IProjectRepository<ProjectEntity>
+        @inject(PROJECT_TYPES.ProjectRepository) private readonly _projectRepository: IProjectRepository<ProjectEntity>,
+        @inject(ProjectPresentationMapper) private readonly _projectPresentationMapper: ProjectPresentationMapper
     ) { }
 
-    async execute(query: GetAllProjectsQuery): Promise<{ message: string; projects: ProjectEntity[]; total: number; }> {
+    async execute(query: GetAllProjectsQuery): Promise<{ message: string; projects: ProjectResponseDTO[]; total: number; }> {
 
         try {
 
@@ -21,7 +25,7 @@ export class GetAllProjectsUseCase implements IExecute<GetAllProjectsQuery, { me
 
             const filter: Record<string, unknown> = {}
 
-            if (search) filter.$or = { title: { $regex: search, $otions: 'i' } }
+            if (search) filter.$or = [{ title: { $regex: search, $options: 'i' } }]
             if (status && status !== 'all') filter.status = status
             if (difficulty && difficulty !== 'all') filter.difficulty = difficulty
 
@@ -33,7 +37,7 @@ export class GetAllProjectsUseCase implements IExecute<GetAllProjectsQuery, { me
 
             return {
                 message: SuccessMessage.PROJECT_FETCHED,
-                projects,
+                projects: projects.map(project => this._projectPresentationMapper.toResponseDTO(project)),
                 total
             }
 

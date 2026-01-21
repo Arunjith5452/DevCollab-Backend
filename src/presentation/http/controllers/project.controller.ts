@@ -18,13 +18,15 @@ import { MESSAGES } from "@/shared/constants/messages";
 
 
 
+import { ProjectResponseDTO } from "@/application/dtos/project/res/project-response.dto";
+
 @injectable()
 export class ProjectController {
 
     constructor(
         @inject(PROJECT_TYPES.CreateProjectUseCase) private readonly _createProjectUseCase: IExecute<{ userId: string, dto: CreateProjectDTO }, { message: string }>,
-        @inject(PROJECT_TYPES.ListProjectUseCase) private readonly _listProjectUseCase: IExecute<GetAllProjectsQuery, { mesage: string, projects: ProjectEntity[], total: number }>,
-        @inject(PROJECT_TYPES.ProjectDetailsUseCase) private readonly _projectDetailsUseCase: IExecute<string, { project: ProjectEntity[], message: string }>,
+        @inject(PROJECT_TYPES.ListProjectUseCase) private readonly _listProjectUseCase: IExecute<GetAllProjectsQuery, { message: string, projects: ProjectResponseDTO[], total: number }>,
+        @inject(PROJECT_TYPES.ProjectDetailsUseCase) private readonly _projectDetailsUseCase: IExecute<string, { project: ProjectResponseDTO, message: string }>,
         @inject(PROJECT_TYPES.ApplyToProjectUseCase) private readonly _applyToProjectUseCase: IExecute<ApplyToProjectDTO, { message: string }>,
         @inject(PROJECT_TYPES.GetPendingApplicationUseCase) private readonly _getPendingApplicationUseCase: IExecute<string, ApplicationEntity[]>,
         @inject(PROJECT_TYPES.ApproveApplcationUseCase) private readonly _approveApplicationUseCase: IExecute<ApproveApplicationDTO, { message: string }>,
@@ -141,7 +143,7 @@ export class ProjectController {
 
             const result = await this._listProjectUseCase.execute(query)
 
-            return successResponse(res, result.mesage, {
+            return successResponse(res, result.message, {
                 projects: result.projects,
                 total: result.total
             })
