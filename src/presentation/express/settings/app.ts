@@ -4,8 +4,7 @@ import compression from 'compression'
 import cors from "cors"
 import cookieParser from "cookie-parser"
 import { appRouter } from '../router/index'
-import { AppError } from '@/shared/utils/appError'
-// import { globalErrorHandler } from '@/presentation/express/middlewares/global-ErrorHandler.middlware'
+import { errorHandler } from '../middlewares/error-handler.middlware'
 
 
 app.use(cors({
@@ -17,7 +16,6 @@ app.use(cors({
 app.use(cookieParser())
 app.use(compression())
 
-// Use express.json() for all routes EXCEPT the stripe webhook
 
 app.use((req, res, next) => {
   if (req.originalUrl === "/api/payment/webhook") {
@@ -36,13 +34,7 @@ app.use((req, res, next) => {
   next()     
 })
 
+app.use(errorHandler)
 
-// // Handle 404 - Not Found
-// app.use((req, res, next) => {
-//   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404))
-// });
-
-// // Global Error Handling Middleware
-// app.use(globalErrorHandler)
 
 export default app;
