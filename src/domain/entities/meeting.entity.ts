@@ -6,8 +6,10 @@ export class MeetingEntity {
     private _title: string;
     private _link?: string;
     private _date: Date;
+    private _endTime: Date;
     private _type: "single" | "group";
     private _createdBy: string;
+    private _createdByName?: string;
     private _status: MeetingStatus;
     private _participants: Array<{ userId: string; joinedAt?: Date }>;
     private readonly _createdAt?: Date;
@@ -19,8 +21,10 @@ export class MeetingEntity {
         title: string;
         link?: string;
         date: Date;
+        endTime: Date;
         type: "single" | "group";
         createdBy: string;
+        createdByName?: string;
         status: MeetingStatus;
         participants?: Array<{ userId: string; joinedAt?: Date }>;
         createdAt?: Date;
@@ -31,8 +35,10 @@ export class MeetingEntity {
         this._title = data.title;
         this._link = data.link;
         this._date = data.date;
+        this._endTime = data.endTime;
         this._type = data.type;
         this._createdBy = data.createdBy;
+        this._createdByName = data.createdByName;
         this._status = data.status;
         this._participants = data.participants || [];
         this._createdAt = data.createdAt || new Date();
@@ -45,8 +51,10 @@ export class MeetingEntity {
         title: string;
         link?: string;
         date: Date;
+        endTime: Date;
         type: "single" | "group";
         createdBy: string;
+        createdByName?: string;
         status: MeetingStatus;
         participants?: Array<{ userId: string; joinedAt?: Date }>;
         createdAt?: Date;
@@ -80,6 +88,9 @@ export class MeetingEntity {
     get date(): Date {
         return this._date;
     }
+    get endTime(): Date {
+        return this._endTime;
+    }
 
     get type(): "single" | "group" {
         return this._type;
@@ -87,6 +98,9 @@ export class MeetingEntity {
 
     get createdBy(): string {
         return this._createdBy;
+    }
+    get createdByName(): string | undefined {
+        return this._createdByName;
     }
 
     get status(): MeetingStatus {
