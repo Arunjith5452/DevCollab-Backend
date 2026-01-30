@@ -23,7 +23,7 @@ import { MESSAGES } from "@/shared/constants/messages";
 export class TaskController {
 
     constructor(
-        @inject(TASK_TYPES.CreateTaskUseCase) private readonly _createTaskUseCase: IExecute<CreateTaskDTO, void>,
+        @inject(TASK_TYPES.CreateTaskUseCase) private readonly _createTaskUseCase: IExecute<CreateTaskDTO, TaskEntity>,
         @inject(TASK_TYPES.GetCreatorTasksUseCase) private readonly _getCreatorTaskUseCase: IExecute<GetAllTaskQuery, { message: string, tasks: TaskEntity[], total: number }>,
         @inject(TASK_TYPES.GetContributorTaskUseCase) private readonly _getContributorUseCase: IExecute<GetContributorTasksQuery, TaskListItemDto[]>,
         @inject(TASK_TYPES.GetProjectAssigneeUseCase) private readonly _getProjectAssigneeUseCase: IExecute<string, ProjectMemberNameOnly[]>,

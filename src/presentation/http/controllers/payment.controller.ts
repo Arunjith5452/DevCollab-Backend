@@ -23,13 +23,13 @@ export class PaymentController {
 
             console.log("payment controllet:", req.body)
 
-            const baseUrl = (process.env.FRONTEND_URL || 'http://localhost:3000').trim(); 
+            const baseUrl = (process.env.FRONTEND_URL || 'http://localhost:3000').trim();
 
             const session = await this._createCheckoutSessionUseCase.execute({
                 amount,
                 metadata,
                 success_url: `${baseUrl}/create-task?projectId=${metadata.project_id}&session_id={CHECKOUT_SESSION_ID}`,
-                cancel_url: `${baseUrl}/create-task?projectId=${metadata.project_id}`,
+                cancel_url: `${baseUrl}/task-listing?projectId=${metadata.project_id}`,
             });
 
             return successResponse(res, MESSAGES.PAYMENT.SUCCESS.CHECKOUT_SESSION_CREATED, {

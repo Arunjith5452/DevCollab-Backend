@@ -36,7 +36,7 @@ export const paymentSchema = new Schema(
 
         status: {
             type: String,
-            enum: ["pending", "held", "released", "refunded", "failed"],
+            enum: ["pending", "held", "released", "failed"],
             default: "pending",
         },
 
@@ -53,7 +53,7 @@ export const paymentSchema = new Schema(
         stripeSessionId: {
             type: String,
         },
-
+        
         metadata: {
             type: Object,
         },
