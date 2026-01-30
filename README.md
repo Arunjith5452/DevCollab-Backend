@@ -1,4 +1,4 @@
-# DevCollab API - Developer Collaboration & Project Management Platform
+# DevCollab - Developer Collaboration & Project Management Platform
 
 **DevCollab Backend** serves as the high-performance backbone of the DevCollab platform. It is engineered to demonstrate **Enterprise-Grade** design patterns, focusing on long-term maintainability, testability, and separation of concerns.
 
