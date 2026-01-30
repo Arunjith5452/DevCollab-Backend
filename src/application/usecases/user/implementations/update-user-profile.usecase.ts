@@ -6,39 +6,50 @@ import { IUserRepository } from "@/infrastructure/db/repository/interface/user.i
 import { USER_TYPES } from "@/infrastructure/di/types/user";
 import { inject, injectable } from "inversify";
 
-@injectable()
-export class UpdateUserProfileUseCase implements IExecute<{ userId: string, dto: UpdateProfileDTO }, UserEntity | null> {
+import { UserPresentationMapper } from "@/infrastructure/mappers/user-presentation.mapper";
+import { UserResponseDTO } from "@/application/dtos/user/res/user-response.dto";
 
-    constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>
+@injectable()
+export class UpdateUserProfileUseCase implements IExecute<{ userId: string, dto: UpdateProfileDTO }, UserResponseDTO | null> {
+
+    constructor(
+        @inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>,
+        @inject(USER_TYPES.UserPresentationMapper) private readonly _userPresentationMapper: UserPresentationMapper
     ) { }
 
-    async execute({ userId, dto }: { userId: string, dto: UpdateProfileDTO }): Promise<UserEntity | null> {
+    async execute({ userId, dto }: { userId: string, dto: UpdateProfileDTO }): Promise<UserResponseDTO | null> {
         try {
 
             let user = await this._userRepository.findEntityById(userId)
 
             const oldProfileImage = user?.profileImage;
 
-            user?.updateProfile(dto)
+            user?.updateProfile({
+                name: dto?.username,
+                bio: dto?.bio,
+                title: dto?.title,
+                profileImage: dto?.profileImage,
+                techStack: dto?.techStack
+            })
 
             const updated = await this._userRepository.updateUser(userId, {
-                username: dto?.username,
+                name: dto?.username,
                 bio: dto?.bio,
                 title: dto?.title,
                 techStack: dto.techStack,
                 profileImage: user?.profileImage,
-            })
+            } as any)
 
-            console.log("dto.profileImage:",dto.profileImage,":oldProfileImage:",oldProfileImage)
+            console.log("dto.profileImage:", dto.profileImage, ":oldProfileImage:", oldProfileImage)
 
             if (dto.profileImage && oldProfileImage && dto.profileImage !== oldProfileImage) {
-                console.log("indside",oldProfileImage)
+                console.log("indside", oldProfileImage)
                 await deleteFile(oldProfileImage);
             }
 
-            console.log("updated",updated)
+            console.log("updated", updated)
 
-            return updated;
+            return updated ? this._userPresentationMapper.toResponseDTO(updated) : null;
 
         } catch (error) {
             throw error

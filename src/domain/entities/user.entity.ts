@@ -54,8 +54,11 @@ export class UserEntity {
     profileImage?: string,
     githubProfile?: string,
     id?: string;
+    bio?: string;
+    title?: string;
+    techStack?: string[];
   }): UserEntity {
-    return new UserEntity(data.email, data.password, data.username, data.role, data.status, data.googleId, data.profileImage, data.githubProfile, data.id);
+    return new UserEntity(data.email, data.password, data.username, data.role, data.status, data.googleId, data.profileImage, data.githubProfile, data.id, data.bio, data.title, data.techStack);
   }
   updateProfile(data: {
     name?: string;

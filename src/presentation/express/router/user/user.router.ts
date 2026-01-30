@@ -13,7 +13,7 @@ const router = Router()
 const userController = container.get(UserController)
 
 
-router.get('/users/profile',AuthGuard([Role.USER]),BlockGuard([Role.USER]),(req:Request,res:Response)=>userController.getProfileHandler(req,res))
-router.patch('/users/profile',AuthGuard([Role.USER]),BlockGuard([Role.USER]),(req:Request,res:Response)=>userController.updateProfile(req,res))
+router.get('/users/profile', AuthGuard([Role.USER, Role.ADMIN, Role.CREATOR, Role.CONTRIBUTER, Role.MAINTAINER]), BlockGuard([Role.USER, Role.ADMIN, Role.CREATOR, Role.CONTRIBUTER, Role.MAINTAINER]), (req: Request, res: Response) => userController.getProfileHandler(req, res))
+router.patch('/users/profile', AuthGuard([Role.USER, Role.ADMIN, Role.CREATOR, Role.CONTRIBUTER, Role.MAINTAINER]), BlockGuard([Role.USER, Role.ADMIN, Role.CREATOR, Role.CONTRIBUTER, Role.MAINTAINER]), (req: Request, res: Response) => userController.updateProfile(req, res))
 
-export {router as userRouter}
+export { router as userRouter }

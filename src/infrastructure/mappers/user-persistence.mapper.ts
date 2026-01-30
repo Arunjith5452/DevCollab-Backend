@@ -29,6 +29,9 @@ export class UserPersistenceMapper {
             googleId: doc?.googleId,
             profileImage: doc?.profileImage,
             githubProfile: doc?.githubProfile,
+            bio: doc?.bio,
+            title: doc?.title,
+            techStack: doc?.techStack
         })
     }
 }

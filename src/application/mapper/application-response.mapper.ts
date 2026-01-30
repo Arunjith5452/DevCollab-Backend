@@ -4,15 +4,12 @@ import { ApplicationResponseDTO } from "../dtos/project/res/application-response
 export class ApplicationResponseMapper {
     static toDTO(application: ApplicationEntity): ApplicationResponseDTO {
         return {
-            id: application.id!,
-            userId: application.userId!,
-            projectId: application.projectId,
-            techStack: application.techStack!,
-            profileUrl: application.profileUrl!,
-            reason: application.reason!,
-            status: application.status!,
-            createdAt: application.createdAt!,
-            updatedAt: application.updatedAt!
+            _id: application.id!,
+            _reason: application.reason!,
+            _status: application.status!,
+            _createdAt: application.createdAt!.toISOString(),
+            _techStack: application.techStack!,
+            _projectId: {} as any // This is a fallback for legacy code
         };
     }
 
