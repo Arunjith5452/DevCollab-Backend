@@ -20,7 +20,10 @@ export class MeetingRepository extends BaseRepository<IMeeting> implements IMeet
     }
 
     async findByProjectId(projectId: string): Promise<MeetingEntity[]> {
-        const meetings = await this.model.find({ projectId: new Types.ObjectId(projectId) }).sort({ date: 1 }).lean();
+        const meetings = await this.model.find({ projectId: new Types.ObjectId(projectId) })
+            .populate("createdBy", "name")
+            .sort({ date: 1 })
+            .lean();
         return meetings.map(meeting => this.meetingPersistenceMapper.fromMongo(meeting));
     }
 
@@ -42,7 +45,10 @@ export class MeetingRepository extends BaseRepository<IMeeting> implements IMeet
             query.status = { $in: statusArray };
         }
 
-        const meetings = await this.model.find(query).sort({ date: 1 }).lean();
+        const meetings = await this.model.find(query)
+            .populate("createdBy", "name")
+            .sort({ date: 1 })
+            .lean();
         return meetings.map(meeting => this.meetingPersistenceMapper.fromMongo(meeting));
     }
 }

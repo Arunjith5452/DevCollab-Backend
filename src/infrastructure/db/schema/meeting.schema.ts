@@ -23,6 +23,10 @@ export const meetingSchema = new Schema(
       type: Date,
       required: true,
     },
+    endTime: {
+      type: Date,
+      required: true,
+    },
 
     type: {
       type: String,

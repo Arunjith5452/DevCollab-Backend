@@ -9,8 +9,10 @@ export class MeetingResponseMapper {
             title: meeting.title,
             link: meeting.link,
             date: meeting.date,
+            endTime: meeting.endTime,
             type: meeting.type,
             createdBy: meeting.createdBy,
+            createdByName: meeting.createdByName || 'Unknown',
             status: meeting.status,
             participants: meeting.participants
         }));
