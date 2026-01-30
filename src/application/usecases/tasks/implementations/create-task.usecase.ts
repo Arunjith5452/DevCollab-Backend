@@ -12,22 +12,19 @@ import { PaymentPurpose } from "@/domain/enums/payment/payment-purpose.enums";
 import { PaymentStatus } from "@/domain/enums/payment/payment.enums";
 
 @injectable()
-export class CreateTaskUseCase implements IExecute<CreateTaskDTO, void> {
+export class CreateTaskUseCase implements IExecute<CreateTaskDTO, TaskEntity> {
     constructor(
         @inject(TASK_TYPES.TaskRepository) private readonly _taskRepository: ITasksRepository<TaskEntity>,
         @inject(PAYMENT_TYPES.StripeProvider) private readonly _stripeProvider: StripeProvider,
         @inject(PAYMENT_TYPES.PaymentRepository) private readonly _paymentRepository: IPaymentRepository<PaymentEntity>
     ) { }
 
-    async execute(dto: CreateTaskDTO): Promise<void> {
+    async execute(dto: CreateTaskDTO): Promise<TaskEntity> {
         try {
             let stripePaymentIntentId: string | undefined;
 
-            if (dto.payment && dto.payment.amount > 0) {
-                if (!dto.payment.sessionId) {
-                    throw new Error("Session ID is required for payment");
-                }
-
+            // Optional Stripe verification - if sessionId is provided (for backward compatibility or direct calls)
+            if (dto.payment && dto.payment.amount > 0 && dto.payment.sessionId) {
                 const session = await this._stripeProvider.retrieveCheckoutSession(dto.payment.sessionId);
 
                 if (session.payment_status !== 'paid') {
@@ -50,6 +47,7 @@ export class CreateTaskUseCase implements IExecute<CreateTaskDTO, void> {
                 payment: dto.payment
                     ? {
                         amount: dto.payment.amount,
+                        escrowStatus: stripePaymentIntentId ? "held" : "not-paid" // Use held if verified, else not-paid
                     }
                     : undefined,
             });
@@ -69,6 +67,8 @@ export class CreateTaskUseCase implements IExecute<CreateTaskDTO, void> {
                 });
                 await this._paymentRepository.createPayment(paymentEntity)
             }
+
+            return createdTask;
         } catch (error) {
             throw error;
         }
