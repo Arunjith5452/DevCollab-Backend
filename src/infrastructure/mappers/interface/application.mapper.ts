@@ -1,13 +1,18 @@
+import { MongoProject } from "./project.mapper.interface";
+
+export interface PopulatedUser {
+  _id: string;
+  name: string;
+  email?: string;
+  githubProfile?: string;
+  bio?: string;
+  profileImage?: string;
+}
+
 export interface MongoApplication {
   _id: string;
-  userId: string | {
-    _id: string;
-    name: string;
-    githubProfile?: string;
-    bio?: string;
-    profileImage?: string;
-  };
-  projectId: string;
+  userId: string | PopulatedUser;
+  projectId: string | MongoProject | null;
   techStack: string[];
   profileUrl: string;
   reason: string;

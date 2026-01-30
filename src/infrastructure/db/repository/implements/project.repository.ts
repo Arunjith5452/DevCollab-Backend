@@ -2,9 +2,9 @@ import { ProjectEntity } from "@/domain/entities/project.entity";
 import { BaseRepository } from "./base.repository";
 import { IProjectRepository } from "../interface/project.interface";
 import { inject, injectable } from "inversify";
-import { Model } from "mongoose";
+import { Model, FilterQuery } from "mongoose";
 import { ProjectPersistenceMapper } from "@/infrastructure/mappers/project-persistence.mapper";
-type PopulatedUser = { _id: string; name: string };
+import { MongoProject, MongoMember, MongoUser } from "@/infrastructure/mappers/interface/project.mapper.interface";
 
 
 @injectable()
@@ -18,7 +18,7 @@ export class ProjectRepository extends BaseRepository<ProjectEntity> implements 
         super(model)
     }
 
-    async find(filter: any, options: { skip: number; limit: number }): Promise<ProjectEntity[]> {
+    async find(filter: FilterQuery<ProjectEntity>, options: { skip: number; limit: number }): Promise<ProjectEntity[]> {
         const docs = await this.model
             .find(filter)
             .populate("creatorId", "name email profileImage")
@@ -28,13 +28,13 @@ export class ProjectRepository extends BaseRepository<ProjectEntity> implements 
             .lean()
             .exec();
 
-        return (docs as any[]).map(doc => this._projectPersistenceMapper.fromMongo(doc));
+        return (docs as unknown as MongoProject[]).map(doc => this._projectPersistenceMapper.fromMongo(doc));
     }
 
     async createProject(data: ProjectEntity): Promise<ProjectEntity> {
         const mongoData = this._projectPersistenceMapper.toMongo(data)
         const createProject = await this.create(mongoData)
-        return await this._projectPersistenceMapper.fromMongo(createProject)
+        return this._projectPersistenceMapper.fromMongo(createProject as unknown as MongoProject)
     }
 
     async findByIdWithCreator(id: string): Promise<ProjectEntity | null> {
@@ -44,13 +44,13 @@ export class ProjectRepository extends BaseRepository<ProjectEntity> implements 
             .lean()
             .exec();
 
-        return doc ? this._projectPersistenceMapper.fromMongo(doc) : null
+        return doc ? this._projectPersistenceMapper.fromMongo(doc as unknown as MongoProject) : null
     }
 
     async findEntityById(id: string): Promise<ProjectEntity | null> {
         const doc = await this.model.findById(id).lean().exec();
         if (!doc) return null;
-        return this._projectPersistenceMapper.fromMongo(doc);
+        return this._projectPersistenceMapper.fromMongo(doc as unknown as MongoProject);
     }
     async updateEntity(project: ProjectEntity): Promise<ProjectEntity | null> {
         const mongoData = this._projectPersistenceMapper.toMongo(project);
@@ -62,7 +62,7 @@ export class ProjectRepository extends BaseRepository<ProjectEntity> implements 
         ).lean().exec();
 
         return updatedDoc
-            ? this._projectPersistenceMapper.fromMongo(updatedDoc)
+            ? this._projectPersistenceMapper.fromMongo(updatedDoc as unknown as MongoProject)
             : null;
     }
 
@@ -72,7 +72,7 @@ export class ProjectRepository extends BaseRepository<ProjectEntity> implements 
             .lean()
             .exec();
 
-        return docs.map(doc => this._projectPersistenceMapper.fromMongo(doc));
+        return docs.map(doc => this._projectPersistenceMapper.fromMongo(doc as unknown as MongoProject));
     }
 
     async findByIdWithPopulation(projectId: string): Promise<ProjectEntity | null> {
@@ -85,7 +85,7 @@ export class ProjectRepository extends BaseRepository<ProjectEntity> implements 
             .lean()
             .exec();
 
-        return doc ? this._projectPersistenceMapper.fromMongo(doc) : null;
+        return doc ? this._projectPersistenceMapper.fromMongo(doc as unknown as MongoProject) : null;
     }
 
     async getProjectMembersForAssignee(projectId: string): Promise<{ userId: string; name: string }[]> {
@@ -99,9 +99,9 @@ export class ProjectRepository extends BaseRepository<ProjectEntity> implements 
 
         if (!projectDoc?.members) return []
 
-        return projectDoc.members.flatMap(m => {
+        return (projectDoc.members as MongoMember[]).flatMap(m => {
             if (m.userId && typeof m.userId === "object") {
-                const user = m.userId as PopulatedUser;
+                const user = m.userId as MongoUser;
                 return [{ userId: user._id, name: user.name }]
             }
             return []

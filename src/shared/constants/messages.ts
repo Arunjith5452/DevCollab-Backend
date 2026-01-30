@@ -64,6 +64,7 @@ export const MESSAGES = {
             APPROVE_APPLICATION_FAILED: "Failed to approve application",
             REJECT_APPLICATION_FAILED: "Failed to reject application",
             LOAD_CREATED_FAILED: "Failed to load created project",
+            LOAD_APPLIED_FAILED: "Failed to load applied projects",
             LOAD_MEMBERS_FAILED: "Failed to load project members",
             DISABLE_FAILED: "Failed to disable project",
         }

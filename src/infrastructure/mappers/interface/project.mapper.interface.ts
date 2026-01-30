@@ -12,12 +12,12 @@ export interface MongoMember {
   userId: string | MongoUser;
   role: string;
   status: string;
-  joinedAt: Date;
+  joinedAt: string;
 }
 
 export interface MongoProject {
   _id: string | ObjectId;
-  creatorId: string | ObjectId;
+  creatorId: string | ObjectId | MongoUser;
   title: string;
   description: string;
   githubRepo?: string;
