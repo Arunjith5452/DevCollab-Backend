@@ -18,6 +18,7 @@ export class UserPresentationMapper {
             createdProjectsCount: stats?.createdProjects || 0,
             contributionsCount: stats?.contributions || 0,
             recentActivities: stats?.activities || [],
+            isGithubConnected: !!user.githubAccessToken
         };
     }
 }

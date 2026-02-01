@@ -28,6 +28,10 @@ export const userSchema = new Schema({
     githubProfile: {
         type: String,
     },
+    githubAccessToken: {
+        type: String,
+        select: false
+    },
     googleId: { type: String, required: false },
     bio: {
         type: String,

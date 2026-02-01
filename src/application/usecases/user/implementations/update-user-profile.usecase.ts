@@ -38,6 +38,8 @@ export class UpdateUserProfileUseCase implements IExecute<{ userId: string, dto:
                 title: dto?.title,
                 techStack: dto.techStack,
                 profileImage: user?.profileImage,
+                githubAccessToken: dto?.githubAccessToken,
+                githubProfile: dto?.githubProfile,
             } as any)
 
             console.log("dto.profileImage:", dto.profileImage, ":oldProfileImage:", oldProfileImage)

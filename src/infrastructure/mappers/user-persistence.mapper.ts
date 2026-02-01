@@ -14,7 +14,8 @@ export class UserPersistenceMapper {
             techStack: user.techStack,
             profileImage: user.profileImage,
             googleId: user.googleId,
-            githubProfile: user.githubProfile
+            githubProfile: user.githubProfile,
+            githubAccessToken: user.githubAccessToken
         }
     }
 
@@ -31,7 +32,8 @@ export class UserPersistenceMapper {
             githubProfile: doc?.githubProfile,
             bio: doc?.bio,
             title: doc?.title,
-            techStack: doc?.techStack
+            techStack: doc?.techStack,
+            githubAccessToken: doc?.githubAccessToken
         })
     }
 }

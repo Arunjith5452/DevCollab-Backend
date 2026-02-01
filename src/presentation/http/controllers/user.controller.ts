@@ -2,6 +2,7 @@ import { UpdateProfileDTO } from "@/application/dtos/user/updateProfile.dto";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { UserEntity } from "@/domain/entities/user.entity";
 import { ServerErrorStatus } from "@/domain/enums/status-codes/server-error-status.enum";
+import { ClientErrorStatus } from "@/domain/enums/status-codes/client-error-status.enum";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
 import { errorResponse, successResponse } from "@/shared/utils/response.util";
 import { Request, Response } from "express";
@@ -65,6 +66,45 @@ export class UserController {
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )
+        }
+    }
+
+    /**
+     * Connects GitHub account for an already logged-in user.
+     * @param req - Express request containing githubAccessToken and githubUrl.
+     * @param res - Express response object.
+     * @returns JSON with success message.
+     */
+    async connectGitHub(req: Request, res: Response): Promise<Response> {
+        try {
+            const userId = req.user?.userId;
+            const { githubAccessToken, githubUrl } = req.body;
+
+            console.log("DEBUG: Connect GitHub Controller - UserId:", userId);
+            console.log("DEBUG: Connect GitHub Controller - Body:", req.body);
+
+            if (!githubAccessToken) {
+                return errorResponse(
+                    res,
+                    "GitHub access token is required",
+                    ClientErrorStatus.BAD_REQUEST,
+                    new Error("Missing githubAccessToken")
+                );
+            }
+
+            await this._updateUserProfileUseCase.execute({
+                userId,
+                dto: { githubAccessToken, githubProfile: githubUrl }
+            });
+
+            return successResponse(res, "GitHub account connected successfully", null);
+        } catch (error) {
+            return errorResponse(
+                res,
+                "Failed to connect GitHub account",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
         }
     }
 

@@ -8,5 +8,6 @@ export interface IUserRepository<T> extends IBaseRepository<T> {
     createUser(data: UserEntity): Promise<T>
     updateUser(userId: string, data: Partial<UserEntity>): Promise<T | null>;
     findEntityById(id: string): Promise<T | null>
+    findEntityByIdWithToken(id: string): Promise<T | null>
 
 }

@@ -12,6 +12,7 @@ export class UserEntity {
   private _googleId?: string;
   private _profileImage?: string;
   private _githubProfile?: string;
+  private _githubAccessToken?: string;
   private _bio?: string;
   private _title?: string
   private _techStack?: string[];
@@ -29,6 +30,7 @@ export class UserEntity {
     bio?: string,
     title?: string,
     techStack?: string[],
+    githubAccessToken?: string
   ) {
     this._email = email;
     this._password = password;
@@ -42,6 +44,7 @@ export class UserEntity {
     this._bio = bio;
     this._title = title
     this._techStack = techStack
+    this._githubAccessToken = githubAccessToken
   }
 
   static create(data: {
@@ -57,8 +60,23 @@ export class UserEntity {
     bio?: string;
     title?: string;
     techStack?: string[];
+    githubAccessToken?: string;
   }): UserEntity {
-    return new UserEntity(data.email, data.password, data.username, data.role, data.status, data.googleId, data.profileImage, data.githubProfile, data.id, data.bio, data.title, data.techStack);
+    return new UserEntity(
+      data.email,
+      data.password,
+      data.username,
+      data.role,
+      data.status,
+      data.googleId,
+      data.profileImage,
+      data.githubProfile,
+      data.id,
+      data.bio,
+      data.title,
+      data.techStack,
+      data.githubAccessToken
+    );
   }
   updateProfile(data: {
     name?: string;
@@ -145,6 +163,10 @@ export class UserEntity {
 
   async getHashedPassword() {
     return await hash(this.password)
+  }
+
+  get githubAccessToken(): string | undefined {
+    return this._githubAccessToken
   }
 
 }

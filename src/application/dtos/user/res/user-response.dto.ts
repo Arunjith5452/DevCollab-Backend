@@ -11,6 +11,7 @@ export interface UserResponseDTO {
     createdProjectsCount?: number;
     contributionsCount?: number;
     recentActivities?: UserActivity[];
+    isGithubConnected?: boolean;
 }
 
 export interface UserActivity {

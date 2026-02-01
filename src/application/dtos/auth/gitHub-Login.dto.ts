@@ -15,12 +15,17 @@ export class GithubLoginDTO {
   @Expose()
   @IsOptional()
   @IsString({ message: "Image URL must be a string" })
-  image?: string;      
+  image?: string;
 
   @Expose()
   @IsOptional()
   @IsString({ message: "github URL must be a string" })
-  githubUrl?:string
+  githubUrl?: string
+
+  @Expose()
+  @IsOptional()
+  @IsString({ message: "Access Token must be a string" })
+  githubAccessToken?: string;
 
   constructor() {
     this.email = "";

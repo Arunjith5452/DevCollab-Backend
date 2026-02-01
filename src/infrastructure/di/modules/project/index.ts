@@ -23,6 +23,7 @@ import { ProjectPresentationMapper } from "@/infrastructure/mappers/project-pres
 import { ProjectPersistenceMapper } from "@/infrastructure/mappers/project-persistence.mapper";
 import { ApplicationPresentationMapper } from "@/infrastructure/mappers/application-presentation.mapper";
 import { ApplicationPersistenceMapper } from "@/infrastructure/mappers/application-persistence.mapper";
+import { GitHubService } from "@/infrastructure/services/github.service";
 
 
 export const ProjectModule = new ContainerModule(({ bind }) => {
@@ -48,4 +49,5 @@ export const ProjectModule = new ContainerModule(({ bind }) => {
     bind<DisableProjectUseCase>(PROJECT_TYPES.DisableProjectUseCase).to(DisableProjectUseCase)
     bind<UpdateProjectUseCase>(PROJECT_TYPES.UpdateProjectUseCase).to(UpdateProjectUseCase)
     bind<GetProjectForEditUseCase>(PROJECT_TYPES.GetProjectForEditUseCase).to(GetProjectForEditUseCase)
+    bind<GitHubService>(PROJECT_TYPES.GitHubService).to(GitHubService)
 })

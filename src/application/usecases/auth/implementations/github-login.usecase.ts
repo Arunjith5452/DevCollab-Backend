@@ -19,7 +19,7 @@ export class GitHubLoginUseCase implements IExecute<GithubLoginDTO, AuthResult> 
 
     constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>) { }
 
-    async execute({ email, image, name , githubUrl }: GithubLoginDTO): Promise<AuthResult> {
+    async execute({ email, image, name, githubUrl, githubAccessToken }: GithubLoginDTO): Promise<AuthResult> {
 
         try {
 
@@ -40,7 +40,8 @@ export class GitHubLoginUseCase implements IExecute<GithubLoginDTO, AuthResult> 
                     role: Role.USER,
                     status: Status.ACTIVE,
                     profileImage: image,
-                    githubProfile:githubUrl
+                    githubProfile: githubUrl,
+                    githubAccessToken: githubAccessToken
                 })
 
                 const hashedPassword = await newUser.getHashedPassword();
@@ -55,11 +56,18 @@ export class GitHubLoginUseCase implements IExecute<GithubLoginDTO, AuthResult> 
                 }
             }
 
+            if (user && githubAccessToken) {
+                console.log("DEBUG: UseCase Updating User with Token:", user.id, githubAccessToken ? "Token Present" : "No Token");
+                await this._userRepository.updateUser(user.id!, { githubAccessToken: githubAccessToken });
+                // Re-fetch user to ensure entity is up to date, although strict consistency might not be needed here if only token changed
+                // user = await this._userRepository.findEntityById(user.id!) || user; 
+            }
+
             user.isBlocked()
 
             const payload = { userId: user.id, name: user.username, email: user.email, role: user.role }
 
-            const accessToken = generateAccessToken(payload)
+            const jwtAccessToken = generateAccessToken(payload)
             const refreshToken = generateRefreshToken(payload)
 
             await redisClient.set(`refresh:${user.email}`, refreshToken, "EX",
@@ -67,7 +75,7 @@ export class GitHubLoginUseCase implements IExecute<GithubLoginDTO, AuthResult> 
 
             return {
                 message: SuccessMessage.LOGIN_SUCCESS,
-                accessToken,
+                accessToken: jwtAccessToken,
                 refreshToken,
                 role: user.role
             }

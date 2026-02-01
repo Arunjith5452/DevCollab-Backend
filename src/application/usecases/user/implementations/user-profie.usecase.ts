@@ -28,7 +28,7 @@ export class GetUserProfileUseCase implements IExecute<{ userId: string }, UserR
   async execute({ userId }: { userId: string }): Promise<UserResponseDTO> {
     try {
 
-      const user = await this._userRepository.findEntityById(userId);
+      const user = await this._userRepository.findEntityByIdWithToken(userId);
       if (!user) throw new Error(ErrorMessage.USER_NOT_FOUND);
 
       const [createdProjectsCount, contributionsCount, recentProjects, recentApps] = await Promise.all([

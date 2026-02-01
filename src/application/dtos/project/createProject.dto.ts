@@ -58,6 +58,10 @@ export class CreateProjectDTO {
   githubRepo?: string;
 
   @Expose()
+  @IsOptional()
+  createGithubRepo?: boolean;
+
+  @Expose()
   @IsArray({ message: "Tech stack must be an array of strings" })
   @ArrayNotEmpty({ message: "Tech stack cannot be empty" })
   @IsString({ each: true, message: "Each tech stack item must be a string" })
