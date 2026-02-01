@@ -1,5 +1,14 @@
 import { injectable } from "inversify";
 
+interface GitHubErrorResponse {
+    message: string;
+}
+
+interface GitHubRepoResponse {
+    html_url: string;
+    [key: string]: unknown;
+}
+
 @injectable()
 export class GitHubService {
     async createRepository(accessToken: string, name: string, description?: string): Promise<string> {
@@ -20,11 +29,11 @@ export class GitHubService {
             });
 
             if (!response.ok) {
-                const errorData = await response.json() as any;
+                const errorData = await response.json() as unknown as GitHubErrorResponse;
                 throw new Error(errorData.message || "Failed to create GitHub repository");
             }
 
-            const data = await response.json() as any;
+            const data = await response.json() as unknown as GitHubRepoResponse;
             return data.html_url;
         } catch (error) {
             console.error("GitHub API Error:", error);

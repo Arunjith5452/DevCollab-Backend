@@ -19,7 +19,7 @@ export class GetMyAppliedProjectUseCase implements IExecute<{ userId: string }, 
 
             let applications = await this._applicationRepository.findAppliedProjectsByUser(userId)
 
-            return applications.map(app => this._applicationMapper.toResponseDTO(app as any));
+            return applications.map(app => this._applicationMapper.toResponseDTO(app));
 
         } catch (error) {
             throw error

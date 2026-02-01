@@ -1,11 +1,13 @@
 import { UserEntity } from "@/domain/entities/user.entity";
+import { IUser } from "../db/interface/user.inteface";
 
+import { IPersistenceMapper } from "./interface/persistence-mapper.interface";
 
-export class UserPersistenceMapper {
+export class UserPersistenceMapper implements IPersistenceMapper<UserEntity, IUser> {
     toMongo(user: UserEntity) {
         return {
             email: user.email,
-            role: user.role,
+            role: user.role as unknown as IUser['role'],
             password: user.password,
             name: user.username,
             status: user.status,
@@ -19,7 +21,7 @@ export class UserPersistenceMapper {
         }
     }
 
-    async fromMongo(doc: any): Promise<UserEntity> {
+    fromMongo(doc: IUser): UserEntity {
         return UserEntity.create({
             id: doc._id.toString(),
             email: doc.email,
@@ -27,15 +29,13 @@ export class UserPersistenceMapper {
             password: doc.password,
             role: doc.role,
             status: doc.status,
-            googleId: doc?.googleId,
-            profileImage: doc?.profileImage,
-            githubProfile: doc?.githubProfile,
-            bio: doc?.bio,
-            title: doc?.title,
-            techStack: doc?.techStack,
-            githubAccessToken: doc?.githubAccessToken
+            googleId: doc?.googleId ?? undefined,
+            profileImage: doc?.profileImage ?? undefined,
+            githubProfile: doc?.githubProfile ?? undefined,
+            bio: doc?.bio ?? undefined,
+            title: doc?.title ?? undefined,
+            techStack: doc?.techStack ?? undefined,
+            githubAccessToken: doc?.githubAccessToken ?? undefined
         })
     }
 }
-
-

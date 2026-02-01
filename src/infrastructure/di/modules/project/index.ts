@@ -24,6 +24,8 @@ import { ProjectPersistenceMapper } from "@/infrastructure/mappers/project-persi
 import { ApplicationPresentationMapper } from "@/infrastructure/mappers/application-presentation.mapper";
 import { ApplicationPersistenceMapper } from "@/infrastructure/mappers/application-persistence.mapper";
 import { GitHubService } from "@/infrastructure/providers/git/github.service";
+import { IProject } from "@/infrastructure/db/interface/project.interface";
+import { IApplication } from "@/infrastructure/db/interface/application.interface";
 
 
 export const ProjectModule = new ContainerModule(({ bind }) => {
@@ -32,14 +34,14 @@ export const ProjectModule = new ContainerModule(({ bind }) => {
     bind<ApplicationPresentationMapper>(ApplicationPresentationMapper).toSelf().inSingletonScope()
     bind<ApplicationPersistenceMapper>(ApplicationPersistenceMapper).toSelf().inSingletonScope()
     bind<ProjectRepository>(PROJECT_TYPES.ProjectRepository).to(ProjectRepository)
-    bind<Model<any>>("ProjectModel").toConstantValue(projectModel)
+    bind<Model<IProject>>("ProjectModel").toConstantValue(projectModel)
     bind<ProjectController>(PROJECT_TYPES.ProjectController).to(ProjectController)
     bind<CreateProjectUseCase>(PROJECT_TYPES.CreateProjectUseCase).to(CreateProjectUseCase)
     bind<ListProjectUseCase>(PROJECT_TYPES.ListProjectUseCase).to(ListProjectUseCase)
     bind<ProjectDetailsUseCase>(PROJECT_TYPES.ProjectDetailsUseCase).to(ProjectDetailsUseCase)
     bind<ApplyToProjectUseCase>(PROJECT_TYPES.ApplyToProjectUseCase).to(ApplyToProjectUseCase)
     bind<ApplicationRepository>(PROJECT_TYPES.ApplicationRepository).to(ApplicationRepository)
-    bind<Model<any>>("ApplicationModel").toConstantValue(applicationModel)
+    bind<Model<IApplication>>("ApplicationModel").toConstantValue(applicationModel)
     bind<GetPendingApplicationUseCase>(PROJECT_TYPES.GetPendingApplicationUseCase).to(GetPendingApplicationUseCase)
     bind<ApproveApplcationUseCase>(PROJECT_TYPES.ApproveApplcationUseCase).to(ApproveApplcationUseCase)
     bind<RejectApplicationUseCase>(PROJECT_TYPES.RejectApplicationUseCase).to(RejectApplicationUseCase)

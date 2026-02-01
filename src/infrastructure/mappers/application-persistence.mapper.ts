@@ -3,11 +3,11 @@ import { WithUser, MongoApplication } from "./interface/application.mapper";
 import { ProjectPersistenceMapper } from "./project-persistence.mapper";
 import { inject, injectable } from "inversify";
 import { MongoProject } from "./interface/project.mapper.interface";
-
 import { ProjectEntity } from "@/domain/entities/project.entity";
+import { IPersistenceMapper } from "./interface/persistence-mapper.interface";
 
 @injectable()
-export class ApplicationPersistenceMapper {
+export class ApplicationPersistenceMapper implements IPersistenceMapper<ApplicationEntity, MongoApplication> {
     constructor(
         @inject(ProjectPersistenceMapper) private readonly _projectPersistenceMapper: ProjectPersistenceMapper
     ) { }
@@ -23,7 +23,7 @@ export class ApplicationPersistenceMapper {
         }
     }
 
-    async fromMongo(doc: MongoApplication): Promise<ApplicationEntity & WithUser & { project?: ProjectEntity }> {
+    fromMongo(doc: MongoApplication): ApplicationEntity & WithUser & { project?: ProjectEntity } {
         const userId = typeof doc.userId === "object" ? doc.userId._id.toString() : doc.userId;
 
         // If population failed (project deleted), projectId will be null.

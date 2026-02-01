@@ -3,24 +3,25 @@ import { PaymentEntity } from "@/domain/entities/payment.entity";
 import { inject, injectable } from "inversify";
 import { PaymentPersistenceMapper } from "@/infrastructure/mappers/payment-persistence.mapper";
 import { BaseRepository } from "./base.repository";
-import { Model } from "mongoose";
+import { Model, UpdateQuery } from "mongoose";
+import { IPayment } from "@/infrastructure/db/interface/payment.interface";
 
 @injectable()
-export class PaymentRepository extends BaseRepository<PaymentEntity> implements IPaymentRepository<PaymentEntity> {
-    private readonly paymentPersistenceMapper: PaymentPersistenceMapper;
+export class PaymentRepository extends BaseRepository<PaymentEntity, IPayment> implements IPaymentRepository<PaymentEntity> {
 
-    constructor(@inject("PaymentModel") model: Model<PaymentEntity>, paymentPersistenceMapper: PaymentPersistenceMapper) {
-        super(model)
-        this.paymentPersistenceMapper = paymentPersistenceMapper
+    constructor(
+        @inject("PaymentModel") model: Model<IPayment>,
+        @inject(PaymentPersistenceMapper) mapper: PaymentPersistenceMapper
+    ) {
+        super(model, mapper)
     }
 
     async createPayment(payment: PaymentEntity): Promise<void> {
-        const mongoData = this.paymentPersistenceMapper.toMongo(payment);
-        await this.create(mongoData);
+        await this.create(payment);
     }
 
     async updatePayment(payment: PaymentEntity): Promise<void> {
-        const mongoData = this.paymentPersistenceMapper.toMongo(payment);
-        await this.updateOne({ _id: payment.id }, mongoData);
+        if (!payment.id) throw new Error("Payment ID required for update");
+        await this.update(payment.id, this.mapper.toMongo(payment) as unknown as UpdateQuery<PaymentEntity>);
     }
 }

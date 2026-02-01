@@ -2,25 +2,25 @@ import { ProjectEntity } from "@/domain/entities/project.entity";
 import { BaseRepository } from "./base.repository";
 import { IProjectRepository } from "../interface/project.interface";
 import { inject, injectable } from "inversify";
-import { Model, FilterQuery } from "mongoose";
+import { FilterQuery, Model, UpdateQuery } from "mongoose";
 import { ProjectPersistenceMapper } from "@/infrastructure/mappers/project-persistence.mapper";
 import { MongoProject, MongoMember, MongoUser } from "@/infrastructure/mappers/interface/project.mapper.interface";
 
 
 @injectable()
-export class ProjectRepository extends BaseRepository<ProjectEntity> implements IProjectRepository<ProjectEntity> {
-
+export class ProjectRepository extends BaseRepository<ProjectEntity, MongoProject> implements IProjectRepository<ProjectEntity> {
 
     constructor(
-        @inject("ProjectModel") model: Model<ProjectEntity>,
-        @inject(ProjectPersistenceMapper) private readonly _projectPersistenceMapper: ProjectPersistenceMapper
+        @inject("ProjectModel") model: Model<MongoProject>,
+        @inject(ProjectPersistenceMapper) mapper: ProjectPersistenceMapper
     ) {
-        super(model)
+        super(model, mapper)
     }
 
     async find(filter: FilterQuery<ProjectEntity>, options: { skip: number; limit: number }): Promise<ProjectEntity[]> {
+        // Override base find to populate creator
         const docs = await this.model
-            .find(filter)
+            .find(filter as FilterQuery<MongoProject>)
             .populate("creatorId", "name email profileImage")
             .sort({ createdAt: -1 })
             .skip(options.skip)
@@ -28,13 +28,11 @@ export class ProjectRepository extends BaseRepository<ProjectEntity> implements 
             .lean()
             .exec();
 
-        return (docs as unknown as MongoProject[]).map(doc => this._projectPersistenceMapper.fromMongo(doc));
+        return docs.map(doc => this.mapper.fromMongo(doc as unknown as MongoProject));
     }
 
     async createProject(data: ProjectEntity): Promise<ProjectEntity> {
-        const mongoData = this._projectPersistenceMapper.toMongo(data)
-        const createProject = await this.create(mongoData)
-        return this._projectPersistenceMapper.fromMongo(createProject as unknown as MongoProject)
+        return this.create(data);
     }
 
     async findByIdWithCreator(id: string): Promise<ProjectEntity | null> {
@@ -44,26 +42,16 @@ export class ProjectRepository extends BaseRepository<ProjectEntity> implements 
             .lean()
             .exec();
 
-        return doc ? this._projectPersistenceMapper.fromMongo(doc as unknown as MongoProject) : null
+        return doc ? this.mapper.fromMongo(doc as unknown as MongoProject) : null;
     }
 
     async findEntityById(id: string): Promise<ProjectEntity | null> {
-        const doc = await this.model.findById(id).lean().exec();
-        if (!doc) return null;
-        return this._projectPersistenceMapper.fromMongo(doc as unknown as MongoProject);
+        return this.findById(id);
     }
+
     async updateEntity(project: ProjectEntity): Promise<ProjectEntity | null> {
-        const mongoData = this._projectPersistenceMapper.toMongo(project);
-
-        const updatedDoc = await this.model.findByIdAndUpdate(
-            project.id,
-            mongoData,
-            { new: true }
-        ).lean().exec();
-
-        return updatedDoc
-            ? this._projectPersistenceMapper.fromMongo(updatedDoc as unknown as MongoProject)
-            : null;
+        if (!project.id) throw new Error("Project ID is required for update");
+        return this.update(project.id, this.mapper.toMongo(project) as unknown as UpdateQuery<ProjectEntity>);
     }
 
     async findByCreatorId(userId: string): Promise<ProjectEntity[]> {
@@ -72,7 +60,7 @@ export class ProjectRepository extends BaseRepository<ProjectEntity> implements 
             .lean()
             .exec();
 
-        return docs.map(doc => this._projectPersistenceMapper.fromMongo(doc as unknown as MongoProject));
+        return docs.map(doc => this.mapper.fromMongo(doc as unknown as MongoProject));
     }
 
     async findByIdWithPopulation(projectId: string): Promise<ProjectEntity | null> {
@@ -85,26 +73,25 @@ export class ProjectRepository extends BaseRepository<ProjectEntity> implements 
             .lean()
             .exec();
 
-        return doc ? this._projectPersistenceMapper.fromMongo(doc as unknown as MongoProject) : null;
+        return doc ? this.mapper.fromMongo(doc as unknown as MongoProject) : null;
     }
 
     async getProjectMembersForAssignee(projectId: string): Promise<{ userId: string; name: string }[]> {
-
         const projectDoc = await this.model
             .findById(projectId)
             .select("members")
             .populate("members.userId", "name")
             .lean()
-            .exec()
+            .exec();
 
-        if (!projectDoc?.members) return []
+        if (!projectDoc?.members) return [];
 
         return (projectDoc.members as MongoMember[]).flatMap(m => {
             if (m.userId && typeof m.userId === "object") {
                 const user = m.userId as MongoUser;
-                return [{ userId: user._id, name: user.name }]
+                return [{ userId: user._id, name: user.name }];
             }
-            return []
-        })
+            return [];
+        });
     }
 }

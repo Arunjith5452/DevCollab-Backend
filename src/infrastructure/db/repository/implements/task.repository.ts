@@ -1,64 +1,48 @@
 import { inject, injectable } from "inversify";
 import { BaseRepository } from "./base.repository";
-import { FilterQuery, Model } from "mongoose";
+import { FilterQuery, Model, UpdateQuery } from "mongoose";
 import { TaskEntity } from "@/domain/entities/task.entity";
+import { ITask } from "../../interface/task.interface";
 import { ITasksRepository } from "../interface/task.interface";
 import { TaskPersistenceMapper } from "@/infrastructure/mappers/task-persistence.mapper";
 
 @injectable()
-export class TaskRepository extends BaseRepository<TaskEntity> implements ITasksRepository<TaskEntity> {
 
-    private readonly taskPersistenceMapper: TaskPersistenceMapper;
+export class TaskRepository extends BaseRepository<TaskEntity, ITask> implements ITasksRepository<TaskEntity> {
 
-    constructor(@inject("TaskModel") model: Model<TaskEntity>, taskPersistenceMapper: TaskPersistenceMapper) {
-        super(model)
-        this.taskPersistenceMapper = taskPersistenceMapper
+    constructor(
+        @inject("TaskModel") model: Model<ITask>,
+        @inject(TaskPersistenceMapper) mapper: TaskPersistenceMapper
+    ) {
+        super(model, mapper)
     }
 
     async findTask(filter: FilterQuery<TaskEntity>, options: { skip: number; limit: number }): Promise<TaskEntity[]> {
-
-        const docs = await this.model
-            .find(filter)
-            .sort({ createdAt: -1 })
-            .skip(options.skip)
-            .limit(options.limit)
-            .lean()
-            .exec();
-
-        return Promise.all(
-            docs.map(doc => this.taskPersistenceMapper.fromMongo(doc))
-        );
+        return this.find(filter, options);
     }
 
     async findById(id: string): Promise<TaskEntity | null> {
-        const doc = await this.model.findById(id).lean().exec();
-        if (!doc) return null;
-        return this.taskPersistenceMapper.fromMongo(doc);
+        return super.findById(id);
     }
 
     async createTask(data: TaskEntity): Promise<TaskEntity> {
-        const mongoData = this.taskPersistenceMapper.toMongo(data)
-        const createTask = await this.create(mongoData as any)
-        return await this.taskPersistenceMapper.fromMongo(createTask)
+        return this.create(data);
     }
 
     async findByProjectAndStatus(projectId: string, status: string): Promise<TaskEntity[]> {
-        const docs = await this.model.find({ projectId, status }).sort({ createdAt: -1 }).lean().exec();
-        return Promise.all(docs.map(doc => this.taskPersistenceMapper.fromMongo(doc)));
+        return this.find({ projectId, status } as unknown as FilterQuery<TaskEntity>, { skip: 0, limit: 1000 })
     }
 
     async findByProjectStatusAndAssignee(projectId: string, status: string, assigneeId: string): Promise<TaskEntity[]> {
-        const docs = await this.model.find({ projectId, status, assignedId: assigneeId }).sort({ createdAt: -1 }).lean().exec();
-        return Promise.all(docs.map(doc => this.taskPersistenceMapper.fromMongo(doc)));
+        return this.find({ projectId, status, assignedId: assigneeId } as unknown as FilterQuery<TaskEntity>, { skip: 0, limit: 1000 })
     }
 
     async updateTask(task: TaskEntity): Promise<TaskEntity> {
-        const mongoData = this.taskPersistenceMapper.toMongo(task);
-        console.log("TaskRepository.updateTask - mongoData:", JSON.stringify(mongoData, null, 2));
-        const updated = await this.model
-            .findByIdAndUpdate(task.id, mongoData, { new: true })
-            .lean()
-            .exec();
-        return this.taskPersistenceMapper.fromMongo(updated!);
+        // toMongo returns full object. update expects UpdateQuery.
+        // We use findByIdAndUpdate. Base update does exactly this.
+        if (!task.id) throw new Error("Task ID required for update");
+        const updated = await this.update(task.id, this.mapper.toMongo(task) as unknown as UpdateQuery<TaskEntity>);
+        if (!updated) throw new Error("Task not found");
+        return updated;
     }
 }

@@ -16,7 +16,7 @@ import { ClientErrorStatus } from "@/domain/enums/status-codes/client-error-stat
  * 
  */
 
-export const validateDTO = (dtoClass: any) => {
+export const validateDTO = (dtoClass: new (...args: any[]) => object) => {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
 

@@ -1,9 +1,10 @@
 import { verifyToken } from "@/shared/utils/jwt.util";
 import { redisClient } from "@/infrastructure/providers/redis/redis-client";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
+import { JwtPayload } from "jsonwebtoken";
 
 
-export class LogoutUseCase implements IExecute<string , void> {
+export class LogoutUseCase implements IExecute<string, void> {
     constructor() { }
 
     async execute(refreshToken: string): Promise<void> {
@@ -15,13 +16,16 @@ export class LogoutUseCase implements IExecute<string , void> {
 
             console.log("refreshTolken", refreshToken)
 
-            const decoded: any = verifyToken(refreshToken, "refresh")
+            const decoded = verifyToken(refreshToken, "refresh") as JwtPayload | string | null;
 
             console.log("decoded", decoded)
 
             if (!decoded) throw new Error("Invalid or expired refresh token")
 
-            await redisClient.del(`refresh:${decoded.email}`)
+            if (typeof decoded === 'object' && 'email' in decoded) {
+                await redisClient.del(`refresh:${decoded.email}`)
+            }
+
 
             console.log("Logout successfully")
 

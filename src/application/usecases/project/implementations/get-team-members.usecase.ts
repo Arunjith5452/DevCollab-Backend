@@ -23,11 +23,11 @@ export class GetProjectMembersUseCase implements IExecute<{ projectId: string },
                 return { users: [], currentPage: page, totalPages: 0, totalItems: 0 };
             }
 
-            let members: any = project.members;
+            let members = project.members;
 
             if (search.trim()) {
                 const regex = new RegExp(search.trim(), "i");
-                members = members.filter((m: { user: { name: string; email: string; }; }) =>
+                members = members.filter((m) =>
                     m.user && (regex.test(m.user.name) || regex.test(m.user.email))
                 );
             }
@@ -36,11 +36,11 @@ export class GetProjectMembersUseCase implements IExecute<{ projectId: string },
             const start = (page - 1) * limit;
             const paginated = members.slice(start, start + limit);
 
-            const users = paginated.map((m: { userId: string; user: { name: string; email: string; }; role: string; joinedAt: Date; }) => ({
+            const users = paginated.map((m) => ({
                 id: m.userId,
                 name: m.user?.name ?? "Unknown User",
                 email: m.user?.email ?? "N/A",
-                role: m.role,
+                role: m.role as "contributor" | "maintainer",
                 joinedAt: m.joinedAt,
             }));
 
