@@ -46,6 +46,16 @@ export class UpdateProfileDTO {
   @MaxLength(300, { message: "Profile image URL is too long" })
   profileImage?: string; // S3 signed URL
 
+  @Expose()
+  @IsOptional()
+  @IsString({ message: "GitHub access token must be a string" })
+  githubAccessToken?: string;
+
+  @Expose()
+  @IsOptional()
+  @IsString({ message: "GitHub profile must be a string" })
+  githubProfile?: string;
+
   constructor(data?: Partial<UpdateProfileDTO>) {
     this.username = data?.username;
     this.title = data?.title;
@@ -53,5 +63,7 @@ export class UpdateProfileDTO {
     this.techStack = data?.techStack;
     this.githubUrl = data?.githubUrl;
     this.profileImage = data?.profileImage;
+    this.githubAccessToken = data?.githubAccessToken;
+    this.githubProfile = data?.githubProfile;
   }
 }

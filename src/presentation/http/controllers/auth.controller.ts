@@ -122,6 +122,7 @@ export class AuthController {
                 role: result.role,
                 accessToken: result.accessToken,
             });
+
         } catch (error) {
             return errorResponse(
                 res,
@@ -270,7 +271,7 @@ export class AuthController {
     async gitHubLogin(req: Request, res: Response): Promise<Response> {
 
         try {
-
+            console.log("DEBUG: Backend gitHubLogin Controller Body:", req.body);
             const result = await this._gitHubLoginUseCase.execute(req.body)
 
             res.cookie("refreshToken", result.refreshToken, {

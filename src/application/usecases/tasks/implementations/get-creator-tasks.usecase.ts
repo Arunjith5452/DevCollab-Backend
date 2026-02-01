@@ -7,11 +7,14 @@ import { SuccessMessage } from '@/domain/enums/messages/success-message.enum';
 import { TaskResponseMapper } from '@/application/mapper/tasks/task-response.mapper';
 import { TaskListItemDto } from '@/application/dtos/tasks/res/list-task.dto';
 import { Types } from 'mongoose';
+import { IProjectRepository } from '@/infrastructure/db/repository/interface/project.interface';
+import { PROJECT_TYPES } from '@/infrastructure/di/types/project';
 
 @injectable()
 export class GetCreatorTasksUseCase implements IExecute<GetAllTaskQuery, { message: string; tasks: TaskListItemDto[]; total: number }> {
     constructor(
         @inject(TASK_TYPES.TaskRepository) private readonly _taskRepository: ITasksRepository<any>,
+        @inject(PROJECT_TYPES.ProjectRepository) private readonly _projectRepository: IProjectRepository<any>,
     ) { }
 
     async execute(query: GetAllTaskQuery,): Promise<{ message: string; tasks: TaskListItemDto[]; total: number }> {
@@ -28,10 +31,16 @@ export class GetCreatorTasksUseCase implements IExecute<GetAllTaskQuery, { messa
 
         if (search?.trim()) {
             const regex = { $regex: search.trim(), $options: 'i' };
+
+            const members = await this._projectRepository.getProjectMembersForAssignee(projectId);
+            const matchingMemberIds = members
+                .filter(m => m.name.toLowerCase().includes(search.trim().toLowerCase()))
+                .map(m => m.userId);
+
             filter.$or = [
                 { title: regex },
                 { description: regex },
-                { assignedId: regex },
+                { assignedId: { $in: [search.trim(), ...matchingMemberIds] } },
             ];
         }
         if (assignee && assignee !== 'all') {

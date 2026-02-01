@@ -27,12 +27,16 @@ export class ListProjectUseCase implements IExecute<GetAllProjectsQuery, { messa
             };
 
             if (search) {
-                filter.title = { $regex: search, $options: "i" }
+                filter.$or = [
+                    { title: { $regex: search, $options: "i" } },
+                    { description: { $regex: search, $options: "i" } }
+                ];
             }
 
             if (techStack) {
-                filter.techStack = { $in: [techStack] };
+                filter.techStack = { $regex: new RegExp(`^${techStack}$`, "i") };
             }
+
             if (difficulty) {
                 filter.difficulty = difficulty;
             }

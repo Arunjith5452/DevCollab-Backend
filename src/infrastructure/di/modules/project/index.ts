@@ -21,11 +21,16 @@ import { UpdateProjectUseCase } from "@/application/usecases/project/implementat
 import { GetProjectForEditUseCase } from "@/application/usecases/project/implementations/get-project-forEdit.usecase";
 import { ProjectPresentationMapper } from "@/infrastructure/mappers/project-presentation.mapper";
 import { ProjectPersistenceMapper } from "@/infrastructure/mappers/project-persistence.mapper";
+import { ApplicationPresentationMapper } from "@/infrastructure/mappers/application-presentation.mapper";
+import { ApplicationPersistenceMapper } from "@/infrastructure/mappers/application-persistence.mapper";
+import { GitHubService } from "@/infrastructure/services/github.service";
 
 
 export const ProjectModule = new ContainerModule(({ bind }) => {
     bind<ProjectPresentationMapper>(ProjectPresentationMapper).toSelf().inSingletonScope()
     bind<ProjectPersistenceMapper>(ProjectPersistenceMapper).toSelf().inSingletonScope()
+    bind<ApplicationPresentationMapper>(ApplicationPresentationMapper).toSelf().inSingletonScope()
+    bind<ApplicationPersistenceMapper>(ApplicationPersistenceMapper).toSelf().inSingletonScope()
     bind<ProjectRepository>(PROJECT_TYPES.ProjectRepository).to(ProjectRepository)
     bind<Model<any>>("ProjectModel").toConstantValue(projectModel)
     bind<ProjectController>(PROJECT_TYPES.ProjectController).to(ProjectController)
@@ -44,4 +49,5 @@ export const ProjectModule = new ContainerModule(({ bind }) => {
     bind<DisableProjectUseCase>(PROJECT_TYPES.DisableProjectUseCase).to(DisableProjectUseCase)
     bind<UpdateProjectUseCase>(PROJECT_TYPES.UpdateProjectUseCase).to(UpdateProjectUseCase)
     bind<GetProjectForEditUseCase>(PROJECT_TYPES.GetProjectForEditUseCase).to(GetProjectForEditUseCase)
+    bind<GitHubService>(PROJECT_TYPES.GitHubService).to(GitHubService)
 })

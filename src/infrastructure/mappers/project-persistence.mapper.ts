@@ -1,5 +1,5 @@
 import { ProjectEntity } from "@/domain/entities/project.entity";
-import { MemberWithUser, MongoMember, MongoUser } from "./interface/project.mapper.interface";
+import { MemberWithUser, MongoMember, MongoProject, MongoUser } from "./interface/project.mapper.interface";
 import { injectable } from "inversify";
 
 @injectable()
@@ -25,45 +25,58 @@ export class ProjectPersistenceMapper {
     };
   }
 
-  fromMongo(doc: any): ProjectEntity {
+  fromMongo(doc: MongoProject): ProjectEntity {
+    if (!doc) return null as any;
 
     const mongoMembers = doc.members as MongoMember[];
 
+    const isPopulatedUser = (user: any): user is MongoUser => {
+      return user && typeof user === 'object' && '_id' in user;
+    };
+
+    const creatorId = isPopulatedUser(doc.creatorId)
+      ? doc.creatorId._id?.toString()
+      : (doc.creatorId?.toString() || "DELETED_USER");
+
     return ProjectEntity.create({
       id: doc._id?.toString(),
-      creatorId: typeof doc.creatorId === "object" && doc.creatorId ? doc.creatorId._id?.toString() : doc.creatorId?.toString(),
-      title: doc.title,
-      description: doc.description,
+      creatorId: creatorId,
+      title: doc.title || "Untitled Project",
+      description: doc.description || "",
       githubRepo: doc.githubRepo,
-      techStack: doc.techStack,
-      difficulty: doc.difficulty,
+      techStack: doc.techStack || [],
+      difficulty: doc.difficulty || "Beginner",
       startDate: doc.startDate,
       endDate: doc.endDate,
       expectation: doc.expectation,
-      visibility: doc.visibility,
-      requiredRoles: doc.requiredRoles,
-      status: doc.status,
+      visibility: doc.visibility || "public",
+      requiredRoles: doc.requiredRoles || [],
+      status: doc.status || "active",
       createdAt: doc.createdAt,
       updatedAt: doc.updatedAt,
       image: doc.image,
-      creator: typeof doc.creatorId === "object" && doc.creatorId ? {
-        name: doc.creatorId.name,
-        email: doc.creatorId.email,
+      creator: isPopulatedUser(doc.creatorId) ? {
+        name: doc.creatorId.name || "Unknown User",
+        email: doc.creatorId.email || "",
         avatar: doc.creatorId.profileImage ?? null,
       } : undefined,
-      members: mongoMembers.map((m): MemberWithUser => {
+      members: (mongoMembers || []).map((m): MemberWithUser => {
+        const userId = typeof m.userId === "object" && m.userId
+          ? m.userId._id?.toString()
+          : (m.userId?.toString() || "DELETED_USER");
+
         const base: MemberWithUser = {
-          userId: typeof m.userId === "object" ? m.userId._id.toString() : m.userId.toString(),
-          role: m.role,
-          status: m.status,
-          joinedAt: m.joinedAt ? new Date(m.joinedAt).toISOString() : 'nothing',
+          userId: userId,
+          role: m.role || "Member",
+          status: m.status || "active",
+          joinedAt: m.joinedAt ? new Date(m.joinedAt).toISOString() : new Date().toISOString(),
         };
 
         if (typeof m.userId === "object" && m.userId !== null) {
           const user = m.userId as MongoUser;
           base.user = {
-            name: user.name,
-            email: user.email,
+            name: user.name || "Unknown User",
+            email: user.email || "",
             avatar: user.profileImage ?? null,
           };
         }

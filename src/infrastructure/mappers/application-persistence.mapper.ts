@@ -1,7 +1,16 @@
 import { ApplicationEntity } from "@/domain/entities/application.entity";
-import { WithUser } from "./interface/application.mapper";
+import { WithUser, MongoApplication } from "./interface/application.mapper";
+import { ProjectPersistenceMapper } from "./project-persistence.mapper";
+import { inject, injectable } from "inversify";
+import { MongoProject } from "./interface/project.mapper.interface";
 
+import { ProjectEntity } from "@/domain/entities/project.entity";
+
+@injectable()
 export class ApplicationPersistenceMapper {
+    constructor(
+        @inject(ProjectPersistenceMapper) private readonly _projectPersistenceMapper: ProjectPersistenceMapper
+    ) { }
 
     toMongo(application: ApplicationEntity) {
         return {
@@ -14,22 +23,35 @@ export class ApplicationPersistenceMapper {
         }
     }
 
-    async fromMongo(doc: any): Promise<ApplicationEntity & WithUser> {
+    async fromMongo(doc: MongoApplication): Promise<ApplicationEntity & WithUser & { project?: ProjectEntity }> {
+        const userId = typeof doc.userId === "object" ? doc.userId._id.toString() : doc.userId;
+
+        // If population failed (project deleted), projectId will be null.
+        // We must provide a non-empty string to avoid Entity validation error.
+        let projectIdStr = "MISSING_PROJECT";
+        if (doc.projectId) {
+            projectIdStr = typeof doc.projectId === "object" ? (doc.projectId._id?.toString() || "MISSING_PROJECT") : doc.projectId;
+        }
+
         const entity = ApplicationEntity.create({
-            id: doc._id,
-            userId: typeof doc.userId === "string" ? doc.userId : doc.userId._id,
-            projectId: doc.projectId,
-            techStack: doc.techStack,
-            profileUrl: doc.profileUrl,
-            reason: doc.reason,
-            status: doc.status,
+            id: doc._id.toString(),
+            userId: userId,
+            projectId: projectIdStr,
+            techStack: doc.techStack || [],
+            profileUrl: doc.profileUrl || "",
+            reason: doc.reason || "",
+            status: doc.status || "pending",
             createdAt: doc.createdAt,
             updatedAt: doc.updatedAt,
-        }) as ApplicationEntity & WithUser
+        }) as ApplicationEntity & WithUser & { project?: ProjectEntity };
+
+        if (doc.projectId && typeof doc.projectId === "object") {
+            entity.project = this._projectPersistenceMapper.fromMongo(doc.projectId as MongoProject);
+        }
 
         if (typeof doc.userId === "object") {
             entity.user = {
-                name: doc.userId.name,
+                name: doc.userId.name || "Unknown User",
                 github: doc.userId.githubProfile || null,
                 bio: doc.userId.bio || null,
                 profileImage: doc.userId.profileImage || null,
@@ -38,5 +60,4 @@ export class ApplicationPersistenceMapper {
 
         return entity;
     }
-
 }

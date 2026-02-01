@@ -30,12 +30,19 @@ export class UserRepository extends BaseRepository<UserEntity> implements IUserR
     }
 
     async updateUser(userId: string, data: Partial<UserEntity>): Promise<UserEntity | null> {
+        console.log("DEBUG: Repo UpdateUser Data:", data);
         const update = await this.update(userId, data)
         return update ? this.userPersistenceMapper.fromMongo(update) : null
     }
 
     async findEntityById(id: string): Promise<UserEntity | null> {
         const doc = await this.findById(id);
+        if (!doc) return null;
+        return this.userPersistenceMapper.fromMongo(doc);
+    }
+
+    async findEntityByIdWithToken(id: string): Promise<UserEntity | null> {
+        const doc = await this.model.findById(id).select('+githubAccessToken');
         if (!doc) return null;
         return this.userPersistenceMapper.fromMongo(doc);
     }

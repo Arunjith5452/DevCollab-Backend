@@ -4,11 +4,13 @@ import { IApplicationRepository } from "../interface/application.interface";
 import { inject, injectable } from "inversify";
 import { Model } from "mongoose";
 import { ApplicationPersistenceMapper } from "@/infrastructure/mappers/application-persistence.mapper";
+import { MongoApplication } from "@/infrastructure/mappers/interface/application.mapper";
 
 @injectable()
 export class ApplicationRepository extends BaseRepository<ApplicationEntity> implements IApplicationRepository<ApplicationEntity> {
     private readonly _applicationPersistenceMapper: ApplicationPersistenceMapper
-    constructor(@inject("ApplicationModel") model: Model<ApplicationEntity>, applicationPersistenceMapper: ApplicationPersistenceMapper) {
+    constructor(@inject("ApplicationModel") model: Model<ApplicationEntity>,
+        @inject(ApplicationPersistenceMapper) applicationPersistenceMapper: ApplicationPersistenceMapper) {
         super(model)
         this._applicationPersistenceMapper = applicationPersistenceMapper
     }
@@ -16,13 +18,13 @@ export class ApplicationRepository extends BaseRepository<ApplicationEntity> imp
     async applyToProject(data: ApplicationEntity): Promise<ApplicationEntity> {
         const mongoData = this._applicationPersistenceMapper.toMongo(data)
         const apply = await this.create(mongoData)
-        return await this._applicationPersistenceMapper.fromMongo(apply)
+        return await this._applicationPersistenceMapper.fromMongo(apply as unknown as MongoApplication)
     }
 
     async findExistingApplication(userId: string, projectId: string): Promise<ApplicationEntity | null> {
         const application = await this.findOne({ userId, projectId });
         return application
-            ? this._applicationPersistenceMapper.fromMongo(application)
+            ? this._applicationPersistenceMapper.fromMongo(application as unknown as MongoApplication)
             : null;
     }
     async getPendingByProject(projectId: string): Promise<ApplicationEntity[]> {
@@ -36,7 +38,7 @@ export class ApplicationRepository extends BaseRepository<ApplicationEntity> imp
             .exec();
 
         return Promise.all(
-            docs.map(doc => this._applicationPersistenceMapper.fromMongo(doc))
+            docs.map(doc => this._applicationPersistenceMapper.fromMongo(doc as unknown as MongoApplication))
         );
     }
     async updateStatus(applicationId: string, newStatus: string): Promise<void> {
@@ -53,9 +55,7 @@ export class ApplicationRepository extends BaseRepository<ApplicationEntity> imp
             .lean()
 
         return await Promise.all(
-            docs.map(doc => this._applicationPersistenceMapper.fromMongo(doc))
+            docs.map(doc => this._applicationPersistenceMapper.fromMongo(doc as unknown as MongoApplication))
         );
     }
-
-
 }

@@ -9,23 +9,39 @@ import { IProjectRepository } from "@/infrastructure/db/repository/interface/pro
 import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
+import { GitHubService } from "@/infrastructure/services/github.service";
 import { inject, injectable } from "inversify";
 
 
 @injectable()
 export class CreateProjectUseCase implements IExecute<{ userId: string, dto: CreateProjectDTO }, { message: string }> {
     constructor(@inject(PROJECT_TYPES.ProjectRepository) private readonly _projectRepository: IProjectRepository<ProjectEntity>,
-        @inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>
+        @inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>,
+        @inject(PROJECT_TYPES.GitHubService) private readonly _gitHubService: GitHubService
     ) { }
 
     async execute({ userId, dto }: { userId: string, dto: CreateProjectDTO }): Promise<{ message: string }> {
 
         try {
 
-            const user = await this._userRepository.findById(userId)
+            let user: UserEntity | null = null;
+
+            if (dto.createGithubRepo) {
+                user = await this._userRepository.findEntityByIdWithToken(userId)
+            } else {
+                user = await this._userRepository.findById(userId)
+            }
 
             if (!user) {
                 throw new Error(ErrorMessage.USER_NOT_FOUND)
+            }
+
+            if (dto.createGithubRepo) {
+                if (!user.githubAccessToken) {
+                    throw new Error("GitHub account not connected. Please connect your GitHub account in your profile.")
+                }
+                const repoUrl = await this._gitHubService.createRepository(user.githubAccessToken, dto.title, dto.description);
+                dto.githubRepo = repoUrl;
             }
 
             const project = ProjectEntity.create({
@@ -40,7 +56,7 @@ export class CreateProjectUseCase implements IExecute<{ userId: string, dto: Cre
                 visibility: dto.visibility,
                 requiredRoles: dto.requiredRoles,
                 creatorId: user.id!,
-                image:dto.image,
+                image: dto.image,
                 members: [
                     {
                         userId: user.id!,

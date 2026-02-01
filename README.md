@@ -1,4 +1,4 @@
-# DevCollab - Developer Collaboration & Project Management Platform
+# DevCollab API - Developer Collaboration & Project Management Platform
 
 **DevCollab Backend** serves as the high-performance backbone of the DevCollab platform. It is engineered to demonstrate **Enterprise-Grade** design patterns, focusing on long-term maintainability, testability, and separation of concerns.
 
@@ -93,8 +93,8 @@ Integrated **Stripe Connect** for complex marketplace flows.
 2.  **Environment Configuration**
     ```env
     PORT=4000
-    MONGO_URI=mongodb:/devcollab
-    REDIS_HOST=
+    MONGO_URI=mongodb://localhost:27017/devcollab
+    REDIS_HOST=localhost
     ```
 
 3.  **Run Service**

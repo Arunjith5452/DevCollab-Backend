@@ -341,7 +341,7 @@ export class ProjectController {
 
             return errorResponse(
                 res,
-                MESSAGES.PROJECT.ERROR.LOAD_CREATED_FAILED,
+                MESSAGES.PROJECT.ERROR.LOAD_APPLIED_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             );
