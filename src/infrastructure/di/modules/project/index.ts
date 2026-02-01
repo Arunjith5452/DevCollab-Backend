@@ -23,7 +23,7 @@ import { ProjectPresentationMapper } from "@/infrastructure/mappers/project-pres
 import { ProjectPersistenceMapper } from "@/infrastructure/mappers/project-persistence.mapper";
 import { ApplicationPresentationMapper } from "@/infrastructure/mappers/application-presentation.mapper";
 import { ApplicationPersistenceMapper } from "@/infrastructure/mappers/application-persistence.mapper";
-import { GitHubService } from "@/infrastructure/services/github.service";
+import { GitHubService } from "@/infrastructure/providers/git/github.service";
 
 
 export const ProjectModule = new ContainerModule(({ bind }) => {

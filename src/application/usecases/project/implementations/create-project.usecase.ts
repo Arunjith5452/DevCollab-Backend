@@ -9,7 +9,7 @@ import { IProjectRepository } from "@/infrastructure/db/repository/interface/pro
 import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
-import { GitHubService } from "@/infrastructure/services/github.service";
+import { GitHubService } from "@/infrastructure/providers/git/github.service";
 import { inject, injectable } from "inversify";
 
 

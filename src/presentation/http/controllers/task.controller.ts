@@ -185,6 +185,12 @@ export class TaskController {
         }
     }
 
+    /**
+     * Starts a task assigned to the user.
+     * @param req - Express request containing taskId in params.
+     * @param res - Express response object.
+     * @returns JSON response with success message.
+     */
     async startTask(req: Request, res: Response): Promise<Response> {
         try {
             const { taskId } = req.params;
@@ -204,6 +210,12 @@ export class TaskController {
     }
 
 
+    /**
+     * Submits work for a task.
+     * @param req - Express request containing taskId in params and work data in body.
+     * @param res - Express response object.
+     * @returns JSON response with success message.
+     */
     async submitTask(req: Request, res: Response): Promise<Response> {
         try {
             const { taskId } = req.params;
@@ -222,6 +234,12 @@ export class TaskController {
         }
     }
 
+    /**
+     * Requests improvement on a submitted task.
+     * @param req - Express request containing taskId in params and improvement details in body.
+     * @param res - Express response object.
+     * @returns JSON response with success message.
+     */
     async requestImprovement(req: Request, res: Response): Promise<Response> {
         try {
 
@@ -244,6 +262,12 @@ export class TaskController {
         }
     }
 
+    /**
+     * Approves a completed task.
+     * @param req - Express request containing taskId in params.
+     * @param res - Express response object.
+     * @returns JSON response with success message.
+     */
     async approveTask(req: Request, res: Response): Promise<Response> {
         try {
 

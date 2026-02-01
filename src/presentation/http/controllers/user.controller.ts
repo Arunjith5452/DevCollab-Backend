@@ -86,7 +86,7 @@ export class UserController {
             if (!githubAccessToken) {
                 return errorResponse(
                     res,
-                    "GitHub access token is required",
+                    MESSAGES.USER.ERROR.GITHUB_TOKEN_REQUIRED,
                     ClientErrorStatus.BAD_REQUEST,
                     new Error("Missing githubAccessToken")
                 );
@@ -97,11 +97,11 @@ export class UserController {
                 dto: { githubAccessToken, githubProfile: githubUrl }
             });
 
-            return successResponse(res, "GitHub account connected successfully", null);
+            return successResponse(res, MESSAGES.USER.SUCCESS.GITHUB_CONNECTED, null);
         } catch (error) {
             return errorResponse(
                 res,
-                "Failed to connect GitHub account",
+                MESSAGES.USER.ERROR.GITHUB_CONNECT_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             );

@@ -1,4 +1,5 @@
 import { UpdateStatusDTO } from "@/application/dtos/admin/updateStatus.dto";
+import { MESSAGES } from "@/shared/constants/messages";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { GetAllProjectsQuery } from "@/application/usecases/admin/interface/projects-usecase.interface";
 import { GetAllUsersQuery } from "@/application/usecases/admin/interface/users-usecase.interface";
@@ -44,7 +45,7 @@ export class AdminController {
         } catch (error) {
             return errorResponse(
                 res,
-                "Failed to fetch users",
+                MESSAGES.ADMIN.ERROR.FETCH_USERS_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )
@@ -68,7 +69,7 @@ export class AdminController {
         } catch (error) {
             return errorResponse(
                 res,
-                "Failed to update users",
+                MESSAGES.ADMIN.ERROR.UPDATE_USER_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )
@@ -106,7 +107,7 @@ export class AdminController {
         } catch (error) {
             return errorResponse(
                 res,
-                "Failed to fetch projects",
+                MESSAGES.ADMIN.ERROR.FETCH_PROJECTS_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )
