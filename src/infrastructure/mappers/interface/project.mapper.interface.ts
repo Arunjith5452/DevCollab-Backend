@@ -47,5 +47,5 @@ export interface MemberWithUser extends Member {
     name: string;
     email: string;
     avatar?: string | null;
-  } | null;
+  };
 }
