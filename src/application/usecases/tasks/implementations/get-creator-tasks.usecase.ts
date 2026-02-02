@@ -9,12 +9,14 @@ import { TaskListItemDto } from '@/application/dtos/tasks/res/list-task.dto';
 import { Types } from 'mongoose';
 import { IProjectRepository } from '@/infrastructure/db/repository/interface/project.interface';
 import { PROJECT_TYPES } from '@/infrastructure/di/types/project';
+import { TaskEntity } from '@/domain/entities/task.entity';
+import { ProjectEntity } from '@/domain/entities/project.entity';
 
 @injectable()
 export class GetCreatorTasksUseCase implements IExecute<GetAllTaskQuery, { message: string; tasks: TaskListItemDto[]; total: number }> {
     constructor(
-        @inject(TASK_TYPES.TaskRepository) private readonly _taskRepository: ITasksRepository<any>,
-        @inject(PROJECT_TYPES.ProjectRepository) private readonly _projectRepository: IProjectRepository<any>,
+        @inject(TASK_TYPES.TaskRepository) private readonly _taskRepository: ITasksRepository<TaskEntity>,
+        @inject(PROJECT_TYPES.ProjectRepository) private readonly _projectRepository: IProjectRepository<ProjectEntity>,
     ) { }
 
     async execute(query: GetAllTaskQuery,): Promise<{ message: string; tasks: TaskListItemDto[]; total: number }> {

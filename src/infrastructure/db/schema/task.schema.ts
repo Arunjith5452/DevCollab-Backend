@@ -8,7 +8,7 @@ export const taskSchema = new Schema({
     },
 
     projectId: {
-        type: Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "Project",
         required: true
     },
@@ -51,7 +51,7 @@ export const taskSchema = new Schema({
                 type: String
             },
             userId: {
-                type: Types.ObjectId,
+                type: Schema.Types.ObjectId,
                 ref: "User"
             }
         }
@@ -87,7 +87,7 @@ export const taskSchema = new Schema({
             type: String
         }
     ],
-    
+
     approval: {
         type: String,
         enum: ["under-review", "approved"]

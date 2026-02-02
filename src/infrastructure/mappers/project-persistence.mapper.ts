@@ -1,9 +1,12 @@
 import { ProjectEntity } from "@/domain/entities/project.entity";
 import { MemberWithUser, MongoMember, MongoProject, MongoUser } from "./interface/project.mapper.interface";
 import { injectable } from "inversify";
+import { IProject } from "../db/interface/project.interface";
+
+import { IPersistenceMapper } from "./interface/persistence-mapper.interface";
 
 @injectable()
-export class ProjectPersistenceMapper {
+export class ProjectPersistenceMapper implements IPersistenceMapper<ProjectEntity, MongoProject> {
   toMongo(project: ProjectEntity) {
     return {
       creatorId: project.creatorId,
@@ -26,12 +29,12 @@ export class ProjectPersistenceMapper {
   }
 
   fromMongo(doc: MongoProject): ProjectEntity {
-    if (!doc) return null as any;
+    if (!doc) throw new Error("Project document is missing");
 
     const mongoMembers = doc.members as MongoMember[];
 
-    const isPopulatedUser = (user: any): user is MongoUser => {
-      return user && typeof user === 'object' && '_id' in user;
+    const isPopulatedUser = (user: unknown): user is MongoUser => {
+      return !!user && typeof user === 'object' && '_id' in user;
     };
 
     const creatorId = isPopulatedUser(doc.creatorId)

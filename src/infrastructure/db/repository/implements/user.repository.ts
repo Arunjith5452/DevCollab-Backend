@@ -4,46 +4,41 @@ import { BaseRepository } from "./base.repository";
 import { UserEntity } from "@/domain/entities/user.entity";
 import { Model } from "mongoose";
 import { UserPersistenceMapper } from "@/infrastructure/mappers/user-persistence.mapper";
+import { IUser } from "../../interface/user.inteface";
 
 @injectable()
-export class UserRepository extends BaseRepository<UserEntity> implements IUserRepository<UserEntity> {
-    private readonly userPersistenceMapper: UserPersistenceMapper;
+export class UserRepository extends BaseRepository<UserEntity, IUser> implements IUserRepository<UserEntity> {
 
-    constructor(@inject("UserModel") model: Model<UserEntity>, userPersistanceMapper: UserPersistenceMapper) {
-        super(model)
-        this.userPersistenceMapper = userPersistanceMapper
+    constructor(
+        @inject("UserModel") model: Model<IUser>,
+        @inject(UserPersistenceMapper) mapper: UserPersistenceMapper
+    ) {
+        super(model, mapper)
     }
 
     async findByEmail(email: string): Promise<UserEntity | null> {
-        const doc = await this.findOne({ email })
-        return doc ? this.userPersistenceMapper.fromMongo(doc) : null
+        return this.findOne({ email });
     }
 
     async updatePassword(userId: string, password: string): Promise<void> {
-        await this.update(userId, { password })
+        await this.update(userId, { password });
     }
 
     async createUser(data: UserEntity): Promise<UserEntity> {
-        const mongoData = this.userPersistenceMapper.toMongo(data)
-        const createUser = await this.create(mongoData)
-        return await this.userPersistenceMapper.fromMongo(createUser)
+        return this.create(data);
     }
 
     async updateUser(userId: string, data: Partial<UserEntity>): Promise<UserEntity | null> {
-        console.log("DEBUG: Repo UpdateUser Data:", data);
-        const update = await this.update(userId, data)
-        return update ? this.userPersistenceMapper.fromMongo(update) : null
+        return this.update(userId, data);
     }
 
     async findEntityById(id: string): Promise<UserEntity | null> {
-        const doc = await this.findById(id);
-        if (!doc) return null;
-        return this.userPersistenceMapper.fromMongo(doc);
+        return this.findById(id);
     }
 
     async findEntityByIdWithToken(id: string): Promise<UserEntity | null> {
         const doc = await this.model.findById(id).select('+githubAccessToken');
         if (!doc) return null;
-        return this.userPersistenceMapper.fromMongo(doc);
+        return this.mapper.fromMongo(doc);
     }
 }

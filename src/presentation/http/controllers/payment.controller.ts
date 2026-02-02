@@ -16,6 +16,12 @@ export class PaymentController {
         @inject(PAYMENT_TYPES.HandleWebhookUseCase) private readonly _handleWebhookUseCase: IExecute<WebhookDTO, { received: boolean; eventType?: string }>
     ) { }
 
+    /**
+     * Creates a Stripe checkout session for a project.
+     * @param req - Express request containing amount and metadata (projectId).
+     * @param res - Express response object.
+     * @returns JSON with the checkout session URL and ID.
+     */
     async createCheckoutSession(req: Request, res: Response): Promise<Response> {
         console.log("reached")
         try {
@@ -46,12 +52,18 @@ export class PaymentController {
         }
     }
 
+    /**
+     * Handles Stripe webhooks for payment events.
+     * @param req - Express request containing the webhook payload and signature.
+     * @param res - Express response object.
+     * @returns JSON confirmation of webhook receipt.
+     */
     async handleWebhook(req: Request, res: Response): Promise<Response> {
         try {
             const signature = req.headers['stripe-signature'];
 
             if (!signature) {
-                return errorResponse(res, "Missing stripe-signature header", ServerErrorStatus.INTERNAL_SERVER_ERROR);
+                return errorResponse(res, MESSAGES.PAYMENT.ERROR.MISSING_SIGNATURE, ServerErrorStatus.INTERNAL_SERVER_ERROR);
             }
 
             const result = await this._handleWebhookUseCase.execute({

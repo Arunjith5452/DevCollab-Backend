@@ -4,7 +4,7 @@ import { MeetingStatus } from "@/domain/enums/meetings/meeting-status.enum";
 export const meetingSchema = new Schema(
   {
     projectId: {
-      type: Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Projects",
       required: true,
     },
@@ -35,7 +35,7 @@ export const meetingSchema = new Schema(
     },
 
     createdBy: {
-      type: Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Users",
       required: true,
     },
@@ -43,7 +43,7 @@ export const meetingSchema = new Schema(
     participants: [
       {
         userId: {
-          type: Types.ObjectId,
+          type: Schema.Types.ObjectId,
           ref: "Users",
         },
         joinedAt: {

@@ -32,15 +32,21 @@ export class UpdateUserProfileUseCase implements IExecute<{ userId: string, dto:
                 techStack: dto?.techStack
             })
 
-            const updated = await this._userRepository.updateUser(userId, {
-                name: dto?.username,
+            // Build update object - note: database uses 'name' field, but entity uses 'username' getter
+            const updateData: Partial<UserEntity> & { name?: string } = {
                 bio: dto?.bio,
                 title: dto?.title,
                 techStack: dto.techStack,
                 profileImage: user?.profileImage,
                 githubAccessToken: dto?.githubAccessToken,
                 githubProfile: dto?.githubProfile,
-            } as any)
+            };
+
+            if (dto?.username) {
+                updateData.name = dto.username;
+            }
+
+            const updated = await this._userRepository.updateUser(userId, updateData as Partial<UserEntity>)
 
             console.log("dto.profileImage:", dto.profileImage, ":oldProfileImage:", oldProfileImage)
 

@@ -24,6 +24,11 @@ export class ProjectEntity {
     role: string;
     joinedAt: string;
     status: string;
+    user?: {
+      name: string;
+      email: string;
+      avatar?: string | null;
+    };
   }[];
 
   private _creator?: {
@@ -53,6 +58,11 @@ export class ProjectEntity {
       role: string;
       joinedAt: string;
       status: string;
+      user?: {
+        name: string;
+        email: string;
+        avatar?: string | null;
+      };
     }[];
     creator?: {
       name: string;
@@ -102,6 +112,11 @@ export class ProjectEntity {
       role: string;
       joinedAt: string;
       status: string;
+      user?: {
+        name: string;
+        email: string;
+        avatar?: string | null;
+      };
     }[];
     creator?: {
       name: string;

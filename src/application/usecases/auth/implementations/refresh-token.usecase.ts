@@ -7,6 +7,7 @@ import { UserEntity } from "@/domain/entities/user.entity";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { Status } from "@/domain/enums/status.enums";
 import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
+import { JwtPayload } from "jsonwebtoken";
 
 @injectable()
 export class RefreshTokenUseCase implements IExecute<string, RefreshResult> {
@@ -21,20 +22,27 @@ export class RefreshTokenUseCase implements IExecute<string, RefreshResult> {
         try {
             if (!refreshToken) throw new Error("Refresh token is missing")
 
-            const decoded: any = verifyToken(refreshToken, "refresh")
+            const decoded = verifyToken(refreshToken, "refresh") as JwtPayload | string | null;
 
             if (!decoded) throw new Error("Invalid or expired refresh token")
 
-            const storedToken = await redisClient.get(`refresh:${decoded.email}`)
+            let email: string;
+            if (typeof decoded === 'object' && 'email' in decoded) {
+                email = decoded.email;
+            } else {
+                throw new Error("Invalid token payload");
+            }
+
+            const storedToken = await redisClient.get(`refresh:${email}`)
             if (!storedToken || storedToken !== refreshToken) {
                 throw new Error("Refrsh token not found or already revoked")
             }
 
-            const user = await this._userRepository.findByEmail(decoded.email);
+            const user = await this._userRepository.findByEmail(email);
             if (!user) throw new Error("User not found");
 
 
-            if(user.status === Status.BLOCK){
+            if (user.status === Status.BLOCK) {
                 throw new Error("Admin blocked please try again")
             }
 

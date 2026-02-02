@@ -1,59 +1,66 @@
 import { TaskEntity } from "@/domain/entities/task.entity";
+import { ITask } from "../db/interface/task.interface";
+import { ApprovalStatus } from "@/domain/enums/tasks/approval-status.enum";
+import { TaskStatus } from "@/domain/enums/tasks/task-status.enums";
+import { Types } from "mongoose";
 
-export class TaskPersistenceMapper {
+import { IPersistenceMapper } from "./interface/persistence-mapper.interface";
+
+export class TaskPersistenceMapper implements IPersistenceMapper<TaskEntity, ITask> {
 
     toMongo(task: TaskEntity) {
         return {
             title: task.title,
-            projectId: task.projectId,
-            assignedId: task.assignedId,
+            projectId: new Types.ObjectId(task.projectId) as unknown as Types.ObjectId,
+            assignedId: new Types.ObjectId(task.assignedId) as unknown as Types.ObjectId,
             description: task.description,
             prLink: task.prLink,
             feedBack: task.feedBack,
             approval: task.approval,
             workDescription: task.workDescription,
-            status: task.status,
+            status: task.status as TaskStatus,
             deadline: task.deadline,
             comments: task.comments?.map(c => ({
                 message: c.message,
-                userId: c.userId,
+                userId: new Types.ObjectId(c.userId),
                 createdAt: c.createdAt
-            })),
+            })) as unknown as ITask['comments'],
             tags: task.tags,
-            acceptanceCriteria: task.acceptanceCriteria,
+            acceptanceCriteria: task.acceptanceCriteria as unknown as ITask['acceptanceCriteria'],
             payment: {
-                totalAmount: task.payment?.amount, // Map amount to totalAmount for Mongoose
-                escrowStatus: task.payment?.escrowStatus // Persist escrow status
+                totalAmount: task.payment?.amount || 0,
+                escrowStatus: task.payment?.escrowStatus || "not-paid"
             },
-            documents: task.documents
+            documents: task.documents || []
         }
     }
 
-    async fromMongo(doc: any): Promise<TaskEntity> {
+
+    fromMongo(doc: ITask & { _id: Types.ObjectId }): TaskEntity {
         return TaskEntity.create({
             id: doc._id.toString(),
             title: doc.title,
             projectId: doc.projectId.toString(),
-            assignedId: doc.assignedId,
-            description: doc.description,
-            prLink: doc.prLink,
-            approval: doc.approval,
-            workDescription: doc.workDescription,
-            feedBack: doc.feedBack,
+            assignedId: doc.assignedId?.toString() ?? undefined,
+            description: doc.description ?? "", 
+            prLink: doc.prLink ?? undefined,
+            approval: doc.approval ? doc.approval as ApprovalStatus : undefined,
+            workDescription: doc.workDescription ?? undefined,
+            feedBack: doc.feedBack ?? undefined,
             status: doc.status,
-            deadline: doc.deadline,
-            comments: doc.comments?.map((c: any) => ({
-                message: c.message,
-                userId: c.userId?._id?.toString() || c.userId,
+            deadline: doc.deadline ? new Date(doc.deadline) : new Date(),
+            comments: doc.comments?.map((c) => ({
+                message: c.message ?? "",
+                userId: (c.userId as any)?._id?.toString() || c.userId?.toString() || "",
                 createdAt: c.createdAt
-            })),
-            tags: doc.tags,
-            acceptanceCriteria: doc.acceptanceCriteria,
+            })) ?? undefined,
+            tags: doc.tags ?? undefined,
+            acceptanceCriteria: doc.acceptanceCriteria ?? undefined,
             payment: doc.payment ? {
-                amount: doc.payment.totalAmount, // Map totalAmount back to amount for Entity
+                amount: doc.payment.totalAmount,
                 escrowStatus: doc.payment.escrowStatus
             } : undefined,
-            documents: doc.documents,
+            documents: doc.documents ?? undefined,
             createdAt: doc.createdAt,
             updatedAt: doc.updatedAt
         });

@@ -11,11 +11,18 @@ import { ResetPasswordUseCase } from "@/application/usecases/auth/implementation
 import { VerifyForgotOtpUseCase } from "@/application/usecases/auth/implementations/verifyforgot-otp.usecase";
 import { VerifyOtpUseCase } from "@/application/usecases/auth/implementations/verity-otp.usecase";
 import { AUTH_TYPES } from "@/infrastructure/di/types";
+import { EMAIL_TYPES } from "@/infrastructure/di/types/email";
+import { EmailService } from "@/infrastructure/providers/email/email.service";
+import { IEmailService } from "@/infrastructure/providers/interface/email.interface";
 import { AuthController } from "@/presentation/http/controllers/auth.controller";
 import { ContainerModule } from "inversify";
 
 
 export const AuthModule = new ContainerModule(({ bind }) => {
+    // Email Service
+    bind<IEmailService>(EMAIL_TYPES.EmailService).to(EmailService).inSingletonScope();
+
+    // Auth Controller and Use Cases
     bind<AuthController>(AUTH_TYPES.AuthController).to(AuthController)
     bind<RegiserUseCase>(AUTH_TYPES.RegisterUseCase).to(RegiserUseCase)
     bind<VerifyOtpUseCase>(AUTH_TYPES.VerifyOtpUseCase).to(VerifyOtpUseCase)

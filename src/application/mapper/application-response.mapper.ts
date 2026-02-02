@@ -1,5 +1,6 @@
 import { ApplicationEntity } from "@/domain/entities/application.entity";
 import { ApplicationResponseDTO } from "../dtos/project/res/application-response.dto";
+import { ProjectResponseDTO } from "../dtos/project/res/project-response.dto";
 
 export class ApplicationResponseMapper {
     static toDTO(application: ApplicationEntity): ApplicationResponseDTO {
@@ -9,7 +10,7 @@ export class ApplicationResponseMapper {
             _status: application.status!,
             _createdAt: application.createdAt!.toISOString(),
             _techStack: application.techStack!,
-            _projectId: {} as any // This is a fallback for legacy code
+            _projectId: { _id: application.projectId, title: "", description: "" } as unknown as ProjectResponseDTO
         };
     }
 

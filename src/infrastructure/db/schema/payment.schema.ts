@@ -3,18 +3,18 @@ import { Schema, Types } from "mongoose";
 export const paymentSchema = new Schema(
     {
         userId: {
-            type: Types.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: "User",
             required: true,
         },
 
         projectId: {
-            type: Types.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: "Project",
         },
 
         taskId: {
-            type: Types.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: "Task",
         },
 
@@ -53,7 +53,7 @@ export const paymentSchema = new Schema(
         stripeSessionId: {
             type: String,
         },
-        
+
         metadata: {
             type: Object,
         },

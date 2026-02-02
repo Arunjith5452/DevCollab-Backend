@@ -2,60 +2,50 @@ import { ApplicationEntity } from "@/domain/entities/application.entity";
 import { BaseRepository } from "./base.repository";
 import { IApplicationRepository } from "../interface/application.interface";
 import { inject, injectable } from "inversify";
-import { Model } from "mongoose";
+import { FilterQuery, Model, Types, UpdateQuery } from "mongoose";
 import { ApplicationPersistenceMapper } from "@/infrastructure/mappers/application-persistence.mapper";
 import { MongoApplication } from "@/infrastructure/mappers/interface/application.mapper";
 
 @injectable()
-export class ApplicationRepository extends BaseRepository<ApplicationEntity> implements IApplicationRepository<ApplicationEntity> {
-    private readonly _applicationPersistenceMapper: ApplicationPersistenceMapper
-    constructor(@inject("ApplicationModel") model: Model<ApplicationEntity>,
-        @inject(ApplicationPersistenceMapper) applicationPersistenceMapper: ApplicationPersistenceMapper) {
-        super(model)
-        this._applicationPersistenceMapper = applicationPersistenceMapper
+export class ApplicationRepository extends BaseRepository<ApplicationEntity, MongoApplication> implements IApplicationRepository<ApplicationEntity> {
+    constructor(
+        @inject("ApplicationModel") model: Model<MongoApplication>,
+        @inject(ApplicationPersistenceMapper) mapper: ApplicationPersistenceMapper
+    ) {
+        super(model, mapper)
     }
 
     async applyToProject(data: ApplicationEntity): Promise<ApplicationEntity> {
-        const mongoData = this._applicationPersistenceMapper.toMongo(data)
-        const apply = await this.create(mongoData)
-        return await this._applicationPersistenceMapper.fromMongo(apply as unknown as MongoApplication)
+        return this.create(data);
     }
 
     async findExistingApplication(userId: string, projectId: string): Promise<ApplicationEntity | null> {
-        const application = await this.findOne({ userId, projectId });
-        return application
-            ? this._applicationPersistenceMapper.fromMongo(application as unknown as MongoApplication)
-            : null;
+        return this.findOne({ userId: new Types.ObjectId(userId), projectId: new Types.ObjectId(projectId) } as unknown as FilterQuery<ApplicationEntity>);
     }
+
     async getPendingByProject(projectId: string): Promise<ApplicationEntity[]> {
         const docs = await this.model
-            .find({ projectId, status: "pending" })
+            .find({ projectId: new Types.ObjectId(projectId), status: "pending" } as FilterQuery<MongoApplication>)
             .populate("userId", "name githubProfile bio profileImage")
             .sort({ createdAt: -1 })
-            .skip(0)
             .limit(100)
             .lean()
             .exec();
 
-        return Promise.all(
-            docs.map(doc => this._applicationPersistenceMapper.fromMongo(doc as unknown as MongoApplication))
-        );
+        return docs.map(doc => this.mapper.fromMongo(doc as MongoApplication));
     }
+
     async updateStatus(applicationId: string, newStatus: string): Promise<void> {
-        await this.updateOne(
-            { _id: applicationId },
-            { $set: { status: newStatus } }
-        );
+        await this.update(applicationId, { status: newStatus } as UpdateQuery<ApplicationEntity>);
     }
+
     async findAppliedProjectsByUser(userId: string): Promise<ApplicationEntity[]> {
         const docs = await this.model
-            .find({ userId })
+            .find({ userId: new Types.ObjectId(userId) } as FilterQuery<MongoApplication>)
             .populate("projectId")
             .sort({ createdAt: -1 })
-            .lean()
+            .lean();
 
-        return await Promise.all(
-            docs.map(doc => this._applicationPersistenceMapper.fromMongo(doc as unknown as MongoApplication))
-        );
+        return docs.map(doc => this.mapper.fromMongo(doc as MongoApplication));
     }
 }

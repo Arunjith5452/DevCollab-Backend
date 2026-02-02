@@ -30,11 +30,36 @@ export const MESSAGES = {
         SUCCESS: {
             PROFILE_UPDATED: "Profile updated successfully",
             AVATAR_UPLOADED: "Avatar uploaded successfully",
+            GITHUB_CONNECTED: "GitHub account connected successfully",
         },
         ERROR: {
             NOT_FOUND: "User not found",
             PROFILE_ERROR: "userProfile error",
             UPDATE_FAILED: "updteUserProfile failed",
+            GITHUB_TOKEN_REQUIRED: "GitHub access token is required",
+            GITHUB_CONNECT_FAILED: "Failed to connect GitHub account",
+        }
+    },
+    ADMIN: {
+        SUCCESS: {
+            USER_STATUS_UPDATED: "User status updated successfully",
+        },
+        ERROR: {
+            FETCH_USERS_FAILED: "Failed to fetch users",
+            UPDATE_USER_FAILED: "Failed to update users",
+            FETCH_PROJECTS_FAILED: "Failed to fetch projects",
+        }
+    },
+    MEETING: {
+        SUCCESS: {
+            SCHEDULED: "Meeting scheduled successfully",
+            FETCHED: "Meetings fetched successfully",
+            STATUS_UPDATED: "Meeting status updated successfully",
+        },
+        ERROR: {
+            SCHEDULE_FAILED: "Failed to schedule meeting",
+            FETCH_FAILED: "Failed to fetch meetings",
+            UPDATE_STATUS_FAILED: "Failed to update meeting status",
         }
     },
     FILE: {
@@ -102,6 +127,7 @@ export const MESSAGES = {
             FAILED: "Payment failed",
             CHECKOUT_SESSION_FAILED: "Failed to create checkout session",
             WEBHOOK_FAILED: "Webhook processing failed",
+            MISSING_SIGNATURE: "Missing stripe-signature header",
         }
     },
     COMMON: {

@@ -38,15 +38,15 @@ export class SignalingGateway {
             });
 
             // WebRTC Signaling Events
-            socket.on('offer', (payload: { target: string; caller: string; sdp: any }) => {
+            socket.on('offer', (payload: { target: string; caller: string; sdp: { type: "offer" | "answer" | "pranswer" | "rollback", sdp: string } }) => {
                 this.io.to(payload.target).emit('offer', payload);
             });
 
-            socket.on('answer', (payload: { target: string; caller: string; sdp: any }) => {
+            socket.on('answer', (payload: { target: string; caller: string; sdp: { type: "offer" | "answer" | "pranswer" | "rollback", sdp: string } }) => {
                 this.io.to(payload.target).emit('answer', payload);
             });
 
-            socket.on('ice-candidate', (payload: { target: string; candidate: any }) => {
+            socket.on('ice-candidate', (payload: { target: string; candidate: { candidate: string, sdpMid: string | null, sdpMLineIndex: number | null } }) => {
                 this.io.to(payload.target).emit('ice-candidate', payload);
             });
 
