@@ -41,4 +41,21 @@ export class UserRepository extends BaseRepository<UserEntity, IUser> implements
         if (!doc) return null;
         return this.mapper.fromMongo(doc);
     }
+    async getDailyRegistrations(startDate: Date, endDate: Date): Promise<{ _id: string; count: number }[]> {
+        const result = await this.model.aggregate([
+            {
+                $match: {
+                    createdAt: { $gte: startDate, $lte: endDate }
+                }
+            },
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { _id: 1 } }
+        ]);
+        return result;
+    }
 }

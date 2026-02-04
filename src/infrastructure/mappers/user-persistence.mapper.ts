@@ -35,7 +35,8 @@ export class UserPersistenceMapper implements IPersistenceMapper<UserEntity, IUs
             bio: doc?.bio ?? undefined,
             title: doc?.title ?? undefined,
             techStack: doc?.techStack ?? undefined,
-            githubAccessToken: doc?.githubAccessToken ?? undefined
+            githubAccessToken: doc?.githubAccessToken ?? undefined,
+            createdAt: (doc as any).createdAt
         })
     }
 }

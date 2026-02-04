@@ -11,13 +11,64 @@ import { errorResponse, successResponse } from "@/shared/utils/response.util";
 import { Request, Response } from "express";
 import { inject, injectable } from "inversify";
 
+import { ResponseUserDto } from "@/application/dtos/auth/res/response.dto";
+
 @injectable()
 export class AdminController {
     constructor(
-        @inject(ADMIN_TYPES.GetAllUsersUseCase) private readonly _getAllUsersUseCase: IExecute<GetAllUsersQuery, { message: string, users: UserEntity[], total: number }>,
+        @inject(ADMIN_TYPES.GetAllUsersUseCase) private readonly _getAllUsersUseCase: IExecute<GetAllUsersQuery, { message: string, users: ResponseUserDto[], total: number }>,
         @inject(ADMIN_TYPES.UpdateUserStatusUseCase) private readonly _updateUserStatusUseCase: IExecute<{ userId: string, newStatus: UpdateStatusDTO }, { message: string, newStatus: string }>,
-        @inject(ADMIN_TYPES.GetAllProjectsUseCase) private readonly _getAllProjectsUseCase: IExecute<GetAllProjectsQuery, { message: string, projects: ProjectEntity[], total: number }>
+        @inject(ADMIN_TYPES.GetAllProjectsUseCase) private readonly _getAllProjectsUseCase: IExecute<GetAllProjectsQuery, { message: string, projects: ProjectEntity[], total: number }>,
+        @inject(ADMIN_TYPES.GetAdminDashboardStatsUseCase) private readonly _getDashboardStatsUseCase: IExecute<{ startDate?: Date, endDate?: Date } | void, { message: string, stats: any }>,
+        @inject(ADMIN_TYPES.GetAdminActivitiesUseCase) private readonly _getActivitiesUseCase: IExecute<{ page: number, limit: number }, { activities: any[], total: number }>
     ) { }
+
+    /**
+     * Fetches dashboard statistics.
+     * @param req - Express request.
+     * @param res - Express response object.
+     * @returns JSON with dashboard stats.
+     */
+    async getDashboardStats(req: Request, res: Response) {
+        try {
+            const { startDate, endDate } = req.query;
+            const query = {
+                startDate: startDate ? new Date(startDate as string) : undefined,
+                endDate: endDate ? new Date(endDate as string) : undefined
+            };
+
+            const result = await this._getDashboardStatsUseCase.execute(query);
+            console.log("Stats result", result);
+            return successResponse(res, result.message, result.stats);
+        } catch (error) {
+            return errorResponse(
+                res,
+                "Failed to fetch dashboard stats",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+        }
+    }
+
+    /**
+     * Fetches paginated recent activities.
+     */
+    async getActivities(req: Request, res: Response) {
+        try {
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+
+            const result = await this._getActivitiesUseCase.execute({ page, limit });
+            return successResponse(res, "Activities fetched successfully", result);
+        } catch (error) {
+            return errorResponse(
+                res,
+                "Failed to fetch activities",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+        }
+    }
 
     /**
      * Fetches all users with optional filters like search, role, and status.
@@ -38,6 +89,7 @@ export class AdminController {
             };
 
             const result = await this._getAllUsersUseCase.execute(query);
+
             return successResponse(res, result.message, {
                 users: result.users,
                 total: result.total,

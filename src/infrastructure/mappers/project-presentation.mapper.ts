@@ -29,6 +29,11 @@ export class ProjectPresentationMapper {
                 role: m.role,
                 joinedAt: m.joinedAt,
                 status: m.status,
+                user: m.user ? {
+                    name: m.user.name,
+                    email: m.user.email,
+                    avatar: m.user.avatar
+                } : undefined
             })),
             creator: project.creator,
         };

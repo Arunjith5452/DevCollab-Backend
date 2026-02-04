@@ -17,4 +17,8 @@ export const PROJECT_TYPES = {
     UpdateProjectUseCase: Symbol.for("UpdateProjectUseCase"),
     GetProjectForEditUseCase: Symbol.for("GetProjectForEditUseCase"),
     GitHubService: Symbol.for("GitHubService"),
+    GetProjectStatsUseCase: Symbol.for("GetProjectStatsUseCase"),
+    GetContributorStatsUseCase: Symbol.for("GetContributorStatsUseCase"),
+    GetPlatformStatsUseCase: Symbol.for("GetPlatformStatsUseCase"),
+    GetFeaturedProjectsUseCase: Symbol.for("GetFeaturedProjectsUseCase"),
 }

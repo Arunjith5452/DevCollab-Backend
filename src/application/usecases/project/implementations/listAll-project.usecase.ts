@@ -20,7 +20,7 @@ export class ListProjectUseCase implements IExecute<GetAllProjectsQuery, { messa
 
         try {
 
-            const { search, techStack, roleNeeded, difficulty, page = 1, limit = 3 } = query
+            const { search, techStack, roleNeeded, difficulty, page = 1, limit = 3, sort } = query
 
             const filter: Record<string, unknown> = {
                 status: { $ne: "disabled" }
@@ -50,7 +50,20 @@ export class ListProjectUseCase implements IExecute<GetAllProjectsQuery, { messa
 
             const skip = (page - 1) * limit
 
-            const [projects, count] = await Promise.all([this._projectRepository.find(filter, { skip, limit }), this._projectRepository.count(filter)])
+            let projects: ProjectEntity[];
+            let count: number;
+
+            if (sort === 'featured') {
+                [projects, count] = await Promise.all([
+                    this._projectRepository.findFeatured(filter, { skip, limit }),
+                    this._projectRepository.count(filter)
+                ]);
+            } else {
+                [projects, count] = await Promise.all([
+                    this._projectRepository.find(filter, { skip, limit }),
+                    this._projectRepository.count(filter)
+                ]);
+            }
 
             let total = Math.ceil(count / limit)
 

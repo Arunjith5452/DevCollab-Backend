@@ -9,6 +9,7 @@ import { GetProjectMembersQuery } from "@/application/usecases/project/interface
 import { ApplicationEntity } from "@/domain/entities/application.entity";
 import { ProjectEntity } from "@/domain/entities/project.entity";
 import { ServerErrorStatus } from "@/domain/enums/status-codes/server-error-status.enum";
+import { ClientErrorStatus } from "@/domain/enums/status-codes/client-error-status.enum";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
 import { errorResponse, successResponse } from "@/shared/utils/response.util";
 import { Request, Response } from "express";
@@ -19,6 +20,13 @@ import { MESSAGES } from "@/shared/constants/messages";
 
 
 import { ProjectResponseDTO } from "@/application/dtos/project/res/project-response.dto";
+
+import { GetProjectStatsUseCase } from "@/application/usecases/project/implementations/get-project-stats.usecase";
+import { ProjectStatsDTO } from "@/application/dtos/project/res/project-stats.dto";
+import { GetContributorStatsUseCase } from "@/application/usecases/project/implementations/get-contributor-stats.usecase";
+import { ContributorStatsDTO } from "@/application/dtos/project/res/contributor-stats.dto";
+import { PlatformStatsDTO } from "@/application/dtos/platform/platform-stats.dto";
+import { FeaturedProjectDTO } from "@/application/usecases/project/implementations/get-featured-projects.usecase";
 
 @injectable()
 export class ProjectController {
@@ -36,7 +44,11 @@ export class ProjectController {
         @inject(PROJECT_TYPES.GetProjectMembersUseCase) private readonly _getProjectMembersUseCase: IExecute<GetProjectMembersQuery, ProjectEntity[]>,
         @inject(PROJECT_TYPES.DisableProjectUseCase) private readonly _disableProjectUseCase: IExecute<{ userId: string, projectId: string }, void>,
         @inject(PROJECT_TYPES.UpdateProjectUseCase) private readonly _updateProjectUseCase: IExecute<{ userId: string, projectId: string, dto: UpdateProjectDTO }, { message: string }>,
-        @inject(PROJECT_TYPES.GetProjectForEditUseCase) private readonly _getProjectForEditUseCase: IExecute<{ userId: string, projectId: string }, ProjectEntity>
+        @inject(PROJECT_TYPES.GetProjectForEditUseCase) private readonly _getProjectForEditUseCase: IExecute<{ userId: string, projectId: string }, ProjectEntity>,
+        @inject(PROJECT_TYPES.GetProjectStatsUseCase) private readonly _getProjectStatsUseCase: IExecute<string, ProjectStatsDTO>,
+        @inject(PROJECT_TYPES.GetContributorStatsUseCase) private readonly _getContributorStatsUseCase: IExecute<{ projectId: string, userId: string, page?: number, limit?: number }, ContributorStatsDTO>,
+        @inject(PROJECT_TYPES.GetPlatformStatsUseCase) private readonly _getPlatformStatsUseCase: IExecute<void, PlatformStatsDTO>,
+        @inject(PROJECT_TYPES.GetFeaturedProjectsUseCase) private readonly _getFeaturedProjectsUseCase: IExecute<void, FeaturedProjectDTO[]>
     ) { }
 
 
@@ -138,7 +150,8 @@ export class ProjectController {
                 difficulty: difficulty as string,
                 teamSize: teamSize as string,
                 page: Number(page) || 1,
-                limit: Number(limit) || 10
+                limit: Number(limit) || 10,
+                sort: req.query.sort as string
             };
 
             const result = await this._listProjectUseCase.execute(query)
@@ -407,6 +420,91 @@ export class ProjectController {
                 error
             );
 
+        }
+    }
+
+    /**
+     * Fetches project statistics including completion rate and contributor performance.
+     * @param req - Express request containing projectId in params.
+     * @param res - Express response object.
+     * @returns JSON response with project statistics.
+     */
+    async getProjectStats(req: Request, res: Response): Promise<Response> {
+        try {
+            const { projectId } = req.params;
+            const stats = await this._getProjectStatsUseCase.execute(projectId);
+            return successResponse(res, "Stats fetched successfully", stats);
+        } catch (error) {
+            return errorResponse(
+                res,
+                "Failed to fetch project stats",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+        }
+    }
+
+    /**
+     * Fetches contributor statistics for a specific project.
+     * @param req - Express request containing projectId in params and authenticated userId.
+     * @param res - Express response object.
+     * @returns JSON response with contributor statistics including earnings and task breakdown.
+     */
+    async getContributorStats(req: Request, res: Response): Promise<Response> {
+        try {
+            const { projectId } = req.params;
+            const userId = req.user?.userId;
+            const page = req.query.page ? parseInt(req.query.page as string, 10) : 1;
+            const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 10;
+
+            const stats = await this._getContributorStatsUseCase.execute({
+                projectId,
+                userId,
+                page,
+                limit
+            });
+            return successResponse(res, "Contributor stats fetched successfully", stats);
+        } catch (error) {
+            return errorResponse(
+                res,
+                "Failed to fetch contributor stats",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+        }
+    }
+
+    /**
+     * Get platform statistics (public endpoint)
+     */
+    async getPlatformStats(req: Request, res: Response): Promise<Response> {
+        try {
+            const stats = await this._getPlatformStatsUseCase.execute();
+            return successResponse(res, "Platform stats fetched successfully", stats);
+        } catch (error) {
+            return errorResponse(
+                res,
+                "Failed to fetch platform stats",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+        }
+    }
+
+    /**
+     * Get featured projects (public endpoint)
+     */
+    async getFeaturedProjects(req: Request, res: Response): Promise<Response> {
+        try {
+            const projects = await this._getFeaturedProjectsUseCase.execute();
+            return successResponse(res, "Featured projects fetched successfully", projects);
+        } catch (error) {
+            return errorResponse(
+                res,
+                "Failed to fetch featured projects",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
         }
     }
 }

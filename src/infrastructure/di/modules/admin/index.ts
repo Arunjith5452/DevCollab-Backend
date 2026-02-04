@@ -4,6 +4,8 @@ import { AdminController } from "@/presentation/http/controllers/admin.controlle
 import { GetAllUsersUseCase } from "@/application/usecases/admin/implementations/get-all-users.usecase";
 import { UpdateUserStatusUseCase } from "@/application/usecases/admin/implementations/updateUserStatus.usecase";
 import { GetAllProjectsUseCase } from "@/application/usecases/admin/implementations/get-all-projects.usecase";
+import { GetAdminDashboardStatsUseCase } from "@/application/usecases/admin/implementations/get-dashboard-stats.usecase";
+import { GetAdminActivitiesUseCase } from "@/application/usecases/admin/implementations/get-activities.usecase";
 
 
 export const AdminModule = new ContainerModule(({ bind }) => {
@@ -11,4 +13,6 @@ export const AdminModule = new ContainerModule(({ bind }) => {
     bind<GetAllUsersUseCase>(ADMIN_TYPES.GetAllUsersUseCase).to(GetAllUsersUseCase)
     bind<UpdateUserStatusUseCase>(ADMIN_TYPES.UpdateUserStatusUseCase).to(UpdateUserStatusUseCase)
     bind<GetAllProjectsUseCase>(ADMIN_TYPES.GetAllProjectsUseCase).to(GetAllProjectsUseCase)
+    bind<GetAdminDashboardStatsUseCase>(ADMIN_TYPES.GetAdminDashboardStatsUseCase).to(GetAdminDashboardStatsUseCase)
+    bind<GetAdminActivitiesUseCase>(ADMIN_TYPES.GetAdminActivitiesUseCase).to(GetAdminActivitiesUseCase)
 })
