@@ -18,6 +18,11 @@ const projectController = container.get(ProjectController)
 
 const ALL_ROLES = [Role.ADMIN, Role.USER, Role.CREATOR, Role.CONTRIBUTER, Role.MAINTAINER];
 
+// Public routes (no auth required) - MUST be before parameterized routes
+router.get('/platform/stats', (req: Request, res: Response) => projectController.getPlatformStats(req, res))
+router.get('/projects/featured', (req: Request, res: Response) => projectController.getFeaturedProjects(req, res))
+
+// Protected routes
 router.post("/projects", AuthGuard(ALL_ROLES), BlockGuard(ALL_ROLES), validateDTO(CreateProjectDTO), (req: Request, res: Response) => projectController.createProject(req, res))
 router.get("/projects", AuthGuard(ALL_ROLES), BlockGuard(ALL_ROLES), (req: Request, res: Response) => projectController.getAllProjects(req, res))
 router.get("/projects/:projectId", AuthGuard(ALL_ROLES), BlockGuard(ALL_ROLES), (req: Request, res: Response) => projectController.projectDetails(req, res))
@@ -31,6 +36,8 @@ router.get('/projects/:projectId/members', AuthGuard(ALL_ROLES), BlockGuard(ALL_
 router.patch('/projects/:projectId/disable', AuthGuard(ALL_ROLES), BlockGuard(ALL_ROLES), (req: Request, res: Response) => projectController.disableProject(req, res))
 router.get('/projects/:projectId/edit', AuthGuard(ALL_ROLES), BlockGuard(ALL_ROLES), (req: Request, res: Response) => projectController.getProjectForEdit(req, res))
 router.patch('/projects/:projectId/edit', AuthGuard(ALL_ROLES), BlockGuard(ALL_ROLES), validateDTO(UpdateProjectDTO), (req: Request, res: Response) => projectController.editProject(req, res))
+router.get('/projects/:projectId/stats', AuthGuard(ALL_ROLES), BlockGuard(ALL_ROLES), (req: Request, res: Response) => projectController.getProjectStats(req, res))
+router.get('/projects/:projectId/contributor-stats', AuthGuard(ALL_ROLES), BlockGuard(ALL_ROLES), (req: Request, res: Response) => projectController.getContributorStats(req, res))
 
 
 export { router as projectRouter }

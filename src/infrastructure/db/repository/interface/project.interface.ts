@@ -11,5 +11,6 @@ export interface IProjectRepository<T> extends IBaseRepository<T> {
     findByCreatorId(userId: string): Promise<ProjectEntity[]>
     findByIdWithPopulation(projectId: string): Promise<ProjectEntity | null>;
     getProjectMembersForAssignee(projectId: string): Promise<ProjectMemberNameOnly[]>;
-
+    findFeatured(filter: any, options: { skip: number; limit: number }): Promise<ProjectEntity[]>;
+    getTechStackDistribution(): Promise<{ name: string; count: number }[]>;
 }

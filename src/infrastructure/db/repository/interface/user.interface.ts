@@ -9,5 +9,5 @@ export interface IUserRepository<T> extends IBaseRepository<T> {
     updateUser(userId: string, data: Partial<UserEntity>): Promise<T | null>;
     findEntityById(id: string): Promise<T | null>
     findEntityByIdWithToken(id: string): Promise<T | null>
-
+    getDailyRegistrations(startDate: Date, endDate: Date): Promise<{ _id: string; count: number }[]>
 }

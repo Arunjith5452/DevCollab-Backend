@@ -22,6 +22,11 @@ export interface ProjectResponseDTO {
         role: string;
         joinedAt: string;
         status: string;
+        user?: {
+            name: string;
+            email: string;
+            avatar?: string | null;
+        };
     }[];
     creator?: {
         name: string;

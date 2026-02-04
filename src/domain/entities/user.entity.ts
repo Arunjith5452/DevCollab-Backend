@@ -16,6 +16,7 @@ export class UserEntity {
   private _bio?: string;
   private _title?: string
   private _techStack?: string[];
+  private _createdAt?: Date;
 
   private constructor(
     email: string,
@@ -30,7 +31,8 @@ export class UserEntity {
     bio?: string,
     title?: string,
     techStack?: string[],
-    githubAccessToken?: string
+    githubAccessToken?: string,
+    createdAt?: Date
   ) {
     this._email = email;
     this._password = password;
@@ -45,6 +47,7 @@ export class UserEntity {
     this._title = title
     this._techStack = techStack
     this._githubAccessToken = githubAccessToken
+    this._createdAt = createdAt
   }
 
   static create(data: {
@@ -61,6 +64,7 @@ export class UserEntity {
     title?: string;
     techStack?: string[];
     githubAccessToken?: string;
+    createdAt?: Date;
   }): UserEntity {
     return new UserEntity(
       data.email,
@@ -75,7 +79,8 @@ export class UserEntity {
       data.bio,
       data.title,
       data.techStack,
-      data.githubAccessToken
+      data.githubAccessToken,
+      data.createdAt
     );
   }
   updateProfile(data: {
@@ -167,6 +172,10 @@ export class UserEntity {
 
   get githubAccessToken(): string | undefined {
     return this._githubAccessToken
+  }
+
+  get createdAt(): Date | undefined {
+    return this._createdAt;
   }
 
 }

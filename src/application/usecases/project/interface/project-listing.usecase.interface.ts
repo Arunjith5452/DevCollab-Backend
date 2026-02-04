@@ -5,4 +5,5 @@ export interface GetAllProjectsQuery {
   roleNeeded?: string;
   page: number;
   limit: number;
+  sort?: string;
 }

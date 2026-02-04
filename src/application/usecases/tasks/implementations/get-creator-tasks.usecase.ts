@@ -27,7 +27,7 @@ export class GetCreatorTasksUseCase implements IExecute<GetAllTaskQuery, { messa
             throw new Error('projectId is required to fetch tasks');
         }
 
-        const filter: Record<string, unknown> = {
+        const filter: Record<string, any> = {
             projectId: new Types.ObjectId(projectId),
         };
 
@@ -39,11 +39,25 @@ export class GetCreatorTasksUseCase implements IExecute<GetAllTaskQuery, { messa
                 .filter(m => m.name.toLowerCase().includes(search.trim().toLowerCase()))
                 .map(m => m.userId);
 
+            const searchAsId = search.trim();
+            const validIds = [...matchingMemberIds];
+
+            if (Types.ObjectId.isValid(searchAsId)) {
+                validIds.push(searchAsId);
+            }
+
             filter.$or = [
                 { title: regex },
                 { description: regex },
-                { assignedId: { $in: [search.trim(), ...matchingMemberIds] } },
             ];
+
+            if (validIds.length > 0) {
+                // Explicitly cast strings to ObjectId if they are strings, though Mongoose might handle string->ObjectId in $in automatically if valid.
+                // But manual cast is safer to avoid CastParam issues if any weirdness.
+                // matchingMemberIds are likely ObjectIds already. searchAsId is string.
+                // Let's just pass them. If Types.ObjectId.isValid is true, it's safe.
+                filter.$or.push({ assignedId: { $in: validIds } });
+            }
         }
         if (assignee && assignee !== 'all') {
             filter.assignedId = assignee;

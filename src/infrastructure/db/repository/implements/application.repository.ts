@@ -48,4 +48,16 @@ export class ApplicationRepository extends BaseRepository<ApplicationEntity, Mon
 
         return docs.map(doc => this.mapper.fromMongo(doc as MongoApplication));
     }
+    async findLatestApproved(limit: number): Promise<ApplicationEntity[]> {
+        const docs = await this.model
+            .find({ status: "approved" } as FilterQuery<MongoApplication>)
+            .populate("userId", "name")
+            .populate("projectId", "title")
+            .sort({ updatedAt: -1 })
+            .limit(limit)
+            .lean()
+            .exec();
+
+        return docs.map(doc => this.mapper.fromMongo(doc as MongoApplication));
+    }
 }

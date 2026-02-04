@@ -5,13 +5,18 @@ import { UserEntity } from "@/domain/entities/user.entity";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { GetAllUsersQuery } from "../interface/users-usecase.interface";
 import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
+import { ResponseUserDto } from "@/application/dtos/auth/res/response.dto";
+import { UserApplicationMapper } from "@/application/mapper/user-application.mapper";
 
-injectable()
-export class GetAllUsersUseCase implements IExecute<GetAllUsersQuery, { message: string, users: UserEntity[], total: number }> {
+@injectable()
+export class GetAllUsersUseCase implements IExecute<GetAllUsersQuery, { message: string, users: ResponseUserDto[], total: number }> {
 
-    constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>) { }
+    constructor(
+        @inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>,
+        private readonly _userMapper: UserApplicationMapper
+    ) { }
 
-    async execute(query: GetAllUsersQuery): Promise<{ message: string; users: UserEntity[]; total: number }> {
+    async execute(query: GetAllUsersQuery): Promise<{ message: string; users: ResponseUserDto[]; total: number }> {
         try {
 
             const { search, role, status, page = 1, limit = 3 } = query
@@ -30,7 +35,7 @@ export class GetAllUsersUseCase implements IExecute<GetAllUsersQuery, { message:
 
             return {
                 message: SuccessMessage.USERS_FETCHED,
-                users,
+                users: users.map(user => this._userMapper.toResponse(user)),
                 total
             }
 

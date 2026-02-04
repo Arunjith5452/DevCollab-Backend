@@ -2,7 +2,7 @@ import { ProjectEntity } from "@/domain/entities/project.entity";
 import { BaseRepository } from "./base.repository";
 import { IProjectRepository } from "../interface/project.interface";
 import { inject, injectable } from "inversify";
-import { FilterQuery, Model, UpdateQuery } from "mongoose";
+import { FilterQuery, Model, UpdateQuery, Types } from "mongoose";
 import { ProjectPersistenceMapper } from "@/infrastructure/mappers/project-persistence.mapper";
 import { MongoProject, MongoMember, MongoUser } from "@/infrastructure/mappers/interface/project.mapper.interface";
 
@@ -39,6 +39,10 @@ export class ProjectRepository extends BaseRepository<ProjectEntity, MongoProjec
         const doc = await this.model
             .findById(id)
             .populate("creatorId", "name email profileImage")
+            .populate({
+                path: "members.userId",
+                select: "name email avatar profileImage",
+            })
             .lean()
             .exec();
 
@@ -93,5 +97,78 @@ export class ProjectRepository extends BaseRepository<ProjectEntity, MongoProjec
             }
             return [];
         });
+    }
+
+    async findFeatured(filter: any, options: { skip: number; limit: number }): Promise<ProjectEntity[]> {
+        if (filter._id) {
+            filter._id = new Types.ObjectId(filter._id as string);
+        }
+
+        const aggregationPipeline: any[] = [
+            { $match: filter },
+            {
+                $lookup: {
+                    from: "applications",
+                    localField: "_id",
+                    foreignField: "projectId",
+                    as: "applications"
+                }
+            },
+            {
+                $addFields: {
+                    applicationCount: { $size: "$applications" }
+                }
+            },
+            { $sort: { applicationCount: -1 } },
+            { $skip: options.skip },
+            { $limit: options.limit },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "creatorId",
+                    foreignField: "_id",
+                    as: "creator"
+                }
+            },
+            { $unwind: "$creator" },
+            {
+                $project: {
+                    _id: 1,
+                    title: 1,
+                    description: 1,
+                    techStack: 1,
+                    difficulty: 1,
+                    startDate: 1,
+                    endDate: 1,
+                    expectation: 1,
+                    visibility: 1,
+                    requiredRoles: 1,
+                    status: 1,
+                    createdAt: 1,
+                    updatedAt: 1,
+                    image: 1,
+                    members: 1,
+                    creatorId: {
+                        _id: "$creator._id",
+                        name: "$creator.name",
+                        email: "$creator.email",
+                        profileImage: "$creator.profileImage"
+                    }
+                }
+            }
+        ];
+
+        const docs = await this.model.aggregate(aggregationPipeline).exec();
+        return docs.map(doc => this.mapper.fromMongo(doc as unknown as MongoProject));
+    }
+    async getTechStackDistribution(): Promise<{ name: string; count: number }[]> {
+        const result = await this.model.aggregate([
+            { $unwind: "$techStack" },
+            { $group: { _id: "$techStack", count: { $sum: 1 } } },
+            { $sort: { count: -1 } },
+            { $limit: 5 },
+            { $project: { _id: 0, name: "$_id", count: 1 } }
+        ]);
+        return result;
     }
 }
