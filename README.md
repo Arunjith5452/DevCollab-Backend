@@ -95,6 +95,7 @@ Integrated **Stripe Connect** for complex marketplace flows.
     PORT=4000
     MONGO_URI=mongodb://localhost:27017/devcollab
     REDIS_HOST=localhost
+    etc ...
     ```
 
 3.  **Run Service**
