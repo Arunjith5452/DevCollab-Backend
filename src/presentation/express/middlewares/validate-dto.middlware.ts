@@ -16,6 +16,7 @@ import { ClientErrorStatus } from "@/domain/enums/status-codes/client-error-stat
  * 
  */
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const validateDTO = (dtoClass: new (...args: any[]) => object) => {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
@@ -33,9 +34,13 @@ export const validateDTO = (dtoClass: new (...args: any[]) => object) => {
             });
 
             if (errors.length > 0) {
-                const messages = errors
-                    .map(err => Object.values(err.constraints || {}).join(", "))
-                    .join("; ");
+                const formatError = (error: any): string => {
+                    const constraints = error.constraints ? Object.values(error.constraints) : [];
+                    const children = error.children ? error.children.map(formatError).flat() : [];
+                    return [...constraints, ...children].join(", ");
+                };
+
+                const messages = errors.map(err => formatError(err)).join("; ");
 
                 return res.status(ClientErrorStatus.BAD_REQUEST).json({
                     message: messages,

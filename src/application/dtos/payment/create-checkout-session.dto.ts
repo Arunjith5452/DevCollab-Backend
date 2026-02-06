@@ -1,4 +1,4 @@
-import { Expose } from "class-transformer";
+import { Expose, Transform } from "class-transformer";
 import {
   IsNumber,
   IsOptional,
@@ -20,6 +20,7 @@ export class CreateCheckoutSessionDTO {
 
   @Expose()
   @IsObject({ message: "Metadata must be an object" })
+  @Transform(({ obj }: { obj: any }) => obj.metadata)
   metadata!: Record<string, string>;
 
   @Expose()

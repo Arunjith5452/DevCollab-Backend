@@ -23,19 +23,20 @@ export class PaymentController {
      * @returns JSON with the checkout session URL and ID.
      */
     async createCheckoutSession(req: Request, res: Response): Promise<Response> {
-        console.log("reached")
         try {
             const { amount, metadata } = req.body;
 
-            console.log("payment controllet:", req.body)
 
             const baseUrl = (process.env.FRONTEND_URL || 'http://localhost:3000').trim();
+
+            const metadataParams = metadata || {};
+            const projectId = metadataParams.project_id || metadataParams.projectId || '';
 
             const session = await this._createCheckoutSessionUseCase.execute({
                 amount,
                 metadata,
-                success_url: `${baseUrl}/create-task?projectId=${metadata.project_id}&session_id={CHECKOUT_SESSION_ID}`,
-                cancel_url: `${baseUrl}/task-listing?projectId=${metadata.project_id}`,
+                success_url: `${baseUrl}/create-task?projectId=${projectId}&session_id={CHECKOUT_SESSION_ID}`,
+                cancel_url: `${baseUrl}/task-listing?projectId=${projectId}`,
             });
 
             return successResponse(res, MESSAGES.PAYMENT.SUCCESS.CHECKOUT_SESSION_CREATED, {

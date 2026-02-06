@@ -1,23 +1,24 @@
 import { injectable, inject } from 'inversify';
 import { IExecute } from '@/application/interface/execute.usecase.interface';
-import { IUserRepository } from '@/infrastructure/db/repository/interface/user.interface';
-import { IProjectRepository } from '@/infrastructure/db/repository/interface/project.interface';
-import { IApplicationRepository } from '@/infrastructure/db/repository/interface/application.interface';
+import { IUserRepository } from '@/domain/repository/user.interface';
+import { IProjectRepository } from '@/domain/repository/project.interface';
+import { IApplicationRepository } from '@/domain/repository/application.interface';
 import { USER_TYPES } from '@/infrastructure/di/types/user';
 import { PROJECT_TYPES } from '@/infrastructure/di/types/project';
 import { UserEntity } from '@/domain/entities/user.entity';
 import { ProjectEntity } from '@/domain/entities/project.entity';
 import { ApplicationEntity } from '@/domain/entities/application.entity';
+import { ActivityItem } from '@/application/dtos/admin/activity.dto';
 
 @injectable()
-export class GetAdminActivitiesUseCase implements IExecute<{ page: number; limit: number }, { activities: any[]; total: number }> {
+export class GetAdminActivitiesUseCase implements IExecute<{ page: number; limit: number }, { activities: ActivityItem[]; total: number }> {
     constructor(
         @inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>,
         @inject(PROJECT_TYPES.ProjectRepository) private readonly _projectRepository: IProjectRepository<ProjectEntity>,
-        @inject(PROJECT_TYPES.ApplicationRepository) private readonly _applicationRepository: IApplicationRepository<ApplicationEntity>,
+        @inject(PROJECT_TYPES.ApplicationRepository) private readonly _applicationRepository: IApplicationRepository<ApplicationEntity>
     ) { }
 
-    async execute(query: { page: number; limit: number }): Promise<{ activities: any[]; total: number }> {
+    async execute(query: { page: number; limit: number }): Promise<{ activities: ActivityItem[]; total: number }> {
         const { page = 1, limit = 10 } = query;
         const fetchLimit = page * limit;
 
@@ -29,35 +30,37 @@ export class GetAdminActivitiesUseCase implements IExecute<{ page: number; limit
         ]);
 
         // Normalize activities
-        const allActivities = [
-            ...users.map((u: any) => ({
-                id: u.id || u._id,
-                type: 'user_joined',
-                title: `User ${u.username || u.name} joined the platform`,
-                desc: `New registration`,
-                time: u.createdAt,
-                timestamp: new Date(u.createdAt).getTime()
+        const allActivities: ActivityItem[] = [
+            ...users.map((u: UserEntity): ActivityItem => ({
+                type: 'user' as const,
+                id: u.id!,
+                name: u.username,
+                title: u.username,
+                desc: `Joined the platform`,
+                email: u.email,
+                createdAt: u.createdAt!
             })),
-            ...projects.map((p: any) => ({
-                id: p.id || p._id,
-                type: 'project_created',
-                title: `Project "${p.title}" created`,
-                desc: `${p.techStack?.join(', ') || 'Tech stack'} stack`,
-                time: p.createdAt,
-                timestamp: new Date(p.createdAt).getTime()
+            ...projects.map((p: ProjectEntity): ActivityItem => ({
+                type: 'project' as const,
+                id: p.id!,
+                name: p.title,
+                title: p.title,
+                desc: `New Project Created`,
+                createdAt: p.createdAt
             })),
-            ...applications.map((a: any) => ({
-                id: a.id || a._id,
-                type: 'contributed_project',
-                title: `User ${a.userId?.name || 'Unknown'} contributed to "${a.projectId?.title || 'Project'}"`,
-                desc: `Application Approved`,
-                time: a.updatedAt,
-                timestamp: new Date(a.updatedAt).getTime()
+            ...applications.map((a: ApplicationEntity): ActivityItem => ({
+                type: 'application' as const,
+                id: a.id!,
+                name: 'Application',
+                title: 'New Application',
+                desc: `Status: ${a.status}`,
+                status: a.status,
+                createdAt: a.updatedAt
             }))
         ];
 
-        // Sort by timestamp descending
-        allActivities.sort((a, b) => b.timestamp - a.timestamp);
+        // Sort by createdAt descending
+        allActivities.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
         // Calculate simplified total (sum of all counts approximations)
         // This is not perfect as we only fetched a subset, but for UI pagination we can estimate or fetch real counts.
