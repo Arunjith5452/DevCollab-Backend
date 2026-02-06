@@ -1,16 +1,18 @@
 import { injectable, inject } from 'inversify';
 import { IExecute } from '@/application/interface/execute.usecase.interface';
-import { ITasksRepository } from '@/infrastructure/db/repository/interface/task.interface';
+import { ITasksRepository } from '@/domain/repository/task.interface';
 import { TASK_TYPES } from '@/infrastructure/di/types/tasks';
 import { GetAllTaskQuery } from '../interface/task-usecase.interface';
 import { SuccessMessage } from '@/domain/enums/messages/success-message.enum';
 import { TaskResponseMapper } from '@/application/mapper/tasks/task-response.mapper';
 import { TaskListItemDto } from '@/application/dtos/tasks/res/list-task.dto';
 import { Types } from 'mongoose';
-import { IProjectRepository } from '@/infrastructure/db/repository/interface/project.interface';
+import { IProjectRepository } from '@/domain/repository/project.interface';
 import { PROJECT_TYPES } from '@/infrastructure/di/types/project';
 import { TaskEntity } from '@/domain/entities/task.entity';
 import { ProjectEntity } from '@/domain/entities/project.entity';
+import { TaskFilter } from '@/domain/types/task-filter.type';
+import { TaskStatus } from '@/domain/enums/tasks/task-status.enums';
 
 @injectable()
 export class GetCreatorTasksUseCase implements IExecute<GetAllTaskQuery, { message: string; tasks: TaskListItemDto[]; total: number }> {
@@ -27,7 +29,7 @@ export class GetCreatorTasksUseCase implements IExecute<GetAllTaskQuery, { messa
             throw new Error('projectId is required to fetch tasks');
         }
 
-        const filter: Record<string, any> = {
+        const filter: TaskFilter = {
             projectId: new Types.ObjectId(projectId),
         };
 
@@ -52,10 +54,6 @@ export class GetCreatorTasksUseCase implements IExecute<GetAllTaskQuery, { messa
             ];
 
             if (validIds.length > 0) {
-                // Explicitly cast strings to ObjectId if they are strings, though Mongoose might handle string->ObjectId in $in automatically if valid.
-                // But manual cast is safer to avoid CastParam issues if any weirdness.
-                // matchingMemberIds are likely ObjectIds already. searchAsId is string.
-                // Let's just pass them. If Types.ObjectId.isValid is true, it's safe.
                 filter.$or.push({ assignedId: { $in: validIds } });
             }
         }
@@ -71,7 +69,6 @@ export class GetCreatorTasksUseCase implements IExecute<GetAllTaskQuery, { messa
         const [tasks, total] = await Promise.all([this._taskRepository.findTask(filter, { skip, limit }), this._taskRepository.count(filter)]);
 
         const tasksDto = TaskResponseMapper.toList(tasks);
-        console.log("taskdDto", tasksDto)
 
         return {
             message: SuccessMessage.TASK_FETCHED,

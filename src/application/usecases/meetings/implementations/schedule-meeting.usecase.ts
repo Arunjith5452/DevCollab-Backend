@@ -1,6 +1,6 @@
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { CreateMeetingDTO } from "@/application/dtos/meetings/create-meeting.dto";
-import { IMeetingRepository } from "@/infrastructure/db/repository/interface/meeting.interface";
+import { IMeetingRepository } from "@/domain/repository/meeting.interface";
 import { MEETING_TYPES } from "@/infrastructure/di/types/meetings";
 import { MeetingEntity } from "@/domain/entities/meeting.entity";
 import { inject, injectable } from "inversify";
@@ -25,8 +25,6 @@ export class ScheduleMeetingUseCase implements IExecute<CreateMeetingDTO, void> 
                 type: data.type,
                 status: MeetingStatus.SCHEDULED
             });
-
-            let meetcount
 
             await this._meetingRepository.createMeeting(meeting);
         } catch (error) {

@@ -26,9 +26,9 @@ export class EmailService implements IEmailService {
     private async verifyConnection(): Promise<void> {
         try {
             await this.transporter.verify();
-            console.log('✅ Email service is ready to send emails');
+            console.log('Email service is ready to send emails');
         } catch (error) {
-            console.error('❌ Email service configuration error:', error);
+            console.error('Email service configuration error:', error);
         }
     }
 
@@ -65,7 +65,6 @@ export class EmailService implements IEmailService {
      */
     async sendWelcomeEmail(email: string, name: string): Promise<void> {
         try {
-            // TODO: Implement welcome email template
             await this.transporter.sendMail({
                 from: `"DevCollab" <${process.env.EMAIL_USER}>`,
                 to: email,
@@ -73,10 +72,9 @@ export class EmailService implements IEmailService {
                 text: `Welcome ${name}! Thank you for joining DevCollab.`
             });
 
-            console.log(`📧 Welcome email sent successfully to ${email}`);
+            console.log(`Welcome email sent successfully to ${email}`);
         } catch (error) {
-            console.error(`❌ Failed to send welcome email to ${email}:`, error);
-            // Don't throw error for welcome emails - it's not critical
+            console.error(`Failed to send welcome email to ${email}:`, error);
         }
     }
 
@@ -87,7 +85,6 @@ export class EmailService implements IEmailService {
      */
     async sendPasswordResetEmail(email: string, resetLink: string): Promise<void> {
         try {
-            // TODO: Implement password reset email template
             await this.transporter.sendMail({
                 from: `"DevCollab" <${process.env.EMAIL_USER}>`,
                 to: email,
@@ -95,9 +92,9 @@ export class EmailService implements IEmailService {
                 text: `Click the following link to reset your password: ${resetLink}`
             });
 
-            console.log(`📧 Password reset email sent successfully to ${email}`);
+            console.log(`Password reset email sent successfully to ${email}`);
         } catch (error) {
-            console.error(`❌ Failed to send password reset email to ${email}:`, error);
+            console.error(`Failed to send password reset email to ${email}:`, error);
             throw new Error('Failed to send password reset email. Please try again later.');
         }
     }

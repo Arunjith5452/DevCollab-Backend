@@ -1,4 +1,3 @@
-import { redisClient } from "@/infrastructure/providers/redis/redis-client";
 import { generateOTP } from "@/shared/utils/otp-generator.util";
 import { ResendOtp } from "@/application/dtos/auth/resend.dto";
 import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
@@ -6,18 +5,21 @@ import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { inject, injectable } from "inversify";
 import { EMAIL_TYPES } from "@/infrastructure/di/types/email";
 import { IEmailService } from "@/infrastructure/providers/interface/email.interface";
+import { COMMON_TYPES } from "@/infrastructure/di/types/common";
+import { ICacheService } from "@/application/interface/cache.service.interface";
 
 @injectable()
 export class ResendForgotOTPUseCase implements IExecute<ResendOtp, { message: string }> {
 
     constructor(
-        @inject(EMAIL_TYPES.EmailService) private readonly _emailService: IEmailService
+        @inject(EMAIL_TYPES.EmailService) private readonly _emailService: IEmailService,
+        @inject(COMMON_TYPES.CacheService) private readonly _cacheService: ICacheService
     ) { }
 
     async execute({ token }: ResendOtp): Promise<{ message: string }> {
         if (!token) throw new Error("Token is required");
 
-        const tempUserJson = await redisClient.get(`otp:${token}`);
+        const tempUserJson = await this._cacheService.get(`otp:${token}`);
         if (!tempUserJson) throw new Error(ErrorMessage.OTP_EXPIRED);
 
         const tempUser = JSON.parse(tempUserJson);
@@ -25,13 +27,14 @@ export class ResendForgotOTPUseCase implements IExecute<ResendOtp, { message: st
         const newOtp = generateOTP();
         const expiryTime = 3 * 60
 
-        await redisClient.setex(
+        await this._cacheService.set(
             `otp:${token}`,
-            expiryTime,
             JSON.stringify({
                 ...tempUser,
                 otp: newOtp,
-            })
+            }),
+            'EX',
+            expiryTime
         );
         console.log(`Resent OTP for ${tempUser.email}:`, newOtp);
 

@@ -7,6 +7,7 @@ import { ProjectModule } from './modules/project'
 import { TaskModule } from './modules/tasks'
 import { PaymentModule } from "./modules/payment/payment";
 import { MeetingModule } from "./modules/meetings";
+import { CommonModule } from "./modules/common";
 
 const container = new Container({
     defaultScope: "Singleton",
@@ -20,7 +21,8 @@ container.load(
     ProjectModule,
     TaskModule,
     PaymentModule,
-    MeetingModule
+    MeetingModule,
+    CommonModule
 );
 
 

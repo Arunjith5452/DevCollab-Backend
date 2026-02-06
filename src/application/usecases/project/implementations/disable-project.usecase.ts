@@ -2,7 +2,7 @@ import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { ProjectEntity } from "@/domain/entities/project.entity";
 import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
 import { ProjectStatus } from "@/domain/enums/project/project-status.enum";
-import { IProjectRepository } from "@/infrastructure/db/repository/interface/project.interface";
+import { IProjectRepository } from "@/domain/repository/project.interface";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
 import { inject, injectable } from "inversify";
 

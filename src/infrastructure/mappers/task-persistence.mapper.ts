@@ -42,7 +42,7 @@ export class TaskPersistenceMapper implements IPersistenceMapper<TaskEntity, ITa
             title: doc.title,
             projectId: doc.projectId.toString(),
             assignedId: doc.assignedId?.toString() ?? undefined,
-            description: doc.description ?? "", 
+            description: doc.description ?? "",
             prLink: doc.prLink ?? undefined,
             approval: doc.approval ? doc.approval as ApprovalStatus : undefined,
             workDescription: doc.workDescription ?? undefined,
@@ -51,7 +51,7 @@ export class TaskPersistenceMapper implements IPersistenceMapper<TaskEntity, ITa
             deadline: doc.deadline ? new Date(doc.deadline) : new Date(),
             comments: doc.comments?.map((c) => ({
                 message: c.message ?? "",
-                userId: (c.userId as any)?._id?.toString() || c.userId?.toString() || "",
+                userId: String((c.userId as { _id?: unknown })?._id || c.userId || ""),
                 createdAt: c.createdAt
             })) ?? undefined,
             tags: doc.tags ?? undefined,

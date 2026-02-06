@@ -21,4 +21,6 @@ export const PROJECT_TYPES = {
     GetContributorStatsUseCase: Symbol.for("GetContributorStatsUseCase"),
     GetPlatformStatsUseCase: Symbol.for("GetPlatformStatsUseCase"),
     GetFeaturedProjectsUseCase: Symbol.for("GetFeaturedProjectsUseCase"),
+    GetAiContributorSuggestionsUseCase: Symbol.for("GetAiContributorSuggestionsUseCase"),
+    LLMService: Symbol.for("LLMService"),
 }

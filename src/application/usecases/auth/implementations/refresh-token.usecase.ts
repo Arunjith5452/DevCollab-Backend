@@ -2,19 +2,20 @@ import { RefreshResult } from "@/domain/types/auth/refresh.types";
 import { inject, injectable } from "inversify";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
 import { generateAccessToken, verifyToken } from "@/shared/utils/jwt.util";
-import { redisClient } from "@/infrastructure/providers/redis/redis-client";
 import { UserEntity } from "@/domain/entities/user.entity";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { Status } from "@/domain/enums/status.enums";
-import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
+import { IUserRepository } from "@/domain/repository/user.interface";
 import { JwtPayload } from "jsonwebtoken";
+import { COMMON_TYPES } from "@/infrastructure/di/types/common";
+import { ICacheService } from "@/application/interface/cache.service.interface";
 
 @injectable()
 export class RefreshTokenUseCase implements IExecute<string, RefreshResult> {
 
     constructor(
         @inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>,
-
+        @inject(COMMON_TYPES.CacheService) private readonly _cacheService: ICacheService
     ) { }
 
     async execute(refreshToken: string): Promise<RefreshResult> {
@@ -33,7 +34,7 @@ export class RefreshTokenUseCase implements IExecute<string, RefreshResult> {
                 throw new Error("Invalid token payload");
             }
 
-            const storedToken = await redisClient.get(`refresh:${email}`)
+            const storedToken = await this._cacheService.get(`refresh:${email}`)
             if (!storedToken || storedToken !== refreshToken) {
                 throw new Error("Refrsh token not found or already revoked")
             }

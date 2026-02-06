@@ -5,7 +5,7 @@ import { UserEntity } from "@/domain/entities/user.entity";
 import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
 import { SuccessMessage } from "@/domain/enums/messages/success-message.enum";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
-import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
+import { IUserRepository } from "@/domain/repository/user.interface";
 
 
 

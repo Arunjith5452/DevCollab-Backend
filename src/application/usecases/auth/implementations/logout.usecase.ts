@@ -1,31 +1,27 @@
 import { verifyToken } from "@/shared/utils/jwt.util";
-import { redisClient } from "@/infrastructure/providers/redis/redis-client";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { JwtPayload } from "jsonwebtoken";
+import { inject, injectable } from "inversify";
+import { COMMON_TYPES } from "@/infrastructure/di/types/common";
+import { ICacheService } from "@/application/interface/cache.service.interface";
 
-
+@injectable()
 export class LogoutUseCase implements IExecute<string, void> {
-    constructor() { }
+    constructor(@inject(COMMON_TYPES.CacheService) private _cacheService: ICacheService) { }
 
     async execute(refreshToken: string): Promise<void> {
 
         try {
-            console.log("reaching thie usecase")
 
             if (!refreshToken) throw new Error("Refresh token missing")
 
-            console.log("refreshTolken", refreshToken)
-
             const decoded = verifyToken(refreshToken, "refresh") as JwtPayload | string | null;
-
-            console.log("decoded", decoded)
 
             if (!decoded) throw new Error("Invalid or expired refresh token")
 
             if (typeof decoded === 'object' && 'email' in decoded) {
-                await redisClient.del(`refresh:${decoded.email}`)
+                await this._cacheService.del(`refresh:${decoded.email}`)
             }
-
 
             console.log("Logout successfully")
 

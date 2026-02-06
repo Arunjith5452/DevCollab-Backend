@@ -3,10 +3,28 @@ import { TaskListItemDto } from "@/application/dtos/tasks/res/list-task.dto";
 import { TaskEntity } from "@/domain/entities/task.entity";
 import { TaskStatus } from "@/domain/enums/tasks/task-status.enums";
 
+import { injectable } from "inversify";
+import { CreateTaskResponseDTO } from "@/application/dtos/tasks/res/create-task-response.dto";
+
+@injectable()
 export class TaskResponseMapper {
+    toResponse(task: TaskEntity): CreateTaskResponseDTO {
+        return new CreateTaskResponseDTO({
+            id: task.id!,
+            title: task.title,
+            description: task.description,
+            projectId: task.projectId,
+            assignedId: task.assignedId,
+            status: task.status,
+            deadline: task.deadline,
+            tags: task.tags,
+            createdAt: task.createdAt,
+            updatedAt: task.updatedAt
+        });
+    }
+
     static toListItem(entity: TaskEntity): TaskListItemDto {
         if (!entity.id) {
-            console.log('entity.id', entity.id)
             throw new Error("TaskEntity ID is missing");
         }
         return new TaskListItemDto({

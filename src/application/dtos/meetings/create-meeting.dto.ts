@@ -1,6 +1,5 @@
-import { IsEnum, IsISO8601, IsNotEmpty, IsOptional, IsString, IsUrl } from "class-validator";
+import { IsEnum, IsISO8601, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { Expose } from "class-transformer";
-import { MeetingStatus } from "@/domain/enums/meetings/meeting-status.enum";
 
 export class CreateMeetingDTO {
     @Expose()

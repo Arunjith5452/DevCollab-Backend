@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { SubmitWorkDTO } from "@/application/dtos/tasks/submit-work.dto";
-import { ITasksRepository } from "@/infrastructure/db/repository/interface/task.interface";
+import { ITasksRepository } from "@/domain/repository/task.interface";
 import { TaskEntity } from "@/domain/entities/task.entity";
 import { TASK_TYPES } from "@/infrastructure/di/types/tasks";
 import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
@@ -14,26 +14,32 @@ export class SubmitWorkUseCase implements IExecute<{ userId: string, taskId: str
     ) { }
 
     async execute({ userId, taskId, data }: { userId: string, taskId: string, data: SubmitWorkDTO }): Promise<void> {
-        const { prLink, workDescription } = data;
 
-        const task = await this._taskRepository.findById(taskId)
+        try {
 
-        if (!task) {
-            throw new Error(ErrorMessage.TASK_NOT_FOUND);
+            const { prLink, workDescription } = data;
+
+            const task = await this._taskRepository.findById(taskId)
+
+            if (!task) {
+                throw new Error(ErrorMessage.TASK_NOT_FOUND);
+            }
+
+            if (task.assignedId.toString() !== userId) {
+                throw new Error(ErrorMessage.UNAUTHORIZED);
+            }
+
+            if (task.status !== TaskStatus.IN_PROGRESS) {
+                throw new Error("Task must be in progress to submit work");
+            }
+
+            task.submitWork(prLink, workDescription);
+
+            await this._taskRepository.updateTask(task);
+
+
+        } catch (error) {
+             throw error
         }
-
-        if (task.assignedId.toString() !== userId) {
-            throw new Error(ErrorMessage.UNAUTHORIZED);
-        }
-
-        if (task.status !== TaskStatus.IN_PROGRESS) {
-            throw new Error("Task must be in progress to submit work");
-        }
-
-        task.submitWork(prLink, workDescription);
-
-        let submitdescription = await this._taskRepository.updateTask(task);
-
-        console.log("this is the submiting des", submitdescription)
     }
 }

@@ -3,19 +3,21 @@ import { USER_TYPES } from "@/infrastructure/di/types/user";
 import { EMAIL_TYPES } from "@/infrastructure/di/types/email";
 import { forgotPasswordDTO } from "@/application/dtos/auth/forgotPassword.dto";
 import { generateOTP } from "@/shared/utils/otp-generator.util";
-import { redisClient } from "@/infrastructure/providers/redis/redis-client";
 import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
 import { UserEntity } from "@/domain/entities/user.entity";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
-import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
+import { IUserRepository } from "@/domain/repository/user.interface";
 import { IEmailService } from "@/infrastructure/providers/interface/email.interface";
+import { COMMON_TYPES } from "@/infrastructure/di/types/common";
+import { ICacheService } from "@/application/interface/cache.service.interface";
 
 @injectable()
 export class ForgotPasswordUseCase implements IExecute<forgotPasswordDTO, void> {
 
   constructor(
     @inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>,
-    @inject(EMAIL_TYPES.EmailService) private readonly _emailService: IEmailService
+    @inject(EMAIL_TYPES.EmailService) private readonly _emailService: IEmailService,
+    @inject(COMMON_TYPES.CacheService) private readonly _cacheService: ICacheService
   ) { }
 
   async execute({ email }: forgotPasswordDTO): Promise<void> {
@@ -29,10 +31,11 @@ export class ForgotPasswordUseCase implements IExecute<forgotPasswordDTO, void> 
       const otp = generateOTP()
       const expiryTime = 3 * 60;
 
-      await redisClient.setex(
+      await this._cacheService.set(
         `forgot-otp:${email}`,
-        expiryTime,
-        JSON.stringify({ otp })
+        JSON.stringify({ otp }),
+        'EX',
+        expiryTime
       );
 
       console.log(`Forgot password OTP sent to ${email}:`, otp);

@@ -3,7 +3,6 @@ import {
   IsOptional,
   IsEnum,
   IsArray,
-  ArrayNotEmpty,
   IsDateString,
   MinLength,
   MaxLength,

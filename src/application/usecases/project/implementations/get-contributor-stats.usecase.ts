@@ -3,8 +3,8 @@ import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { ProjectEntity } from "@/domain/entities/project.entity";
 import { TaskEntity } from "@/domain/entities/task.entity";
 import { TaskStatus } from "@/domain/enums/tasks/task-status.enums";
-import { IProjectRepository } from "@/infrastructure/db/repository/interface/project.interface";
-import { ITasksRepository } from "@/infrastructure/db/repository/interface/task.interface";
+import { IProjectRepository } from "@/domain/repository/project.interface";
+import { ITasksRepository } from "@/domain/repository/task.interface";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
 import { TASK_TYPES } from "@/infrastructure/di/types/tasks";
 import { inject, injectable } from "inversify";
@@ -27,7 +27,6 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
     async execute(query: GetContributorStatsQuery): Promise<ContributorStatsDTO> {
         const { projectId, userId } = query;
 
-        // 1. Validate project exists and user is a member
         const project = await this._projectRepository.findByIdWithCreator(projectId);
         if (!project) {
             throw new Error("Project not found");

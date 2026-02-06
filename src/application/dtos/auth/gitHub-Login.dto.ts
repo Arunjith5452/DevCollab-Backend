@@ -1,4 +1,4 @@
-import { IsEmail, IsOptional, isString, IsString } from "class-validator";
+import { IsEmail, IsOptional, IsString } from "class-validator";
 import { Expose } from "class-transformer";
 
 export class GithubLoginDTO {

@@ -1,16 +1,16 @@
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { UserEntity } from "@/domain/entities/user.entity";
 import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
-import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
+import { IUserRepository } from "@/domain/repository/user.interface";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
 import { inject, injectable } from "inversify";
 
 import { UserPresentationMapper } from "@/infrastructure/mappers/user-presentation.mapper";
 import { UserResponseDTO, UserActivity } from "@/application/dtos/user/res/user-response.dto";
 
-import { IProjectRepository } from "@/infrastructure/db/repository/interface/project.interface";
+import { IProjectRepository } from "@/domain/repository/project.interface";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
-import { IApplicationRepository } from "@/infrastructure/db/repository/interface/application.interface";
+import { IApplicationRepository } from "@/domain/repository/application.interface";
 import { ApplicationEntity } from "@/domain/entities/application.entity";
 import { ApplicationStatus } from "@/domain/enums/project/application.enums";
 import { ProjectEntity } from "@/domain/entities/project.entity";

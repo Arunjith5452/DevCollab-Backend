@@ -11,6 +11,7 @@ export const TASK_TYPES = {
     StartTaskUseCase: Symbol.for("StartTaskUseCase"),
     SubmitWorkUseCase: Symbol.for("SubmitWorkUseCase"),
     ApproveTaskUseCase: Symbol.for("ApproveTaskUseCase"),
-    RequestImprovementUseCase: Symbol.for("RequestImprovementUseCase")
+    RequestImprovementUseCase: Symbol.for("RequestImprovementUseCase"),
+    TaskResponseMapper: Symbol.for("TaskResponseMapper")
 
 }

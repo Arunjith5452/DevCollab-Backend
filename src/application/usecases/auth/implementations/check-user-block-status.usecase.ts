@@ -2,7 +2,7 @@ import { ResponseUserDto } from "@/application/dtos/auth/res/response.dto";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { UserApplicationMapper } from "@/application/mapper/user-application.mapper";
 import { UserEntity } from "@/domain/entities/user.entity";
-import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
+import { IUserRepository } from "@/domain/repository/user.interface";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
 import { inject, injectable } from "inversify";
 

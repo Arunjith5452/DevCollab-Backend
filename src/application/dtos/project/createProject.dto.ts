@@ -11,7 +11,7 @@ import {
   IsUrl,
   IsNumberString,
 } from "class-validator";
-import { Exclude, Expose, Type } from "class-transformer";
+import { Exclude, Expose, Type, Transform } from "class-transformer";
 import { Difficulty, Visibility } from "@/domain/enums/project";
 
 
@@ -54,6 +54,7 @@ export class CreateProjectDTO {
 
   @Expose()
   @IsOptional()
+  @Transform(({ value }: { value: any }) => value === "" ? undefined : value)
   @IsUrl({}, { message: "GitHub repository must be a valid URL" })
   githubRepo?: string;
 

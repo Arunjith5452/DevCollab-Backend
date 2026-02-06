@@ -1,21 +1,25 @@
 import { UpdateProjectDTO } from "@/application/dtos/project/edit-project.dto";
-import { deleteFile } from "@/infrastructure/providers/s3-bucket/s3Service";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { ProjectEntity } from "@/domain/entities/project.entity";
 import { UserEntity } from "@/domain/entities/user.entity";
 import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
-import { IProjectRepository } from "@/infrastructure/db/repository/interface/project.interface";
-import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
+import { IProjectRepository } from "@/domain/repository/project.interface";
+import { IUserRepository } from "@/domain/repository/user.interface";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
+import { COMMON_TYPES } from "@/infrastructure/di/types/common";
+import { IStorageService } from "@/application/interface/storage.service.interface";
 
 
 
+@injectable()
 export class UpdateProjectUseCase implements IExecute<{ userId: string; projectId: string; dto: UpdateProjectDTO }, { message: string }> {
 
-    constructor(@inject(PROJECT_TYPES.ProjectRepository) private readonly _projectRepository: IProjectRepository<ProjectEntity>,
-        @inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>
+    constructor(
+        @inject(PROJECT_TYPES.ProjectRepository) private readonly _projectRepository: IProjectRepository<ProjectEntity>,
+        @inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>,
+        @inject(COMMON_TYPES.StorageService) private readonly _storageService: IStorageService
     ) { }
 
     async execute({ userId, projectId, dto }: { userId: string; projectId: string; dto: UpdateProjectDTO }): Promise<{ message: string }> {
@@ -47,7 +51,7 @@ export class UpdateProjectUseCase implements IExecute<{ userId: string; projectI
             await this._projectRepository.updateEntity(project);
 
             if (dto.image && oldImage && dto.image !== oldImage) {
-                await deleteFile(oldImage);
+                await this._storageService.deleteFile(oldImage);
             }
 
             return { message: "Project updated successfully" };

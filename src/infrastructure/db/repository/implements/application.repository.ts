@@ -1,6 +1,6 @@
 import { ApplicationEntity } from "@/domain/entities/application.entity";
 import { BaseRepository } from "./base.repository";
-import { IApplicationRepository } from "../interface/application.interface";
+import { IApplicationRepository } from "@/domain/repository/application.interface";
 import { inject, injectable } from "inversify";
 import { FilterQuery, Model, Types, UpdateQuery } from "mongoose";
 import { ApplicationPersistenceMapper } from "@/infrastructure/mappers/application-persistence.mapper";

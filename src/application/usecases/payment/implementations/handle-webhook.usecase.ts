@@ -1,21 +1,23 @@
 import { injectable, inject } from "inversify";
 import { PAYMENT_TYPES } from "@/infrastructure/di/types/payment";
-import { StripeProvider } from "@/infrastructure/providers/stripe/stripe.provider";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { WebhookDTO } from "@/application/dtos/payment/webhook.dto";
 import Stripe from "stripe";
-import { ITasksRepository } from "@/infrastructure/db/repository/interface/task.interface";
+import { ITasksRepository } from "@/domain/repository/task.interface";
 import { TaskEntity } from "@/domain/entities/task.entity";
-import { IPaymentRepository } from "@/infrastructure/db/repository/interface/payment.interface";
+import { IPaymentRepository } from "@/domain/repository/payment.interface";
 import { PaymentEntity } from "@/domain/entities/payment.entity";
 import { TASK_TYPES } from "@/infrastructure/di/types/tasks";
+import { TaskStatus } from "@/domain/enums/tasks/task-status.enums";
 import { PaymentStatus } from "@/domain/enums/payment/payment.enums";
 import { PaymentPurpose } from "@/domain/enums/payment/payment-purpose.enums";
+import { COMMON_TYPES } from "@/infrastructure/di/types/common";
+import { IPaymentService } from "@/application/interface/payment.service.interface";
 
 @injectable()
 export class HandleWebhookUseCase implements IExecute<WebhookDTO, { received: boolean; eventType?: string }> {
     constructor(
-        @inject(PAYMENT_TYPES.StripeProvider) private readonly _stripeProvider: StripeProvider,
+        @inject(COMMON_TYPES.PaymentService) private readonly _paymentService: IPaymentService,
         @inject(TASK_TYPES.TaskRepository) private readonly _taskRepository: ITasksRepository<TaskEntity>,
         @inject(PAYMENT_TYPES.PaymentRepository) private readonly _paymentRepository: IPaymentRepository<PaymentEntity>
     ) { }
@@ -35,7 +37,7 @@ export class HandleWebhookUseCase implements IExecute<WebhookDTO, { received: bo
             let event: Stripe.Event;
 
             try {
-                event = await this._stripeProvider.constructWebhookEvent(
+                event = await this._paymentService.constructWebhookEvent(
                     dto.payload,
                     dto.signature,
                     webhookSecret
@@ -50,7 +52,6 @@ export class HandleWebhookUseCase implements IExecute<WebhookDTO, { received: bo
                 case 'checkout.session.completed':
                     const session = event.data.object as Stripe.Checkout.Session;
 
-                    console.log('Checkout session completed:', session.id);
                     const taskId = session.metadata?.task_id;
                     const projectId = session.metadata?.project_id;
 
@@ -58,8 +59,8 @@ export class HandleWebhookUseCase implements IExecute<WebhookDTO, { received: bo
                         const task = await this._taskRepository.findById(taskId);
                         if (task) {
                             task.updatePayment(task.payment.amount, "held");
+                            task.updateStatus(TaskStatus.TODO); // Activate task
                             await this._taskRepository.updateTask(task);
-                            console.log(`Task ${taskId} escrow status updated to held`);
 
                             // Also create/update payment record
                             const paymentIntentId = session.payment_intent as string;
@@ -74,7 +75,6 @@ export class HandleWebhookUseCase implements IExecute<WebhookDTO, { received: bo
                                 status: PaymentStatus.HELD
                             });
                             await this._paymentRepository.createPayment(payment);
-                            console.log(`Payment record created for task ${taskId}`);
                         }
                     }
                     break

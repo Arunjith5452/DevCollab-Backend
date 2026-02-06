@@ -23,13 +23,14 @@ import { ProjectPresentationMapper } from "@/infrastructure/mappers/project-pres
 import { ProjectPersistenceMapper } from "@/infrastructure/mappers/project-persistence.mapper";
 import { ApplicationPresentationMapper } from "@/infrastructure/mappers/application-presentation.mapper";
 import { ApplicationPersistenceMapper } from "@/infrastructure/mappers/application-persistence.mapper";
-import { GitHubService } from "@/infrastructure/providers/git/github.service";
 import { IProject } from "@/infrastructure/db/interface/project.interface";
 import { IApplication } from "@/infrastructure/db/interface/application.interface";
 import { GetProjectStatsUseCase } from "@/application/usecases/project/implementations/get-project-stats.usecase";
 import { GetContributorStatsUseCase } from "@/application/usecases/project/implementations/get-contributor-stats.usecase";
 import { GetPlatformStatsUseCase } from "@/application/usecases/platform/get-platform-stats.usecase";
 import { GetFeaturedProjectsUseCase } from "@/application/usecases/project/implementations/get-featured-projects.usecase";
+import { GetAiContributorSuggestionsUseCase } from "@/application/usecases/project/implementations/get-ai-contributor-suggestions.usecase";
+import { LLMService } from "@/infrastructure/providers/llm/llm.service";
 
 export const ProjectModule = new ContainerModule(({ bind }) => {
     bind<ProjectPresentationMapper>(ProjectPresentationMapper).toSelf().inSingletonScope()
@@ -54,9 +55,10 @@ export const ProjectModule = new ContainerModule(({ bind }) => {
     bind<DisableProjectUseCase>(PROJECT_TYPES.DisableProjectUseCase).to(DisableProjectUseCase)
     bind<UpdateProjectUseCase>(PROJECT_TYPES.UpdateProjectUseCase).to(UpdateProjectUseCase)
     bind<GetProjectForEditUseCase>(PROJECT_TYPES.GetProjectForEditUseCase).to(GetProjectForEditUseCase)
-    bind<GitHubService>(PROJECT_TYPES.GitHubService).to(GitHubService)
     bind<GetProjectStatsUseCase>(PROJECT_TYPES.GetProjectStatsUseCase).to(GetProjectStatsUseCase)
     bind<GetContributorStatsUseCase>(PROJECT_TYPES.GetContributorStatsUseCase).to(GetContributorStatsUseCase)
     bind<GetPlatformStatsUseCase>(PROJECT_TYPES.GetPlatformStatsUseCase).to(GetPlatformStatsUseCase)
     bind<GetFeaturedProjectsUseCase>(PROJECT_TYPES.GetFeaturedProjectsUseCase).to(GetFeaturedProjectsUseCase)
+    bind<GetAiContributorSuggestionsUseCase>(PROJECT_TYPES.GetAiContributorSuggestionsUseCase).to(GetAiContributorSuggestionsUseCase)
+    bind<LLMService>(PROJECT_TYPES.LLMService).to(LLMService).inSingletonScope()
 })

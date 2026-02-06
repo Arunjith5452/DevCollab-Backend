@@ -1,8 +1,9 @@
 import Stripe from 'stripe';
 import { injectable } from 'inversify';
+import { IPaymentService } from '@/application/interface/payment.service.interface';
 
 @injectable()
-export class StripeProvider {
+export class StripeProvider implements IPaymentService {
     private stripe: Stripe;
 
     constructor() {

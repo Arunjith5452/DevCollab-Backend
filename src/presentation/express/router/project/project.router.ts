@@ -38,6 +38,7 @@ router.get('/projects/:projectId/edit', AuthGuard(ALL_ROLES), BlockGuard(ALL_ROL
 router.patch('/projects/:projectId/edit', AuthGuard(ALL_ROLES), BlockGuard(ALL_ROLES), validateDTO(UpdateProjectDTO), (req: Request, res: Response) => projectController.editProject(req, res))
 router.get('/projects/:projectId/stats', AuthGuard(ALL_ROLES), BlockGuard(ALL_ROLES), (req: Request, res: Response) => projectController.getProjectStats(req, res))
 router.get('/projects/:projectId/contributor-stats', AuthGuard(ALL_ROLES), BlockGuard(ALL_ROLES), (req: Request, res: Response) => projectController.getContributorStats(req, res))
+router.get('/projects/:projectId/ai-suggestions', AuthGuard(ALL_ROLES), BlockGuard(ALL_ROLES), (req: Request, res: Response) => projectController.getAiSuggestions(req, res))
 
 
 export { router as projectRouter }

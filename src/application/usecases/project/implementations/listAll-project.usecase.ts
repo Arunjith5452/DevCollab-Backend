@@ -1,12 +1,13 @@
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { ProjectEntity } from "@/domain/entities/project.entity";
 import { SuccessMessage } from "@/domain/enums/messages/success-message.enum";
-import { IProjectRepository } from "@/infrastructure/db/repository/interface/project.interface";
+import { IProjectRepository } from "@/domain/repository/project.interface";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
 import { inject, injectable } from "inversify";
 import { GetAllProjectsQuery } from "../interface/project-listing.usecase.interface";
 import { ProjectResponseDTO } from "@/application/dtos/project/res/project-response.dto";
 import { ProjectPresentationMapper } from "@/infrastructure/mappers/project-presentation.mapper";
+import { ProjectFilter } from "@/domain/types/project-filter.type";
 
 
 @injectable()
@@ -22,8 +23,8 @@ export class ListProjectUseCase implements IExecute<GetAllProjectsQuery, { messa
 
             const { search, techStack, roleNeeded, difficulty, page = 1, limit = 3, sort } = query
 
-            const filter: Record<string, unknown> = {
-                status: { $ne: "disabled" }
+            const filter: ProjectFilter = {
+                status: { $ne: "disabled" } as unknown as string
             };
 
             if (search) {

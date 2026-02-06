@@ -1,4 +1,4 @@
-import { Schema, Types } from "mongoose";
+import { Schema } from "mongoose";
 import { MeetingStatus } from "@/domain/enums/meetings/meeting-status.enum";
 
 export const meetingSchema = new Schema(

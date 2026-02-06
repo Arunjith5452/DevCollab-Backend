@@ -1,7 +1,7 @@
 import { ProjectMemberNameOnly } from "@/application/dtos/tasks/res/get-project-members.dto";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { ProjectEntity } from "@/domain/entities/project.entity";
-import { IProjectRepository, } from "@/infrastructure/db/repository/interface/project.interface";
+import { IProjectRepository, } from "@/domain/repository/project.interface";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
 import { inject } from "inversify";
 

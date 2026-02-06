@@ -4,7 +4,7 @@ import { SuccessMessage } from "@/domain/enums/messages/success-message.enum";
 import { UserEntity } from "@/domain/entities/user.entity";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { GetAllUsersQuery } from "../interface/users-usecase.interface";
-import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
+import { IUserRepository } from "@/domain/repository/user.interface";
 import { ResponseUserDto } from "@/application/dtos/auth/res/response.dto";
 import { UserApplicationMapper } from "@/application/mapper/user-application.mapper";
 

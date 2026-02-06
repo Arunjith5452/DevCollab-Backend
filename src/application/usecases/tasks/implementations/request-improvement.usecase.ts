@@ -1,11 +1,11 @@
 import { inject, injectable } from "inversify";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { RequestImprovementDTO } from "@/application/dtos/tasks/request-improvement.dto";
-import { ITasksRepository } from "@/infrastructure/db/repository/interface/task.interface";
+import { ITasksRepository } from "@/domain/repository/task.interface";
 import { TaskEntity } from "@/domain/entities/task.entity";
 import { TASK_TYPES } from "@/infrastructure/di/types/tasks";
 import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
-import { IProjectRepository } from "@/infrastructure/db/repository/interface/project.interface";
+import { IProjectRepository } from "@/domain/repository/project.interface";
 import { ProjectEntity } from "@/domain/entities/project.entity";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
 import { TaskStatus } from "@/domain/enums/tasks/task-status.enums";

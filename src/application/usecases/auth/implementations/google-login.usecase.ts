@@ -8,17 +8,21 @@ import { Status } from "@/domain/enums/status.enums";
 import { AuthResult } from "@/domain/types/auth";
 import { randomBytes } from "crypto";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
-import { redisClient } from "@/infrastructure/providers/redis/redis-client";
 import { validateEmail } from "@/shared/utils/email-validate.util";
 import { generateAccessToken, generateRefreshToken } from "@/shared/utils/jwt.util";
 import { inject, injectable } from "inversify";
-import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
+import { IUserRepository } from "@/domain/repository/user.interface";
+import { COMMON_TYPES } from "@/infrastructure/di/types/common";
+import { ICacheService } from "@/application/interface/cache.service.interface";
 
 
 @injectable()
 export class GoogleLoginUseCase implements IExecute<GoogleLoginDTO, AuthResult> {
 
-    constructor(@inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>) { }
+    constructor(
+        @inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>,
+        @inject(COMMON_TYPES.CacheService) private readonly _cacheService: ICacheService
+    ) { }
 
     async execute({ email, name, googleId, image }: GoogleLoginDTO): Promise<AuthResult> {
 
@@ -63,7 +67,7 @@ export class GoogleLoginUseCase implements IExecute<GoogleLoginDTO, AuthResult> 
             const accessToken = generateAccessToken(payload)
             const refreshToken = generateRefreshToken(payload)
 
-            await redisClient.set(`refresh:${user.email}`, refreshToken, "EX",
+            await this._cacheService.set(`refresh:${user.email}`, refreshToken, "EX",
                 Number(process.env.REFRESH_TOKEN_MAX_AGE))
 
             return {

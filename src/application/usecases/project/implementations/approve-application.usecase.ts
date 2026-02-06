@@ -3,8 +3,8 @@ import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { ApplicationEntity } from "@/domain/entities/application.entity";
 import { ProjectEntity } from "@/domain/entities/project.entity";
 import { ApplicationStatus } from "@/domain/enums/project/application.enums";
-import { IApplicationRepository } from "@/infrastructure/db/repository/interface/application.interface";
-import { IProjectRepository } from "@/infrastructure/db/repository/interface/project.interface";
+import { IApplicationRepository } from "@/domain/repository/application.interface";
+import { IProjectRepository } from "@/domain/repository/project.interface";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
 import { inject, injectable } from "inversify";
 
