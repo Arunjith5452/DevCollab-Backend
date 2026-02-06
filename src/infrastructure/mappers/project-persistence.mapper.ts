@@ -1,7 +1,6 @@
 import { ProjectEntity } from "@/domain/entities/project.entity";
 import { MemberWithUser, MongoMember, MongoProject, MongoUser } from "./interface/project.mapper.interface";
 import { injectable } from "inversify";
-import { IProject } from "../db/interface/project.interface";
 
 import { IPersistenceMapper } from "./interface/persistence-mapper.interface";
 

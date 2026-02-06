@@ -1,4 +1,4 @@
-import { IUserRepository } from "../interface/user.interface";
+import { IUserRepository } from "@/domain/repository/user.interface";
 import { inject, injectable } from "inversify";
 import { BaseRepository } from "./base.repository";
 import { UserEntity } from "@/domain/entities/user.entity";

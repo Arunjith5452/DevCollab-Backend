@@ -233,8 +233,6 @@ export class AuthController {
 
     async googleLogin(req: Request, res: Response): Promise<Response> {
 
-        console.log("googleauth", req.body)
-
         try {
 
             const result = await this._googleLoginUseCase.execute(req.body)
@@ -271,7 +269,6 @@ export class AuthController {
     async gitHubLogin(req: Request, res: Response): Promise<Response> {
 
         try {
-            console.log("DEBUG: Backend gitHubLogin Controller Body:", req.body);
             const result = await this._gitHubLoginUseCase.execute(req.body)
 
             res.cookie("refreshToken", result.refreshToken, {

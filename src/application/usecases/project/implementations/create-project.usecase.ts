@@ -5,11 +5,12 @@ import { UserEntity } from "@/domain/entities/user.entity";
 import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
 import { Role } from "@/domain/enums/role.enum";
 import { Status } from "@/domain/enums/status.enums";
-import { IProjectRepository } from "@/infrastructure/db/repository/interface/project.interface";
-import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
+import { IProjectRepository } from "@/domain/repository/project.interface";
+import { IUserRepository } from "@/domain/repository/user.interface";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
-import { GitHubService } from "@/infrastructure/providers/git/github.service";
+import { COMMON_TYPES } from "@/infrastructure/di/types/common";
+import { IGitHubService } from "@/application/interface/git.service.interface";
 import { inject, injectable } from "inversify";
 
 
@@ -17,7 +18,7 @@ import { inject, injectable } from "inversify";
 export class CreateProjectUseCase implements IExecute<{ userId: string, dto: CreateProjectDTO }, { message: string }> {
     constructor(@inject(PROJECT_TYPES.ProjectRepository) private readonly _projectRepository: IProjectRepository<ProjectEntity>,
         @inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>,
-        @inject(PROJECT_TYPES.GitHubService) private readonly _gitHubService: GitHubService
+        @inject(COMMON_TYPES.GitHubService) private readonly _gitHubService: IGitHubService
     ) { }
 
     async execute({ userId, dto }: { userId: string, dto: CreateProjectDTO }): Promise<{ message: string }> {

@@ -2,7 +2,7 @@ import { ProjectResponseDTO } from "@/application/dtos/project/res/project-respo
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { ProjectEntity } from "@/domain/entities/project.entity";
 import { SuccessMessage } from "@/domain/enums/messages/success-message.enum";
-import { IProjectRepository } from "@/infrastructure/db/repository/interface/project.interface";
+import { IProjectRepository } from "@/domain/repository/project.interface";
 import { ProjectPresentationMapper } from "@/infrastructure/mappers/project-presentation.mapper";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
 import { inject, injectable } from "inversify";

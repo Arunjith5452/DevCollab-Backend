@@ -1,5 +1,6 @@
 import { UserEntity } from "@/domain/entities/user.entity";
 import { IUser } from "../db/interface/user.inteface";
+import { Document } from "mongoose";
 
 import { IPersistenceMapper } from "./interface/persistence-mapper.interface";
 
@@ -21,7 +22,7 @@ export class UserPersistenceMapper implements IPersistenceMapper<UserEntity, IUs
         }
     }
 
-    fromMongo(doc: IUser): UserEntity {
+    fromMongo(doc: IUser & Document): UserEntity {
         return UserEntity.create({
             id: doc._id.toString(),
             email: doc.email,
@@ -36,7 +37,7 @@ export class UserPersistenceMapper implements IPersistenceMapper<UserEntity, IUs
             title: doc?.title ?? undefined,
             techStack: doc?.techStack ?? undefined,
             githubAccessToken: doc?.githubAccessToken ?? undefined,
-            createdAt: (doc as any).createdAt
+            createdAt: doc.createdAt
         })
     }
 }

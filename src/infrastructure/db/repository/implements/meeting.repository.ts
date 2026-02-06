@@ -1,6 +1,6 @@
 
 import { MeetingEntity } from "@/domain/entities/meeting.entity";
-import { IMeetingRepository } from "../interface/meeting.interface";
+import { IMeetingRepository } from "@/domain/repository/meeting.interface";
 import { BaseRepository } from "./base.repository";
 import { inject, injectable } from "inversify";
 import { Model, Types, FilterQuery } from "mongoose";

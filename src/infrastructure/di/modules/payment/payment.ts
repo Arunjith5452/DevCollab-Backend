@@ -8,9 +8,12 @@ import { HandleWebhookUseCase } from "@/application/usecases/payment/implementat
 import { paymentModel } from "@/infrastructure/db/models/payment.model";
 import { Model } from "mongoose";
 import { IPayment } from "@/infrastructure/db/interface/payment.interface";
+import { COMMON_TYPES } from "@/infrastructure/di/types/common";
+import { IPaymentService } from "@/application/interface/payment.service.interface";
 
 export const PaymentModule = new ContainerModule(({ bind }) => {
     bind<StripeProvider>(PAYMENT_TYPES.StripeProvider).to(StripeProvider);
+    bind<IPaymentService>(COMMON_TYPES.PaymentService).to(StripeProvider).inSingletonScope();
     bind<Model<IPayment>>("PaymentModel").toConstantValue(paymentModel)
     bind<CreateCheckoutSessionUseCase>(PAYMENT_TYPES.CreateCheckoutSessionUseCase).to(CreateCheckoutSessionUseCase);
     bind<HandleWebhookUseCase>(PAYMENT_TYPES.HandleWebhookUseCase).to(HandleWebhookUseCase);

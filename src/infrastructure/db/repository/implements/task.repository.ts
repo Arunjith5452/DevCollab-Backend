@@ -3,7 +3,7 @@ import { BaseRepository } from "./base.repository";
 import { FilterQuery, Model, UpdateQuery } from "mongoose";
 import { TaskEntity } from "@/domain/entities/task.entity";
 import { ITask } from "../../interface/task.interface";
-import { ITasksRepository } from "../interface/task.interface";
+import { ITasksRepository } from "@/domain/repository/task.interface";
 import { TaskPersistenceMapper } from "@/infrastructure/mappers/task-persistence.mapper";
 
 @injectable()

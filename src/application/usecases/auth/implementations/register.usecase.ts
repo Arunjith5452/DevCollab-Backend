@@ -3,21 +3,23 @@ import { inject, injectable } from "inversify"
 import { USER_TYPES } from "@/infrastructure/di/types/user"
 import { EMAIL_TYPES } from "@/infrastructure/di/types/email"
 import { generateOTP } from "@/shared/utils/otp-generator.util"
-import { redisClient } from "@/infrastructure/providers/redis/redis-client"
 import { randomBytes } from "crypto"
 import { validateEmail } from "@/shared/utils/email-validate.util"
 import { ErrorMessage } from "@/domain/enums/messages/error-message.enum"
 import { UserEntity } from "@/domain/entities/user.entity"
 import { IExecute } from "@/application/interface/execute.usecase.interface"
-import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface"
+import { IUserRepository } from "@/domain/repository/user.interface"
 import { IEmailService } from "@/infrastructure/providers/interface/email.interface"
+import { COMMON_TYPES } from "@/infrastructure/di/types/common"
+import { ICacheService } from "@/application/interface/cache.service.interface"
 
 @injectable()
 export class RegiserUseCase implements IExecute<RegisterDTO, { token: string }> {
 
     constructor(
         @inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>,
-        @inject(EMAIL_TYPES.EmailService) private readonly _emailService: IEmailService
+        @inject(EMAIL_TYPES.EmailService) private readonly _emailService: IEmailService,
+        @inject(COMMON_TYPES.CacheService) private readonly _cacheService: ICacheService
     ) { }
 
     async execute({ name, email, password }: RegisterDTO): Promise<{ token: string }> {
@@ -38,12 +40,12 @@ export class RegiserUseCase implements IExecute<RegisterDTO, { token: string }> 
             // Generate a secure random token
             const token = randomBytes(32).toString("hex")
 
-            await redisClient.setex(`otp:${token}`, expiryTime, JSON.stringify({
+            await this._cacheService.set(`otp:${token}`, JSON.stringify({
                 name,
                 email,
                 password,
                 otp
-            }))
+            }), 'EX', expiryTime)
 
             await this._emailService.sendOtpEmail(email, otp, 3);
 

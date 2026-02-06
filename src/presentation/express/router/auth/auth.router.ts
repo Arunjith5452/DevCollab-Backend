@@ -5,7 +5,6 @@ import { AuthController } from "@/presentation/http/controllers/auth.controller"
 import { RegisterDTO } from "@/application/dtos/auth/register.dto";
 import { VerifyOtpDTO } from "@/application/dtos/auth/verifyOtp.dto";
 import { LoginDTO } from "@/application/dtos/auth/login.dto";
-import { LogoutDTO } from "@/application/dtos/auth/logout.dto";
 import { forgotPasswordDTO } from "@/application/dtos/auth/forgotPassword.dto";
 import { ResendOtp } from "@/application/dtos/auth/resend.dto";
 import { VerifyForgotOtpDTO } from "@/application/dtos/auth/forgotOtp.dto";

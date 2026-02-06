@@ -9,7 +9,6 @@ import { GetProjectMembersQuery } from "@/application/usecases/project/interface
 import { ApplicationEntity } from "@/domain/entities/application.entity";
 import { ProjectEntity } from "@/domain/entities/project.entity";
 import { ServerErrorStatus } from "@/domain/enums/status-codes/server-error-status.enum";
-import { ClientErrorStatus } from "@/domain/enums/status-codes/client-error-status.enum";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
 import { errorResponse, successResponse } from "@/shared/utils/response.util";
 import { Request, Response } from "express";
@@ -20,13 +19,11 @@ import { MESSAGES } from "@/shared/constants/messages";
 
 
 import { ProjectResponseDTO } from "@/application/dtos/project/res/project-response.dto";
-
-import { GetProjectStatsUseCase } from "@/application/usecases/project/implementations/get-project-stats.usecase";
 import { ProjectStatsDTO } from "@/application/dtos/project/res/project-stats.dto";
-import { GetContributorStatsUseCase } from "@/application/usecases/project/implementations/get-contributor-stats.usecase";
 import { ContributorStatsDTO } from "@/application/dtos/project/res/contributor-stats.dto";
 import { PlatformStatsDTO } from "@/application/dtos/platform/platform-stats.dto";
 import { FeaturedProjectDTO } from "@/application/usecases/project/implementations/get-featured-projects.usecase";
+import { GetAiContributorSuggestionsUseCase } from "@/application/usecases/project/implementations/get-ai-contributor-suggestions.usecase";
 
 @injectable()
 export class ProjectController {
@@ -48,7 +45,8 @@ export class ProjectController {
         @inject(PROJECT_TYPES.GetProjectStatsUseCase) private readonly _getProjectStatsUseCase: IExecute<string, ProjectStatsDTO>,
         @inject(PROJECT_TYPES.GetContributorStatsUseCase) private readonly _getContributorStatsUseCase: IExecute<{ projectId: string, userId: string, page?: number, limit?: number }, ContributorStatsDTO>,
         @inject(PROJECT_TYPES.GetPlatformStatsUseCase) private readonly _getPlatformStatsUseCase: IExecute<void, PlatformStatsDTO>,
-        @inject(PROJECT_TYPES.GetFeaturedProjectsUseCase) private readonly _getFeaturedProjectsUseCase: IExecute<void, FeaturedProjectDTO[]>
+        @inject(PROJECT_TYPES.GetFeaturedProjectsUseCase) private readonly _getFeaturedProjectsUseCase: IExecute<void, FeaturedProjectDTO[]>,
+        @inject(PROJECT_TYPES.GetAiContributorSuggestionsUseCase) private readonly _getAiContributorSuggestionsUseCase: GetAiContributorSuggestionsUseCase
     ) { }
 
 
@@ -505,6 +503,21 @@ export class ProjectController {
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             );
+        }
+    }
+
+    /**
+     * Get AI suggestions for contributors for a project
+     */
+
+    async getAiSuggestions(req: Request, res: Response): Promise<Response> {
+        try {
+            const { projectId } = req.params;
+            const result = await this._getAiContributorSuggestionsUseCase.execute(projectId);
+            return successResponse(res, MESSAGES.PROJECT.SUCCESS.APPLICATIONS_FETCHED, result);
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'An unknown error occurred';
+            return errorResponse(res, message);
         }
     }
 }

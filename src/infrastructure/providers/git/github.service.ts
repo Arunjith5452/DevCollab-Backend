@@ -1,4 +1,5 @@
 import { injectable } from "inversify";
+import { IGitHubService } from "@/application/interface/git.service.interface";
 
 interface GitHubErrorResponse {
     message: string;
@@ -10,7 +11,7 @@ interface GitHubRepoResponse {
 }
 
 @injectable()
-export class GitHubService {
+export class GitHubService implements IGitHubService {
     async createRepository(accessToken: string, name: string, description?: string): Promise<string> {
         try {
             const response = await fetch("https://api.github.com/user/repos", {

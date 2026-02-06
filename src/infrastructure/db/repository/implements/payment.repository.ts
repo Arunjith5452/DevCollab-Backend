@@ -1,4 +1,4 @@
-import { IPaymentRepository } from "@/infrastructure/db/repository/interface/payment.interface";
+import { IPaymentRepository } from "@/domain/repository/payment.interface";
 import { PaymentEntity } from "@/domain/entities/payment.entity";
 import { inject, injectable } from "inversify";
 import { PaymentPersistenceMapper } from "@/infrastructure/mappers/payment-persistence.mapper";

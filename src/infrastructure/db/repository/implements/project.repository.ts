@@ -1,10 +1,11 @@
 import { ProjectEntity } from "@/domain/entities/project.entity";
 import { BaseRepository } from "./base.repository";
-import { IProjectRepository } from "../interface/project.interface";
+import { IProjectRepository } from "@/domain/repository/project.interface";
 import { inject, injectable } from "inversify";
-import { FilterQuery, Model, UpdateQuery, Types } from "mongoose";
+import { FilterQuery, Model, UpdateQuery, Types, PipelineStage } from "mongoose";
 import { ProjectPersistenceMapper } from "@/infrastructure/mappers/project-persistence.mapper";
 import { MongoProject, MongoMember, MongoUser } from "@/infrastructure/mappers/interface/project.mapper.interface";
+import { ProjectFilter } from "@/domain/types/project-filter.type";
 
 
 @injectable()
@@ -99,12 +100,12 @@ export class ProjectRepository extends BaseRepository<ProjectEntity, MongoProjec
         });
     }
 
-    async findFeatured(filter: any, options: { skip: number; limit: number }): Promise<ProjectEntity[]> {
+    async findFeatured(filter: ProjectFilter, options: { skip: number; limit: number }): Promise<ProjectEntity[]> {
         if (filter._id) {
             filter._id = new Types.ObjectId(filter._id as string);
         }
 
-        const aggregationPipeline: any[] = [
+        const aggregationPipeline: PipelineStage[] = [
             { $match: filter },
             {
                 $lookup: {

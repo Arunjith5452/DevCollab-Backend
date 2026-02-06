@@ -1,4 +1,4 @@
-interface GetProjectMembersResult {
+export interface GetProjectMembersResult {
     users: Array<{
         id: string;
         name: string;

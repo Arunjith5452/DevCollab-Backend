@@ -13,6 +13,15 @@ module.exports = tseslint.config({
       process: 'readonly',
       __dirname: 'readonly',
       require: 'readonly',
+      console: 'readonly',
+      Buffer: 'readonly',
+      module: 'readonly',
+      exports: 'writable',
+      setTimeout: 'readonly',
+      setInterval: 'readonly',
+      clearTimeout: 'readonly',
+      clearInterval: 'readonly',
+      fetch: 'readonly',
     },
   },
 
@@ -23,7 +32,8 @@ module.exports = tseslint.config({
   ignores: ['dist/**', 'node_modules/**'],
 
   rules: {
-    'no-unused-vars': 'warn',
+    'no-console': 'warn',
+    'no-unused-vars': 'off', // Use TypeScript version instead
     'no-undef': 'error',
     'no-unreachable': 'warn',
     'no-async-promise-executor': 'error',
@@ -31,7 +41,15 @@ module.exports = tseslint.config({
 
     '@typescript-eslint/no-explicit-any': 'error',
     '@typescript-eslint/ban-ts-comment': 'warn',
-    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+    '@typescript-eslint/no-unused-vars': [
+      'warn',
+      {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_',
+        destructuredArrayIgnorePattern: '^_',
+      },
+    ],
     '@typescript-eslint/no-inferrable-types': 'off',
     '@typescript-eslint/no-non-null-assertion': 'warn',
 

@@ -1,4 +1,4 @@
-import { Schema, Types } from "mongoose";
+import { Schema } from "mongoose";
 
 export const taskSchema = new Schema({
 
@@ -33,7 +33,7 @@ export const taskSchema = new Schema({
 
     status: {
         type: String,
-        enum: ["todo", "in-progress", "done"],
+        enum: ["todo", "in-progress", "done", "improvement-needed"],
         default: "todo"
     },
 

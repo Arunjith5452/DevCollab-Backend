@@ -6,8 +6,8 @@ import { ProjectEntity } from "@/domain/entities/project.entity";
 import { TaskEntity } from "@/domain/entities/task.entity";
 import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
 import { TaskStatus } from "@/domain/enums/tasks/task-status.enums";
-import { IProjectRepository } from "@/infrastructure/db/repository/interface/project.interface";
-import { ITasksRepository } from "@/infrastructure/db/repository/interface/task.interface";
+import { IProjectRepository } from "@/domain/repository/project.interface";
+import { ITasksRepository } from "@/domain/repository/task.interface";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
 import { TASK_TYPES } from "@/infrastructure/di/types/tasks";
 import { inject, injectable } from "inversify";
@@ -37,10 +37,8 @@ export class GetContributorTaskUseCase implements IExecute<GetContributorTasksQu
 
             if (status === TaskStatus.TODO) {
                 tasks = await this._taskRepository.findByProjectAndStatus(projectId, "todo")
-                console.log("todo:", tasks)
             } else {
                 tasks = await this._taskRepository.findByProjectStatusAndAssignee(projectId, status, userId)
-                console.log("AllTabs:", tasks)
             }
 
             return TaskResponseMapper.toList(tasks)

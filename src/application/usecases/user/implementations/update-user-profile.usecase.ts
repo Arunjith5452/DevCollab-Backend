@@ -1,20 +1,22 @@
 import { UpdateProfileDTO } from "@/application/dtos/user/updateProfile.dto";
-import { deleteFile } from "@/infrastructure/providers/s3-bucket/s3Service";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { UserEntity } from "@/domain/entities/user.entity";
-import { IUserRepository } from "@/infrastructure/db/repository/interface/user.interface";
+import { IUserRepository } from "@/domain/repository/user.interface";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
 import { inject, injectable } from "inversify";
 
 import { UserPresentationMapper } from "@/infrastructure/mappers/user-presentation.mapper";
 import { UserResponseDTO } from "@/application/dtos/user/res/user-response.dto";
+import { COMMON_TYPES } from "@/infrastructure/di/types/common";
+import { IStorageService } from "@/application/interface/storage.service.interface";
 
 @injectable()
 export class UpdateUserProfileUseCase implements IExecute<{ userId: string, dto: UpdateProfileDTO }, UserResponseDTO | null> {
 
     constructor(
         @inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>,
-        @inject(USER_TYPES.UserPresentationMapper) private readonly _userPresentationMapper: UserPresentationMapper
+        @inject(USER_TYPES.UserPresentationMapper) private readonly _userPresentationMapper: UserPresentationMapper,
+        @inject(COMMON_TYPES.StorageService) private readonly _storageService: IStorageService
     ) { }
 
     async execute({ userId, dto }: { userId: string, dto: UpdateProfileDTO }): Promise<UserResponseDTO | null> {
@@ -32,7 +34,6 @@ export class UpdateUserProfileUseCase implements IExecute<{ userId: string, dto:
                 techStack: dto?.techStack
             })
 
-            // Build update object - note: database uses 'name' field, but entity uses 'username' getter
             const updateData: Partial<UserEntity> & { name?: string } = {
                 bio: dto?.bio,
                 title: dto?.title,
@@ -48,14 +49,9 @@ export class UpdateUserProfileUseCase implements IExecute<{ userId: string, dto:
 
             const updated = await this._userRepository.updateUser(userId, updateData as Partial<UserEntity>)
 
-            console.log("dto.profileImage:", dto.profileImage, ":oldProfileImage:", oldProfileImage)
-
             if (dto.profileImage && oldProfileImage && dto.profileImage !== oldProfileImage) {
-                console.log("indside", oldProfileImage)
-                await deleteFile(oldProfileImage);
+                await this._storageService.deleteFile(oldProfileImage);
             }
-
-            console.log("updated", updated)
 
             return updated ? this._userPresentationMapper.toResponseDTO(updated) : null;
 

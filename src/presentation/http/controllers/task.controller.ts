@@ -16,6 +16,7 @@ import { SubmitWorkDTO } from "@/application/dtos/tasks/submit-work.dto";
 import { TaskListItemDto } from "@/application/dtos/tasks/res/list-task.dto";
 import { RequestImprovementDTO } from "@/application/dtos/tasks/request-improvement.dto";
 import { MESSAGES } from "@/shared/constants/messages";
+import { CreateTaskResponseDTO } from "@/application/dtos/tasks/res/create-task-response.dto";
 
 
 
@@ -23,7 +24,7 @@ import { MESSAGES } from "@/shared/constants/messages";
 export class TaskController {
 
     constructor(
-        @inject(TASK_TYPES.CreateTaskUseCase) private readonly _createTaskUseCase: IExecute<CreateTaskDTO, TaskEntity>,
+        @inject(TASK_TYPES.CreateTaskUseCase) private readonly _createTaskUseCase: IExecute<CreateTaskDTO, CreateTaskResponseDTO>,
         @inject(TASK_TYPES.GetCreatorTasksUseCase) private readonly _getCreatorTaskUseCase: IExecute<GetAllTaskQuery, { message: string, tasks: TaskEntity[], total: number }>,
         @inject(TASK_TYPES.GetContributorTaskUseCase) private readonly _getContributorUseCase: IExecute<GetContributorTasksQuery, TaskListItemDto[]>,
         @inject(TASK_TYPES.GetProjectAssigneeUseCase) private readonly _getProjectAssigneeUseCase: IExecute<string, ProjectMemberNameOnly[]>,

@@ -1,5 +1,5 @@
 import { Model, UpdateQuery, FilterQuery } from "mongoose";
-import { IBaseRepository } from "../interface/base-repository.interface";
+import { IBaseRepository } from "@/domain/repository/base-repository.interface";
 import { IPersistenceMapper } from "@/infrastructure/mappers/interface/persistence-mapper.interface";
 
 export abstract class BaseRepository<TEntity, TDocument> implements IBaseRepository<TEntity> {

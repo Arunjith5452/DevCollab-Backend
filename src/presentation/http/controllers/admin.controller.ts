@@ -4,7 +4,6 @@ import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { GetAllProjectsQuery } from "@/application/usecases/admin/interface/projects-usecase.interface";
 import { GetAllUsersQuery } from "@/application/usecases/admin/interface/users-usecase.interface";
 import { ProjectEntity } from "@/domain/entities/project.entity";
-import { UserEntity } from "@/domain/entities/user.entity";
 import { ServerErrorStatus } from "@/domain/enums/status-codes/server-error-status.enum";
 import { ADMIN_TYPES } from "@/infrastructure/di/types";
 import { errorResponse, successResponse } from "@/shared/utils/response.util";
@@ -12,6 +11,8 @@ import { Request, Response } from "express";
 import { inject, injectable } from "inversify";
 
 import { ResponseUserDto } from "@/application/dtos/auth/res/response.dto";
+import { DashboardStats } from "@/application/dtos/admin/dashboard-stats.dto";
+import { ActivityItem } from "@/application/dtos/admin/activity.dto";
 
 @injectable()
 export class AdminController {
@@ -19,8 +20,8 @@ export class AdminController {
         @inject(ADMIN_TYPES.GetAllUsersUseCase) private readonly _getAllUsersUseCase: IExecute<GetAllUsersQuery, { message: string, users: ResponseUserDto[], total: number }>,
         @inject(ADMIN_TYPES.UpdateUserStatusUseCase) private readonly _updateUserStatusUseCase: IExecute<{ userId: string, newStatus: UpdateStatusDTO }, { message: string, newStatus: string }>,
         @inject(ADMIN_TYPES.GetAllProjectsUseCase) private readonly _getAllProjectsUseCase: IExecute<GetAllProjectsQuery, { message: string, projects: ProjectEntity[], total: number }>,
-        @inject(ADMIN_TYPES.GetAdminDashboardStatsUseCase) private readonly _getDashboardStatsUseCase: IExecute<{ startDate?: Date, endDate?: Date } | void, { message: string, stats: any }>,
-        @inject(ADMIN_TYPES.GetAdminActivitiesUseCase) private readonly _getActivitiesUseCase: IExecute<{ page: number, limit: number }, { activities: any[], total: number }>
+        @inject(ADMIN_TYPES.GetAdminDashboardStatsUseCase) private readonly _getDashboardStatsUseCase: IExecute<{ startDate?: Date, endDate?: Date } | void, { message: string, stats: DashboardStats }>,
+        @inject(ADMIN_TYPES.GetAdminActivitiesUseCase) private readonly _getActivitiesUseCase: IExecute<{ page: number, limit: number }, { activities: ActivityItem[], total: number }>
     ) { }
 
     /**

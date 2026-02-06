@@ -3,7 +3,7 @@ import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { TaskEntity } from "@/domain/entities/task.entity";
 import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
 import { TaskStatus } from "@/domain/enums/tasks/task-status.enums";
-import { ITasksRepository } from "@/infrastructure/db/repository/interface/task.interface";
+import { ITasksRepository } from "@/domain/repository/task.interface";
 import { TASK_TYPES } from "@/infrastructure/di/types/tasks";
 import { inject, injectable } from "inversify";
 

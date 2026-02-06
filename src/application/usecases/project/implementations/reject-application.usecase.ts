@@ -2,7 +2,7 @@ import { RejectApplicationDTO } from "@/application/dtos/project/reject-applicat
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { ApplicationEntity } from "@/domain/entities/application.entity";
 import { ApplicationStatus } from "@/domain/enums/project/application.enums";
-import { IApplicationRepository } from "@/infrastructure/db/repository/interface/application.interface";
+import { IApplicationRepository } from "@/domain/repository/application.interface";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
 import { inject, injectable } from "inversify";
 
