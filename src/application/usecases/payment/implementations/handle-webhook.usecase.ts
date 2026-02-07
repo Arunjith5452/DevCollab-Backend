@@ -59,7 +59,7 @@ export class HandleWebhookUseCase implements IExecute<WebhookDTO, { received: bo
                         const task = await this._taskRepository.findById(taskId);
                         if (task) {
                             task.updatePayment(task.payment.amount, "held");
-                            task.updateStatus(TaskStatus.TODO); // Activate task
+                            task.updateStatus(TaskStatus.TODO);
                             await this._taskRepository.updateTask(task);
 
                             // Also create/update payment record

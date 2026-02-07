@@ -12,6 +12,8 @@ export class UpdateMeetingStatusUseCase implements IExecute<{ meetingId: string,
     ) { }
 
     async execute(data: { meetingId: string, status: MeetingStatus }): Promise<void> {
+
         await this._meetingRepository.updateStatus(data.meetingId, data.status);
     }
 }
+ 

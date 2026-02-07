@@ -19,7 +19,6 @@ export class ProjectRepository extends BaseRepository<ProjectEntity, MongoProjec
     }
 
     async find(filter: FilterQuery<ProjectEntity>, options: { skip: number; limit: number }): Promise<ProjectEntity[]> {
-        // Override base find to populate creator
         const docs = await this.model
             .find(filter as FilterQuery<MongoProject>)
             .populate("creatorId", "name email profileImage")
