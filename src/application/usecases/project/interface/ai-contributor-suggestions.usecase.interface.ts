@@ -4,7 +4,6 @@ export interface AiSuggestionResult {
     source: 'ai' | 'heuristic';
 }
 
-// Interface for what the repository actually returns when populated
 export interface PopulatedUser {
     name: string;
     bio?: string;

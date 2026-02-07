@@ -38,8 +38,7 @@ export class TaskRepository extends BaseRepository<TaskEntity, ITask> implements
     }
 
     async updateTask(task: TaskEntity): Promise<TaskEntity> {
-        // toMongo returns full object. update expects UpdateQuery.
-        // We use findByIdAndUpdate. Base update does exactly this.
+
         if (!task.id) throw new Error("Task ID required for update");
         const updated = await this.update(task.id, this.mapper.toMongo(task) as unknown as UpdateQuery<TaskEntity>);
         if (!updated) throw new Error("Task not found");

@@ -11,6 +11,7 @@ import { AiSuggestionResult, PopulatedUser } from "../interface/ai-contributor-s
 import { ILLMService } from "@/infrastructure/providers/interface/llm.interface";
 import { COMMON_TYPES } from "@/infrastructure/di/types/common";
 import { ICacheService } from "@/application/interface/cache.service.interface";
+import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
 
 
 
@@ -23,17 +24,15 @@ export class GetAiContributorSuggestionsUseCase implements IExecute<string, AiSu
         @inject(COMMON_TYPES.CacheService) private _cacheService: ICacheService
     ) { }
     async execute(projectId: string): Promise<AiSuggestionResult> {
-        // 1. Fetch Project
-        const project = await this._projectRepository.findEntityById(projectId);
-        if (!project) throw new Error("Project not found");
 
-        // 2. Fetch Pending Applications
+        const project = await this._projectRepository.findEntityById(projectId);
+        if (!project) throw new Error(ErrorMessage.PROJECT_NOT_FOUND);
+
         const applications = await this._applicationRepository.getPendingByProject(projectId);
         if (!applications || applications.length === 0) {
             return { suggestions: [], source: 'heuristic' };
         }
 
-        // 3. Heuristic Fallback (< 3 Applicants)
         if (applications.length < 3) {
             return {
                 suggestions: this.runHeuristicAnalysis(project, applications),
@@ -41,7 +40,6 @@ export class GetAiContributorSuggestionsUseCase implements IExecute<string, AiSu
             };
         }
 
-        // 4. Optimization: Check Cache
         const applicantsHash = this.generateHash(applications);
         const cacheKey = `ai_suggestions:${projectId}:${applicantsHash}`;
 
@@ -53,14 +51,11 @@ export class GetAiContributorSuggestionsUseCase implements IExecute<string, AiSu
             };
         }
 
-        // 5. Call LLM
-        // Map applications to 'UserEntity' like structure for LLM
         const candidates = applications.map(app => {
-            // Runtime check because repository returns populated object despite entity definition
             const user = app.userId as unknown as PopulatedUser;
             return {
-                id: app.id!, // Application ID to map back easily
-                role: "Applicant", // Application doesn't have role, using generic
+                id: app.id!, 
+                role: "Applicant", 
                 skills: app.techStack || [],
                 name: user?.name || "Unknown Candidate",
                 bio: user?.bio || ""
@@ -77,11 +72,8 @@ export class GetAiContributorSuggestionsUseCase implements IExecute<string, AiSu
             candidates
         );
 
-        // 6. Cache and Return
-        // Sort by score
         const sortedSuggestions = aiResult.suggestions.sort((a, b) => b.score - a.score);
 
-        // Slice Top 3
         const top3 = sortedSuggestions.slice(0, 3);
 
         await this._cacheService.set(cacheKey, JSON.stringify(top3), "EX", 3600 * 24); // Cache for 24h
@@ -102,7 +94,6 @@ export class GetAiContributorSuggestionsUseCase implements IExecute<string, AiSu
             const projectStack = project.techStack || [];
             const appStack = app.techStack || [];
 
-            // Calculate intersection
             const matches = appStack.filter((skill: string) =>
                 projectStack.some((pSkill: string) => pSkill.toLowerCase() === skill.toLowerCase())
             );
@@ -113,7 +104,7 @@ export class GetAiContributorSuggestionsUseCase implements IExecute<string, AiSu
 
             return {
                 id: app.id!,
-                score: Math.min(score + 10, 100), // slight boost for being human
+                score: Math.min(score + 10, 100),
                 reason: matches.length > 0
                     ? `Matches ${matches.length} required skills: ${matches.join(", ")}`
                     : "Partial skill match based on profile."

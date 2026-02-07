@@ -26,8 +26,6 @@ export class ApplicationPersistenceMapper implements IPersistenceMapper<Applicat
     fromMongo(doc: MongoApplication): ApplicationEntity & WithUser & { project?: ProjectEntity } {
         const userId = typeof doc.userId === "object" ? doc.userId._id.toString() : doc.userId;
 
-        // If population failed (project deleted), projectId will be null.
-        // We must provide a non-empty string to avoid Entity validation error.
         let projectIdStr = "MISSING_PROJECT";
         if (doc.projectId) {
             projectIdStr = typeof doc.projectId === "object" ? (doc.projectId._id?.toString() || "MISSING_PROJECT") : doc.projectId;

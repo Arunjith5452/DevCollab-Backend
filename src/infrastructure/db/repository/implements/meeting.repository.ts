@@ -19,7 +19,6 @@ export class MeetingRepository extends BaseRepository<MeetingEntity, IMeeting> i
     }
 
     async findByProjectId(projectId: string): Promise<MeetingEntity[]> {
-        // Here we rely on mapper to handle the populated fields "safely" via unknown check
         const meetings = await this.model.find({ projectId: new Types.ObjectId(projectId) })
             .populate("createdBy", "name")
             .sort({ date: 1 })
@@ -49,4 +48,5 @@ export class MeetingRepository extends BaseRepository<MeetingEntity, IMeeting> i
             .lean();
         return meetings.map(meeting => this.mapper.fromMongo(meeting as unknown as IMeeting));
     }
+
 }
