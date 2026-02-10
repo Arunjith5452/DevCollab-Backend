@@ -22,7 +22,7 @@ import { ProjectResponseDTO } from "@/application/dtos/project/res/project-respo
 import { ProjectStatsDTO } from "@/application/dtos/project/res/project-stats.dto";
 import { ContributorStatsDTO } from "@/application/dtos/project/res/contributor-stats.dto";
 import { PlatformStatsDTO } from "@/application/dtos/platform/platform-stats.dto";
-import { FeaturedProjectDTO } from "@/application/usecases/project/implementations/get-featured-projects.usecase";
+import { FeaturedProjectDTO } from "@/application/dtos/project/res/featured-project.dto";
 import { GetAiContributorSuggestionsUseCase } from "@/application/usecases/project/implementations/get-ai-contributor-suggestions.usecase";
 
 @injectable()
@@ -42,8 +42,8 @@ export class ProjectController {
         @inject(PROJECT_TYPES.DisableProjectUseCase) private readonly _disableProjectUseCase: IExecute<{ userId: string, projectId: string }, void>,
         @inject(PROJECT_TYPES.UpdateProjectUseCase) private readonly _updateProjectUseCase: IExecute<{ userId: string, projectId: string, dto: UpdateProjectDTO }, { message: string }>,
         @inject(PROJECT_TYPES.GetProjectForEditUseCase) private readonly _getProjectForEditUseCase: IExecute<{ userId: string, projectId: string }, ProjectEntity>,
-        @inject(PROJECT_TYPES.GetProjectStatsUseCase) private readonly _getProjectStatsUseCase: IExecute<string, ProjectStatsDTO>,
-        @inject(PROJECT_TYPES.GetContributorStatsUseCase) private readonly _getContributorStatsUseCase: IExecute<{ projectId: string, userId: string, page?: number, limit?: number }, ContributorStatsDTO>,
+        @inject(PROJECT_TYPES.GetProjectStatsUseCase) private readonly _getProjectStatsUseCase: IExecute<{ projectId: string; startDate?: Date; endDate?: Date }, ProjectStatsDTO>,
+        @inject(PROJECT_TYPES.GetContributorStatsUseCase) private readonly _getContributorStatsUseCase: IExecute<{ projectId: string, userId: string, page?: number, limit?: number, startDate?: Date, endDate?: Date }, ContributorStatsDTO>,
         @inject(PROJECT_TYPES.GetPlatformStatsUseCase) private readonly _getPlatformStatsUseCase: IExecute<void, PlatformStatsDTO>,
         @inject(PROJECT_TYPES.GetFeaturedProjectsUseCase) private readonly _getFeaturedProjectsUseCase: IExecute<void, FeaturedProjectDTO[]>,
         @inject(PROJECT_TYPES.GetAiContributorSuggestionsUseCase) private readonly _getAiContributorSuggestionsUseCase: GetAiContributorSuggestionsUseCase
@@ -430,7 +430,10 @@ export class ProjectController {
     async getProjectStats(req: Request, res: Response): Promise<Response> {
         try {
             const { projectId } = req.params;
-            const stats = await this._getProjectStatsUseCase.execute(projectId);
+            const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
+            const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
+
+            const stats = await this._getProjectStatsUseCase.execute({ projectId, startDate, endDate });
             return successResponse(res, "Stats fetched successfully", stats);
         } catch (error) {
             return errorResponse(
@@ -455,11 +458,16 @@ export class ProjectController {
             const page = req.query.page ? parseInt(req.query.page as string, 10) : 1;
             const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 10;
 
+            const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
+            const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
+
             const stats = await this._getContributorStatsUseCase.execute({
                 projectId,
                 userId,
                 page,
-                limit
+                limit,
+                startDate,
+                endDate
             });
             return successResponse(res, "Contributor stats fetched successfully", stats);
         } catch (error) {

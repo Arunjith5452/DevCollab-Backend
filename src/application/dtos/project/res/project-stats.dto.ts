@@ -8,4 +8,13 @@ export interface ProjectStatsDTO {
         completedTasks: number;
         totalAssigned: number;
     }[];
+    earningsTimeline: {
+        month: string;
+        earnings: number;
+    }[];
+    activityTimeline: {
+        month: string;
+        created: number;
+        completed: number;
+    }[];
 }

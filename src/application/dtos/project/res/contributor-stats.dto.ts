@@ -25,5 +25,11 @@ export interface ContributorStatsDTO {
     taskBreakdown: TaskBreakdownItem[];
     totalTasksInBreakdown: number; // Total count for pagination
     earningsTimeline: EarningsTimelineItem[];
+    activityTimeline: {
+        month: string;
+        assigned: number;
+        completed: number;
+    }[];
+    lastMonthEarnings: number;
 }
 
