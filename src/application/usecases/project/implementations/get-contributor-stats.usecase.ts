@@ -15,6 +15,8 @@ interface GetContributorStatsQuery {
     userId: string;
     page?: number;
     limit?: number;
+    startDate?: Date;
+    endDate?: Date;
 }
 
 @injectable()
@@ -40,11 +42,19 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
         const projectObjectId = new Types.ObjectId(projectId);
 
         // 2. Fetch all tasks assigned to the contributor in this project
+        const queryFilter: any = {
+            projectId: projectObjectId,
+            assignedId: userId
+        };
+
+        if (query.startDate || query.endDate) {
+            queryFilter.createdAt = {};
+            if (query.startDate) queryFilter.createdAt.$gte = query.startDate;
+            if (query.endDate) queryFilter.createdAt.$lte = query.endDate;
+        }
+
         const tasks = await this._taskRepository.findTask(
-            {
-                projectId: projectObjectId,
-                assignedId: userId
-            },
+            queryFilter,
             { skip: 0, limit: 1000 }
         );
 
@@ -90,17 +100,35 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
         const taskBreakdown = allTaskBreakdown.slice(startIndex, endIndex);
         const totalTasksInBreakdown = allTaskBreakdown.length;
 
-        // 6. Generate earnings timeline (group by month)
+        // Determine grouping granularity
+        let groupBy: 'day' | 'month' = 'month';
+        if (query.startDate && query.endDate) {
+            const diffTime = Math.abs(query.endDate.getTime() - query.startDate.getTime());
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            if (diffDays <= 90) {
+                groupBy = 'day';
+            }
+        }
+
+        // 6. Generate earnings timeline
         const earningsMap = new Map<string, number>();
 
         tasks.forEach(task => {
             if (task.payment?.amount && task.payment.amount > 0) {
                 const date = new Date(task.createdAt);
-                const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-                const monthName = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                let key: string;
+                let label: string;
 
-                const current = earningsMap.get(monthName) || 0;
-                earningsMap.set(monthName, current + task.payment.amount);
+                if (groupBy === 'day') {
+                    key = date.toISOString().split('T')[0];
+                    label = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                } else {
+                    key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                    label = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                }
+
+                const current = earningsMap.get(label) || 0;
+                earningsMap.set(label, current + task.payment.amount);
             }
         });
 
@@ -112,6 +140,60 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
                 return dateA.getTime() - dateB.getTime();
             });
 
+        // 7. Calculate Activity Timeline
+        const activityMap = new Map<string, { assigned: number; completed: number }>();
+
+        tasks.forEach(task => {
+            const createdDate = new Date(task.createdAt);
+            let createdKey: string;
+
+            if (groupBy === 'day') {
+                createdKey = createdDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            } else {
+                createdKey = createdDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+            }
+
+            if (!activityMap.has(createdKey)) {
+                activityMap.set(createdKey, { assigned: 0, completed: 0 });
+            }
+            activityMap.get(createdKey)!.assigned += 1;
+
+            if (task.status === TaskStatus.DONE) {
+                const updatedDate = new Date(task.updatedAt || task.createdAt);
+                let updatedKey: string;
+
+                if (groupBy === 'day') {
+                    updatedKey = updatedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                } else {
+                    updatedKey = updatedDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                }
+
+                if (!activityMap.has(updatedKey)) {
+                    activityMap.set(updatedKey, { assigned: 0, completed: 0 });
+                }
+                activityMap.get(updatedKey)!.completed += 1;
+            }
+        });
+
+        const activityTimeline = Array.from(activityMap.entries())
+            .map(([month, stats]) => ({ month, ...stats }))
+            .sort((a, b) => new Date(a.month).getTime() - new Date(b.month).getTime());
+
+        // 8. Calculate Last Month Earnings
+        const today = new Date();
+        const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
+
+        let lastMonthEarnings = 0;
+        tasks.forEach(task => {
+            if (task.payment?.escrowStatus === "released" && task.payment.amount) {
+                const paymentDate = new Date(task.createdAt); // Approximation
+                if (paymentDate >= lastMonth && paymentDate <= lastMonthEnd) {
+                    lastMonthEarnings += task.payment.amount;
+                }
+            }
+        });
+
         return {
             totalEarnings,
             paidEarnings,
@@ -122,7 +204,9 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
             completionRate,
             taskBreakdown,
             totalTasksInBreakdown,
-            earningsTimeline
+            earningsTimeline,
+            activityTimeline,
+            lastMonthEarnings
         };
     }
 }

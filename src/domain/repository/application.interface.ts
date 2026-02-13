@@ -9,4 +9,4 @@ export interface IApplicationRepository<T> extends IBaseRepository<T> {
     updateStatus(applicationId: string, newStatus: string): Promise<void>
     findAppliedProjectsByUser(userId: string): Promise<ApplicationEntity[]>
     findLatestApproved(limit: number): Promise<ApplicationEntity[]>
-}
+  }
