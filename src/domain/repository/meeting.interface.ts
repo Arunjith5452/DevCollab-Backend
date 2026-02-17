@@ -5,6 +5,6 @@ import { IBaseRepository } from "./base-repository.interface";
 export interface IMeetingRepository<T> extends IBaseRepository<T> {
     createMeeting(data: MeetingEntity): Promise<MeetingEntity>;
     findByProjectId(projectId: string): Promise<MeetingEntity[]>;
-    updateStatus(meetingId: string, status: MeetingStatus): Promise<void>;
-    findByProjectIdAndStatus(projectId: string, status?: string): Promise<T[]>;
+    updateStatus(meetingId: string, status: MeetingStatus, endTime?: Date): Promise<void>;
+    findByProjectIdAndStatus(projectId: string, status?: string, page?: number, limit?: number): Promise<{ items: T[], total: number }>;
 }

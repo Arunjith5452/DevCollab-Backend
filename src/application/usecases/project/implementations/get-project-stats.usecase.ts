@@ -8,7 +8,7 @@ import { ITasksRepository } from "@/domain/repository/task.interface";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
 import { TASK_TYPES } from "@/infrastructure/di/types/tasks";
 import { inject, injectable } from "inversify";
-import { Types } from "mongoose";
+import { Types, FilterQuery } from "mongoose";
 
 @injectable()
 export class GetProjectStatsUseCase implements IExecute<{ projectId: string; startDate?: Date; endDate?: Date }, ProjectStatsDTO> {
@@ -20,7 +20,6 @@ export class GetProjectStatsUseCase implements IExecute<{ projectId: string; sta
     async execute(input: { projectId: string; startDate?: Date; endDate?: Date }): Promise<ProjectStatsDTO> {
         const { projectId, startDate, endDate } = input;
 
-        // 1. Validate project exists
         const project = await this._projectRepository.findByIdWithCreator(projectId);
         if (!project) {
             throw new Error("Project not found");
@@ -29,12 +28,13 @@ export class GetProjectStatsUseCase implements IExecute<{ projectId: string; sta
         const projectObjectId = new Types.ObjectId(projectId);
 
         // 2. Fetch all tasks for the project with optional date filtering
-        const query: any = { projectId: projectObjectId };
+        const query: FilterQuery<TaskEntity> = { projectId: projectObjectId };
 
         if (startDate || endDate) {
-            query.createdAt = {};
-            if (startDate) query.createdAt.$gte = startDate;
-            if (endDate) query.createdAt.$lte = endDate;
+            const dateQuery: { $gte?: Date; $lte?: Date } = {};
+            if (startDate) dateQuery.$gte = startDate;
+            if (endDate) dateQuery.$lte = endDate;
+            Object.assign(query, { createdAt: dateQuery });
         }
 
         const tasks = await this._taskRepository.findTask(query, { skip: 0, limit: 1000 });

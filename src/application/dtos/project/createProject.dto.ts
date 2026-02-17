@@ -54,7 +54,7 @@ export class CreateProjectDTO {
 
   @Expose()
   @IsOptional()
-  @Transform(({ value }: { value: any }) => value === "" ? undefined : value)
+  @Transform(({ value }: { value: unknown }) => value === "" ? undefined : value)
   @IsUrl({}, { message: "GitHub repository must be a valid URL" })
   githubRepo?: string;
 
