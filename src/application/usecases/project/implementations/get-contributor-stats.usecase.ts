@@ -8,7 +8,7 @@ import { ITasksRepository } from "@/domain/repository/task.interface";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
 import { TASK_TYPES } from "@/infrastructure/di/types/tasks";
 import { inject, injectable } from "inversify";
-import { Types } from "mongoose";
+import { FilterQuery } from "mongoose";
 
 interface GetContributorStatsQuery {
     projectId: string;
@@ -27,6 +27,7 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
     ) { }
 
     async execute(query: GetContributorStatsQuery): Promise<ContributorStatsDTO> {
+
         const { projectId, userId } = query;
 
         const project = await this._projectRepository.findByIdWithCreator(projectId);
@@ -39,18 +40,19 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
             throw new Error("User is not a member of this project");
         }
 
-        const projectObjectId = new Types.ObjectId(projectId);
-
         // 2. Fetch all tasks assigned to the contributor in this project
-        const queryFilter: any = {
-            projectId: projectObjectId,
+        const queryFilter: FilterQuery<TaskEntity> = {
+            projectId: projectId,
             assignedId: userId
         };
 
         if (query.startDate || query.endDate) {
-            queryFilter.createdAt = {};
-            if (query.startDate) queryFilter.createdAt.$gte = query.startDate;
-            if (query.endDate) queryFilter.createdAt.$lte = query.endDate;
+            const dateQuery: { $gte?: Date; $lte?: Date } = {};
+            if (query.startDate) dateQuery.$gte = query.startDate;
+            if (query.endDate) dateQuery.$lte = query.endDate;
+            // Use Object.defineProperty or cast to any to bypass readonly check on createdAt
+            // or simply recreate the object
+            Object.assign(queryFilter, { createdAt: dateQuery });
         }
 
         const tasks = await this._taskRepository.findTask(

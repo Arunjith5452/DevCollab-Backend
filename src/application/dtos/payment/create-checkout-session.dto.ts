@@ -20,7 +20,7 @@ export class CreateCheckoutSessionDTO {
 
   @Expose()
   @IsObject({ message: "Metadata must be an object" })
-  @Transform(({ obj }: { obj: any }) => obj.metadata)
+  @Transform(({ obj }: { obj: { metadata: Record<string, string> } }) => obj.metadata)
   metadata!: Record<string, string>;
 
   @Expose()

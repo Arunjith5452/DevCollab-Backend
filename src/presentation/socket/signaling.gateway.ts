@@ -4,6 +4,7 @@ import { Server as HttpServer } from 'http';
 export class SignalingGateway {
     private io: Server;
     private userVideoState = new Map<string, boolean>();
+    private userAudioState = new Map<string, boolean>();
 
     constructor(server: HttpServer) {
         this.io = new Server(server, {
@@ -28,12 +29,36 @@ export class SignalingGateway {
                 socket.data.userName = userName;
                 socket.data.roomId = roomId;
 
+                // Send current state of the room to the new joiner
+                const roomVideoState: Record<string, boolean> = {};
+                const roomAudioState: Record<string, boolean> = {};
+
+                // Get all users in the room
+                const socketsInRoom = this.io.sockets.adapter.rooms.get(roomId);
+                if (socketsInRoom) {
+                    socketsInRoom.forEach((socketId) => {
+                        const socket = this.io.sockets.sockets.get(socketId);
+                        if (socket && socket.data.userId && socket.data.userId !== userId) {
+                            const peerId = socket.data.userId;
+                            roomVideoState[peerId] = this.userVideoState.get(peerId) ?? true;
+                            roomAudioState[peerId] = this.userAudioState.get(peerId) ?? true;
+                        }
+                    });
+                }
+
+                socket.emit('room-state', {
+                    video: roomVideoState,
+                    audio: roomAudioState
+                });
+
                 console.log(`User ${userName} (${userId}) joined room ${roomId}`);
                 socket.to(roomId).emit('user-connected', { userId, userName });
 
                 socket.on('disconnect', () => {
                     console.log(`User ${userName} (${userId}) disconnected`);
                     socket.to(roomId).emit('user-disconnected', { userId, userName, videoEnabled: this.userVideoState.get(userId) ?? true });
+                    this.userVideoState.delete(userId); // Use cleanup with caution if reconnection logic exists
+                    this.userAudioState.delete(userId);
                 });
             });
 
@@ -59,6 +84,7 @@ export class SignalingGateway {
                 socket.to(payload.roomId).emit('video-state', payload);
             });
             socket.on('audio-state', (payload: { roomId: string; userId: string; enabled: boolean }) => {
+                this.userAudioState.set(payload.userId, payload.enabled);
                 socket.to(payload.roomId).emit('audio-state', payload);
             });
 

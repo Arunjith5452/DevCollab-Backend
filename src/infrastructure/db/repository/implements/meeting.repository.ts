@@ -21,7 +21,7 @@ export class MeetingRepository extends BaseRepository<MeetingEntity, IMeeting> i
     async findByProjectId(projectId: string): Promise<MeetingEntity[]> {
         const meetings = await this.model.find({ projectId: new Types.ObjectId(projectId) })
             .populate("createdBy", "name")
-            .sort({ date: 1 })
+            .sort({ date: -1 })
             .lean();
         return meetings.map(meeting => this.mapper.fromMongo(meeting as unknown as IMeeting));
     }
@@ -30,11 +30,15 @@ export class MeetingRepository extends BaseRepository<MeetingEntity, IMeeting> i
         return this.create(meeting);
     }
 
-    async updateStatus(meetingId: string, status: MeetingStatus): Promise<void> {
-        await this.update(meetingId, { status });
+    async updateStatus(meetingId: string, status: MeetingStatus, endTime?: Date): Promise<void> {
+        const updateData: { status: MeetingStatus; endTime?: Date } = { status };
+        if (endTime) {
+            updateData.endTime = endTime;
+        }
+        await this.update(meetingId, updateData);
     }
 
-    async findByProjectIdAndStatus(projectId: string, status?: string): Promise<MeetingEntity[]> {
+    async findByProjectIdAndStatus(projectId: string, status?: string, page: number = 1, limit: number = 10): Promise<{ items: MeetingEntity[], total: number }> {
         const query: FilterQuery<IMeeting> = { projectId: new Types.ObjectId(projectId) };
 
         if (status) {
@@ -42,11 +46,22 @@ export class MeetingRepository extends BaseRepository<MeetingEntity, IMeeting> i
             query.status = { $in: statusArray };
         }
 
-        const meetings = await this.model.find(query)
-            .populate("createdBy", "name")
-            .sort({ date: 1 })
-            .lean();
-        return meetings.map(meeting => this.mapper.fromMongo(meeting as unknown as IMeeting));
+        const skip = (page - 1) * limit;
+
+        const [meetings, total] = await Promise.all([
+            this.model.find(query)
+                .populate("createdBy", "name")
+                .sort({ date: -1 }) // Sort by date descending
+                .skip(skip)
+                .limit(limit)
+                .lean(),
+            this.model.countDocuments(query)
+        ]);
+
+        return {
+            items: meetings.map(meeting => this.mapper.fromMongo(meeting as unknown as IMeeting)),
+            total
+        };
     }
 
 }

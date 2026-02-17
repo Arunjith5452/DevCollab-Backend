@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { validate } from "class-validator";
+import { validate, ValidationError } from "class-validator";
 import { plainToInstance, } from "class-transformer";
 import { ServerErrorStatus } from "@/domain/enums/status-codes/server-error-status.enum";
 import { ClientErrorStatus } from "@/domain/enums/status-codes/client-error-status.enum";
@@ -34,7 +34,7 @@ export const validateDTO = (dtoClass: new (...args: any[]) => object) => {
             });
 
             if (errors.length > 0) {
-                const formatError = (error: any): string => {
+                const formatError = (error: ValidationError): string => {
                     const constraints = error.constraints ? Object.values(error.constraints) : [];
                     const children = error.children ? error.children.map(formatError).flat() : [];
                     return [...constraints, ...children].join(", ");

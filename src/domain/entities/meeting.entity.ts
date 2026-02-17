@@ -128,4 +128,9 @@ export class MeetingEntity {
         this._participants.push(participant);
         this._updatedAt = new Date();
     }
+
+    setEndTime(endTime: Date) {
+        this._endTime = endTime;
+        this._updatedAt = new Date();
+    }
 }

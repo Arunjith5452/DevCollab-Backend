@@ -13,8 +13,8 @@ import { MeetingListItemDto } from "@/application/dtos/meetings/res/meeting-list
 export class MeetingController {
     constructor(
         @inject(MEETING_TYPES.ScheduleMeetingUseCase) private readonly _scheduleMeetingUseCase: IExecute<CreateMeetingDTO, void>,
-        @inject(MEETING_TYPES.GetProjectMeetingsUseCase) private readonly _getProjectMeetingsUseCase: IExecute<{ projectId: string, status?: string }, MeetingListItemDto[]>,
-        @inject(MEETING_TYPES.UpdateMeetingStatusUseCase) private readonly _updateMeetingStatusUseCase: IExecute<{ meetingId: string, status: string }, void>
+        @inject(MEETING_TYPES.GetProjectMeetingsUseCase) private readonly _getProjectMeetingsUseCase: IExecute<{ projectId: string, status?: string, page?: number, limit?: number }, { items: MeetingListItemDto[], total: number }>,
+        @inject(MEETING_TYPES.UpdateMeetingStatusUseCase) private readonly _updateMeetingStatusUseCase: IExecute<{ meetingId: string, status: string, endTime?: Date }, void>
     ) { }
 
     /**
@@ -47,9 +47,14 @@ export class MeetingController {
     async getProjectMeetings(req: Request, res: Response): Promise<Response> {
         try {
             const { projectId } = req.params;
-            const { status } = req.query;
+            const { status, page, limit } = req.query;
 
-            const result = await this._getProjectMeetingsUseCase.execute({ projectId, status: status as string });
+            const result = await this._getProjectMeetingsUseCase.execute({
+                projectId,
+                status: status as string,
+                page: page ? Number(page) : undefined,
+                limit: limit ? Number(limit) : undefined
+            });
 
             return successResponse(res, MESSAGES.MEETING.SUCCESS.FETCHED, result);
         } catch (error) {
@@ -66,8 +71,9 @@ export class MeetingController {
     async updateMeetingStatus(req: Request, res: Response): Promise<Response> {
         try {
             const { meetingId } = req.params;
-            const { status } = req.body;
-            await this._updateMeetingStatusUseCase.execute({ meetingId, status });
+            const { status, endTime } = req.body;
+            console.log(`[MeetingController] Updating status for ${meetingId}: status=${status}, endTime=${endTime}`);
+            await this._updateMeetingStatusUseCase.execute({ meetingId, status, endTime });
 
             return successResponse(res, MESSAGES.MEETING.SUCCESS.STATUS_UPDATED);
         } catch (error) {
