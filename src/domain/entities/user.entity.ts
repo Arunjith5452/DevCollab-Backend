@@ -2,7 +2,10 @@ import { hash } from "@/shared/utils/password-hash.utils";
 import { ErrorMessage } from "../enums/messages/error-message.enum";
 import { Status } from "../enums/status.enums";
 
+
+
 export class UserEntity {
+  // ... existing properties
   private readonly _id?: string;
   private _email: string;
   private _password: string;
@@ -48,6 +51,8 @@ export class UserEntity {
     this._techStack = techStack
     this._githubAccessToken = githubAccessToken
     this._createdAt = createdAt
+    this._githubAccessToken = githubAccessToken
+    this._createdAt = createdAt
   }
 
   static create(data: {
@@ -83,6 +88,13 @@ export class UserEntity {
       data.createdAt
     );
   }
+
+
+
+  // ... existing getters ...
+
+  // ... rest of the file
+
   updateProfile(data: {
     name?: string;
     bio?: string;
