@@ -7,7 +7,9 @@ export interface IPaymentService {
         currency: string,
         metadata: Record<string, string>,
         successUrl: string,
-        cancelUrl: string
+        cancelUrl: string,
+        mode?: 'payment' | 'subscription',
+        priceId?: string
     ): Promise<Stripe.Checkout.Session>;
 
     retrieveCheckoutSession(sessionId: string): Promise<Stripe.Checkout.Session>;

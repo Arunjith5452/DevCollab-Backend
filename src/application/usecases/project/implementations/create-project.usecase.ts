@@ -12,13 +12,20 @@ import { USER_TYPES } from "@/infrastructure/di/types/user";
 import { COMMON_TYPES } from "@/infrastructure/di/types/common";
 import { IGitHubService } from "@/application/interface/git.service.interface";
 import { inject, injectable } from "inversify";
-
+import { ISubscriptionRepository } from "@/domain/repository/subscription.interface";
+import { SubscriptionEntity } from "@/domain/entities/subscription.entity";
+import { SUBSCRIPTION_TYPES } from "@/infrastructure/di/types/subscription";
+import { PLAN_TYPES } from "@/infrastructure/di/types/plan";
+import { IPlanRepository } from "@/domain/repository/plan.repository.interface";
+import { PlanEntity } from "@/domain/entities/plan.entity";
 
 @injectable()
 export class CreateProjectUseCase implements IExecute<{ userId: string, dto: CreateProjectDTO }, { message: string }> {
     constructor(@inject(PROJECT_TYPES.ProjectRepository) private readonly _projectRepository: IProjectRepository<ProjectEntity>,
         @inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>,
-        @inject(COMMON_TYPES.GitHubService) private readonly _gitHubService: IGitHubService
+        @inject(COMMON_TYPES.GitHubService) private readonly _gitHubService: IGitHubService,
+        @inject(SUBSCRIPTION_TYPES.SubscriptionRepository) private readonly _subscriptionRepository: ISubscriptionRepository<SubscriptionEntity>,
+        @inject(PLAN_TYPES.PlanRepository) private readonly _planRepository: IPlanRepository
     ) { }
 
     async execute({ userId, dto }: { userId: string, dto: CreateProjectDTO }): Promise<{ message: string }> {
@@ -43,6 +50,19 @@ export class CreateProjectUseCase implements IExecute<{ userId: string, dto: Cre
                 }
                 const repoUrl = await this._gitHubService.createRepository(user.githubAccessToken, dto.title, dto.description);
                 dto.githubRepo = repoUrl;
+            }
+
+            // Check Subscription Limit
+            const subscription = await this._subscriptionRepository.findByUserId(userId);
+            const planName = (subscription && subscription.status === 'active') ? subscription.plan : 'Free';
+
+            const plan = await this._planRepository.findByName(planName);
+            const projectLimit = plan ? plan.projectLimit : 1; // Default to 1 if plan not found (e.g. basic free tier not in DB yet)
+
+            const projectCount = await this._projectRepository.count({ creatorId: userId });
+
+            if (projectCount >= projectLimit) {
+                throw new Error(`Plan limit reached. Your current plan (${planName}) allows ${projectLimit} project(s). Upgrade to create more.`);
             }
 
             const project = ProjectEntity.create({

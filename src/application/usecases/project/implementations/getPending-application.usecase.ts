@@ -8,11 +8,9 @@ import { inject, injectable } from "inversify";
 
 @injectable()
 export class GetPendingApplicationUseCase implements IExecute<string, ResponsePendingApplicationDto[]> {
-    private readonly _applicationMapper = new PendingApplicationMapper();
-
     constructor(
-        @inject(PROJECT_TYPES.ApplicationRepository)
-        private readonly _applicationRepository: IApplicationRepository<ApplicationEntity>
+        @inject(PROJECT_TYPES.ApplicationRepository) private readonly _applicationRepository: IApplicationRepository<ApplicationEntity>,
+        @inject(PendingApplicationMapper) private readonly _applicationMapper: PendingApplicationMapper
     ) { }
 
     async execute(projectId: string): Promise<ResponsePendingApplicationDto[]> {

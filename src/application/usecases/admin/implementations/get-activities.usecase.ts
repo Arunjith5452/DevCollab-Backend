@@ -19,66 +19,68 @@ export class GetAdminActivitiesUseCase implements IExecute<{ page: number; limit
     ) { }
 
     async execute(query: { page: number; limit: number }): Promise<{ activities: ActivityItem[]; total: number }> {
-        const { page = 1, limit = 10 } = query;
-        const fetchLimit = page * limit;
+        try {
 
-        // Fetch enough data from each source to ensure correct interleaving
-        const [users, projects, applications] = await Promise.all([
-            this._userRepository.find({}, { skip: 0, limit: fetchLimit }),
-            this._projectRepository.find({}, { skip: 0, limit: fetchLimit }),
-            this._applicationRepository.findLatestApproved(fetchLimit)
-        ]);
+            const { page = 1, limit = 10 } = query;
+            const fetchLimit = page * limit;
 
-        // Normalize activities
-        const allActivities: ActivityItem[] = [
-            ...users.map((u: UserEntity): ActivityItem => ({
-                type: 'user' as const,
-                id: u.id!,
-                name: u.username,
-                title: u.username,
-                desc: `Joined the platform`,
-                email: u.email,
-                createdAt: u.createdAt!
-            })),
-            ...projects.map((p: ProjectEntity): ActivityItem => ({
-                type: 'project' as const,
-                id: p.id!,
-                name: p.title,
-                title: p.title,
-                desc: `New Project Created`,
-                createdAt: p.createdAt
-            })),
-            ...applications.map((a: ApplicationEntity): ActivityItem => ({
-                type: 'application' as const,
-                id: a.id!,
-                name: 'Application',
-                title: 'New Application',
-                desc: `Status: ${a.status}`,
-                status: a.status,
-                createdAt: a.updatedAt
-            }))
-        ];
 
-        // Sort by createdAt descending
-        allActivities.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            const [users, projects, applications] = await Promise.all([
+                this._userRepository.find({}, { skip: 0, limit: fetchLimit }),
+                this._projectRepository.find({}, { skip: 0, limit: fetchLimit }),
+                this._applicationRepository.findLatestApproved(fetchLimit)
+            ]);
 
-        // Calculate simplified total (sum of all counts approximations)
-        // This is not perfect as we only fetched a subset, but for UI pagination we can estimate or fetch real counts.
-        // Fetching real counts is cheap.
-        const [totalUsers, totalProjects, totalApps] = await Promise.all([
-            this._userRepository.count({}),
-            this._projectRepository.count({}),
-            this._applicationRepository.count({ status: 'approved' })
-        ]);
-        const total = totalUsers + totalProjects + totalApps;
+            const allActivities: ActivityItem[] = [
+                ...users.map((u: UserEntity): ActivityItem => ({
+                    type: 'user' as const,
+                    id: u.id!,
+                    name: u.username,
+                    title: u.username,
+                    desc: `Joined the platform`,
+                    email: u.email,
+                    createdAt: u.createdAt!
+                })),
+                ...projects.map((p: ProjectEntity): ActivityItem => ({
+                    type: 'project' as const,
+                    id: p.id!,
+                    name: p.title,
+                    title: p.title,
+                    desc: `New Project Created`,
+                    createdAt: p.createdAt
+                })),
+                ...applications.map((a: ApplicationEntity): ActivityItem => ({
+                    type: 'application' as const,
+                    id: a.id!,
+                    name: 'Application',
+                    title: 'New Application',
+                    desc: `Status: ${a.status}`,
+                    status: a.status,
+                    createdAt: a.updatedAt
+                }))
+            ];
 
-        // Slice the requested page
-        const startIndex = (page - 1) * limit;
-        const paginatedActivities = allActivities.slice(startIndex, startIndex + limit);
 
-        return {
-            activities: paginatedActivities,
-            total
-        };
+            allActivities.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+
+            const [totalUsers, totalProjects, totalApps] = await Promise.all([
+                this._userRepository.count({}),
+                this._projectRepository.count({}),
+                this._applicationRepository.count({ status: 'approved' })
+            ]);
+            const total = totalUsers + totalProjects + totalApps;
+
+            const startIndex = (page - 1) * limit;
+            const paginatedActivities = allActivities.slice(startIndex, startIndex + limit);
+
+            return {
+                activities: paginatedActivities,
+                total
+            };
+
+        } catch (error) {
+            throw error
+        }
     }
 }

@@ -23,7 +23,7 @@ export interface ContributorStatsDTO {
     pendingTasks: number;
     completionRate: number;
     taskBreakdown: TaskBreakdownItem[];
-    totalTasksInBreakdown: number; // Total count for pagination
+    totalTasksInBreakdown: number;
     earningsTimeline: EarningsTimelineItem[];
     activityTimeline: {
         month: string;

@@ -1,4 +1,5 @@
 import { ContributorStatsDTO, TaskBreakdownItem, EarningsTimelineItem } from "@/application/dtos/project/res/contributor-stats.dto";
+import { GetContributorStatsQueryDTO } from "@/application/dtos/project/get-contributor-stats.dto";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { ProjectEntity } from "@/domain/entities/project.entity";
 import { TaskEntity } from "@/domain/entities/task.entity";
@@ -10,23 +11,14 @@ import { TASK_TYPES } from "@/infrastructure/di/types/tasks";
 import { inject, injectable } from "inversify";
 import { FilterQuery } from "mongoose";
 
-interface GetContributorStatsQuery {
-    projectId: string;
-    userId: string;
-    page?: number;
-    limit?: number;
-    startDate?: Date;
-    endDate?: Date;
-}
-
 @injectable()
-export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQuery, ContributorStatsDTO> {
+export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQueryDTO, ContributorStatsDTO> {
     constructor(
         @inject(PROJECT_TYPES.ProjectRepository) private readonly _projectRepository: IProjectRepository<ProjectEntity>,
         @inject(TASK_TYPES.TaskRepository) private readonly _taskRepository: ITasksRepository<TaskEntity>
     ) { }
 
-    async execute(query: GetContributorStatsQuery): Promise<ContributorStatsDTO> {
+    async execute(query: GetContributorStatsQueryDTO): Promise<ContributorStatsDTO> {
 
         const { projectId, userId } = query;
 
@@ -43,17 +35,14 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
         // 2. Fetch all tasks assigned to the contributor in this project
         const queryFilter: FilterQuery<TaskEntity> = {
             projectId: projectId,
-            assignedId: userId
+            assignedId: userId,
+            ...(query.startDate || query.endDate ? {
+                createdAt: {
+                    ...(query.startDate ? { $gte: query.startDate } : {}),
+                    ...(query.endDate ? { $lte: query.endDate } : {})
+                }
+            } : {})
         };
-
-        if (query.startDate || query.endDate) {
-            const dateQuery: { $gte?: Date; $lte?: Date } = {};
-            if (query.startDate) dateQuery.$gte = query.startDate;
-            if (query.endDate) dateQuery.$lte = query.endDate;
-            // Use Object.defineProperty or cast to any to bypass readonly check on createdAt
-            // or simply recreate the object
-            Object.assign(queryFilter, { createdAt: dateQuery });
-        }
 
         const tasks = await this._taskRepository.findTask(
             queryFilter,

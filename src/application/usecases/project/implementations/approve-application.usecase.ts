@@ -7,13 +7,17 @@ import { IApplicationRepository } from "@/domain/repository/application.interfac
 import { IProjectRepository } from "@/domain/repository/project.interface";
 import { PROJECT_TYPES } from "@/infrastructure/di/types";
 import { inject, injectable } from "inversify";
+import { ISubscriptionRepository } from "@/domain/repository/subscription.interface";
+import { SubscriptionEntity } from "@/domain/entities/subscription.entity";
+import { SUBSCRIPTION_TYPES } from "@/infrastructure/di/types/subscription";
 
 
 @injectable()
 export class ApproveApplcationUseCase implements IExecute<ApproveApplicationDTO, { message: string }> {
 
     constructor(@inject(PROJECT_TYPES.ApplicationRepository) private readonly _applicationRepository: IApplicationRepository<ApplicationEntity>,
-        @inject(PROJECT_TYPES.ProjectRepository) private readonly _projectRepository: IProjectRepository<ProjectEntity>
+        @inject(PROJECT_TYPES.ProjectRepository) private readonly _projectRepository: IProjectRepository<ProjectEntity>,
+        @inject(SUBSCRIPTION_TYPES.SubscriptionRepository) private readonly _subscriptionRepository: ISubscriptionRepository<SubscriptionEntity>
     ) { }
 
     async execute({ applicationId, projectId }: ApproveApplicationDTO): Promise<{ message: string }> {
@@ -30,6 +34,17 @@ export class ApproveApplcationUseCase implements IExecute<ApproveApplicationDTO,
 
             if (!project) {
                 throw new Error("Project not found");
+            }
+
+            // Check Subscription Limit
+            const subscription = await this._subscriptionRepository.findByUserId(project.creatorId);
+            const isPro = subscription?.plan === 'pro' && subscription?.status === 'active';
+
+            if (!isPro) {
+                // Free plan limit: 4 contributors + 1 creator = 5 members
+                if (project.members.length >= 5) {
+                    throw new Error("Free plan limit reached. Partial updates restricted. Upgrade to Pro to add more contributors.");
+                }
             }
 
             project.addMember(application.userId.toString())
