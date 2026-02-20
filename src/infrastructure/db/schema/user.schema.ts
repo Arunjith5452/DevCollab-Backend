@@ -43,30 +43,7 @@ export const userSchema = new Schema({
         type: String,
         default: "active"
     },
-    subscription: [
-        {
-            plan: {
-                type: String,
-                enum: ['free', 'pro'],
-                // required: true,
-                default: 'free'
-            },
-            startDate: {
-                type: Date,
-                // required: true,
-            },
-            endDate: {
-                type: Date,
-                // required: true,
-            },
-            status: {
-                type: String,
-                enum: ['active', 'inactive', 'cancelled'],
-                // required: true,
-                default: 'active',
-            },
-        }
-    ],
+
     verification: {
         email: {
             type: Boolean,
