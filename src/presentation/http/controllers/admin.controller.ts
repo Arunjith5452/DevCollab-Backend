@@ -13,6 +13,7 @@ import { inject, injectable } from "inversify";
 import { ResponseUserDto } from "@/application/dtos/auth/res/response.dto";
 import { DashboardStats } from "@/application/dtos/admin/dashboard-stats.dto";
 import { ActivityItem } from "@/application/dtos/admin/activity.dto";
+import { SubscriptionWithUserDTO } from "@/application/dtos/admin/subscription.dto";
 
 @injectable()
 export class AdminController {
@@ -21,7 +22,8 @@ export class AdminController {
         @inject(ADMIN_TYPES.UpdateUserStatusUseCase) private readonly _updateUserStatusUseCase: IExecute<{ userId: string, newStatus: UpdateStatusDTO }, { message: string, newStatus: string }>,
         @inject(ADMIN_TYPES.GetAllProjectsUseCase) private readonly _getAllProjectsUseCase: IExecute<GetAllProjectsQuery, { message: string, projects: ProjectEntity[], total: number }>,
         @inject(ADMIN_TYPES.GetAdminDashboardStatsUseCase) private readonly _getDashboardStatsUseCase: IExecute<{ startDate?: Date, endDate?: Date } | void, { message: string, stats: DashboardStats }>,
-        @inject(ADMIN_TYPES.GetAdminActivitiesUseCase) private readonly _getActivitiesUseCase: IExecute<{ page: number, limit: number }, { activities: ActivityItem[], total: number }>
+        @inject(ADMIN_TYPES.GetAdminActivitiesUseCase) private readonly _getActivitiesUseCase: IExecute<{ page: number, limit: number }, { activities: ActivityItem[], total: number }>,
+        @inject(ADMIN_TYPES.GetAllSubscriptionsUseCase) private readonly _getAllSubscriptionsUseCase: IExecute<{ page: number, limit: number, search?: string, status?: string }, { subscriptions: SubscriptionWithUserDTO[], total: number }>
     ) { }
 
     /**
@@ -164,6 +166,28 @@ export class AdminController {
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
                 error
             )
+        }
+    }
+
+    /**
+     * Fetches all subscriptions with pagination.
+     */
+    async getSubscriptions(req: Request, res: Response) {
+        try {
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+            const search = req.query.search as string;
+            const status = req.query.status as string;
+
+            const result = await this._getAllSubscriptionsUseCase.execute({ page, limit, search, status });
+            return successResponse(res, "Subscriptions fetched successfully", result);
+        } catch (error) {
+            return errorResponse(
+                res,
+                "Failed to fetch subscriptions",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
         }
     }
 }

@@ -80,9 +80,6 @@ export class UserController {
             const userId = req.user?.userId;
             const { githubAccessToken, githubUrl } = req.body;
 
-            console.log("DEBUG: Connect GitHub Controller - UserId:", userId);
-            console.log("DEBUG: Connect GitHub Controller - Body:", req.body);
-
             if (!githubAccessToken) {
                 return errorResponse(
                     res,
