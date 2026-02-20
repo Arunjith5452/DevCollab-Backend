@@ -8,8 +8,12 @@ import { SignalingGateway } from "../../socket/signaling.gateway";
 
 const PORT = process.env.PORT;
 
+import { seedDefaultFreePlan } from "@/infrastructure/db/seeders/plan.seeder";
+
 const bootstrap = async () => {
   await DatabaseService.connect()
+  await seedDefaultFreePlan();
+
   const server = app.listen(PORT, () => {
     console.log(`🚀 Server started on http://localhost:${PORT}`);
   });

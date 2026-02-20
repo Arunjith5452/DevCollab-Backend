@@ -19,8 +19,9 @@ app.use(compression())
 
 app.use((req, res, next) => {
   if (req.originalUrl === "/api/payment/webhook") {
+    // Skip JSON parsing for webhook - express.raw() is applied in the payment router
     next()
-    } else {
+  } else {
     express.json()(req, res, next)
   }
 })
@@ -31,7 +32,7 @@ app.use("/api", appRouter)
 /* =====  GLOBAL DEBUG  ===== */
 app.use((req, res, next) => {
   console.log(' GLOBAL – method:', req.method, '  url:', req.originalUrl)
-  next()     
+  next()
 })
 
 app.use(errorHandler)

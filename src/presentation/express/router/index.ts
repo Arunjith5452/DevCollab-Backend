@@ -8,6 +8,7 @@ import { userRouter } from "./user/user.router";
 import { taskRouter } from "./tasks/task.router";
 import { paymentRouter } from "./payment/payment.router";
 import { meetingRouter } from "./meetings/meeting.router";
+import { planRouter } from "./plan/plan.router";
 
 const router = Router();
 
@@ -20,6 +21,7 @@ router.use(projectRouter);
 router.use(taskRouter);
 router.use(paymentRouter);
 router.use(meetingRouter);
+router.use(planRouter);
 
 
 export const appRouter = router;
