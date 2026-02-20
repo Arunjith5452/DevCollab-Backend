@@ -10,6 +10,9 @@ interface ApplicationWithUser extends ApplicationEntity {
     };
 }
 
+import { injectable } from "inversify";
+
+@injectable()
 export class PendingApplicationMapper {
     toResponse(application: ApplicationWithUser): ResponsePendingApplicationDto {
         return {
