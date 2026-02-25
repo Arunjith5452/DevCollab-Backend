@@ -26,7 +26,6 @@ export class CreateTaskUseCase implements IExecute<CreateTaskDTO, CreateTaskResp
 
     async execute(dto: CreateTaskDTO): Promise<CreateTaskResponseDTO> {
         try {
-            // Mandatory Payment Validation
             if (!dto.payment || dto.payment.amount <= 0) {
                 throw new Error("Payment amount is required and must be greater than zero.");
             }

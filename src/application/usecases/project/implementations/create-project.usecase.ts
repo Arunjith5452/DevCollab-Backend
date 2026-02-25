@@ -17,7 +17,9 @@ import { SubscriptionEntity } from "@/domain/entities/subscription.entity";
 import { SUBSCRIPTION_TYPES } from "@/infrastructure/di/types/subscription";
 import { PLAN_TYPES } from "@/infrastructure/di/types/plan";
 import { IPlanRepository } from "@/domain/repository/plan.repository.interface";
+import { PlanFeature } from "@/domain/enums/plan/plan-feature.enum";
 import { PlanEntity } from "@/domain/entities/plan.entity";
+
 
 @injectable()
 export class CreateProjectUseCase implements IExecute<{ userId: string, dto: CreateProjectDTO }, { message: string }> {
@@ -52,12 +54,17 @@ export class CreateProjectUseCase implements IExecute<{ userId: string, dto: Cre
                 dto.githubRepo = repoUrl;
             }
 
-            // Check Subscription Limit
             const subscription = await this._subscriptionRepository.findByUserId(userId);
             const planName = (subscription && subscription.status === 'active') ? subscription.plan : 'Free';
 
             const plan = await this._planRepository.findByName(planName);
-            const projectLimit = plan ? plan.projectLimit : 1; // Default to 1 if plan not found (e.g. basic free tier not in DB yet)
+
+            if (!plan?.features.includes(PlanFeature.CREATE_PROJECTS)) {
+                throw new Error(`Your current plan (${planName}) does not support project creation. Upgrade to create projects.`);
+            }
+
+            const projectLimit = plan ? plan.projectLimit : 1;
+
 
             const projectCount = await this._projectRepository.count({ creatorId: userId });
 

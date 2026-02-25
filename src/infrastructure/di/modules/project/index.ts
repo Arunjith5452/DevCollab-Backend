@@ -12,7 +12,7 @@ import { ApplicationRepository } from "@/infrastructure/db/repository/implements
 import { applicationModel } from "@/infrastructure/db/models/application.model";
 import { GetPendingApplicationUseCase } from "@/application/usecases/project/implementations/getPending-application.usecase";
 import { RejectApplicationUseCase } from "@/application/usecases/project/implementations/reject-application.usecase";
-import { ApproveApplcationUseCase } from "@/application/usecases/project/implementations/approve-application.usecase";
+import { ApproveApplicationUseCase } from "@/application/usecases/project/implementations/approve-application.usecase";
 import { GetMyCreatedProjectUseCase } from "@/application/usecases/project/implementations/get-my-created-projects.usecase";
 import { GetMyAppliedProjectUseCase } from "@/application/usecases/project/implementations/get-my-applied-projects.usecase";
 import { GetProjectMembersUseCase } from "@/application/usecases/project/implementations/get-team-members.usecase";
@@ -49,7 +49,7 @@ export const ProjectModule = new ContainerModule(({ bind }) => {
     bind<ApplicationRepository>(PROJECT_TYPES.ApplicationRepository).to(ApplicationRepository)
     bind<Model<IApplication>>("ApplicationModel").toConstantValue(applicationModel)
     bind<GetPendingApplicationUseCase>(PROJECT_TYPES.GetPendingApplicationUseCase).to(GetPendingApplicationUseCase)
-    bind<ApproveApplcationUseCase>(PROJECT_TYPES.ApproveApplcationUseCase).to(ApproveApplcationUseCase)
+    bind<ApproveApplicationUseCase>(PROJECT_TYPES.ApproveApplcationUseCase).to(ApproveApplicationUseCase)
     bind<RejectApplicationUseCase>(PROJECT_TYPES.RejectApplicationUseCase).to(RejectApplicationUseCase)
     bind<GetMyCreatedProjectUseCase>(PROJECT_TYPES.GetMyCreatedProjectUseCase).to(GetMyCreatedProjectUseCase)
     bind<GetMyAppliedProjectUseCase>(PROJECT_TYPES.GetMyAppliedProjectUseCase).to(GetMyAppliedProjectUseCase)

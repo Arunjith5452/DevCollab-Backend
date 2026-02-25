@@ -24,7 +24,8 @@ export class ListProjectUseCase implements IExecute<GetAllProjectsQuery, { messa
             const { search, techStack, roleNeeded, difficulty, page = 1, limit = 3, sort } = query
 
             const filter: ProjectFilter = {
-                status: { $ne: "disabled" } as unknown as string
+                status: { $ne: "disabled" } as unknown as string,
+                visibility: { $ne: "private" } as unknown as string
             };
 
             if (search) {

@@ -32,7 +32,6 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
             throw new Error("User is not a member of this project");
         }
 
-        // 2. Fetch all tasks assigned to the contributor in this project
         const queryFilter: FilterQuery<TaskEntity> = {
             projectId: projectId,
             assignedId: userId,
@@ -49,7 +48,6 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
             { skip: 0, limit: 1000 }
         );
 
-        // 3. Calculate earnings
         let totalEarnings = 0;
         let paidEarnings = 0;
         let pendingEarnings = 0;
@@ -65,13 +63,11 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
             }
         });
 
-        // 4. Calculate task statistics
         const totalTasks = tasks.length;
         const completedTasks = tasks.filter(t => t.status === TaskStatus.DONE).length;
         const pendingTasks = totalTasks - completedTasks;
         const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
-        // 5. Generate task breakdown
         const allTaskBreakdown: TaskBreakdownItem[] = tasks.map(task => ({
             taskId: task.id || "",
             title: task.title,
@@ -83,7 +79,6 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
             approval: task.approval
         }));
 
-        // 5a. Apply pagination to task breakdown
         const page = query.page || 1;
         const limit = query.limit || 10;
         const startIndex = (page - 1) * limit;
@@ -91,7 +86,6 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
         const taskBreakdown = allTaskBreakdown.slice(startIndex, endIndex);
         const totalTasksInBreakdown = allTaskBreakdown.length;
 
-        // Determine grouping granularity
         let groupBy: 'day' | 'month' = 'month';
         if (query.startDate && query.endDate) {
             const diffTime = Math.abs(query.endDate.getTime() - query.startDate.getTime());
@@ -101,7 +95,6 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
             }
         }
 
-        // 6. Generate earnings timeline
         const earningsMap = new Map<string, number>();
 
         tasks.forEach(task => {
@@ -131,7 +124,6 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
                 return dateA.getTime() - dateB.getTime();
             });
 
-        // 7. Calculate Activity Timeline
         const activityMap = new Map<string, { assigned: number; completed: number }>();
 
         tasks.forEach(task => {
@@ -170,7 +162,6 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
             .map(([month, stats]) => ({ month, ...stats }))
             .sort((a, b) => new Date(a.month).getTime() - new Date(b.month).getTime());
 
-        // 8. Calculate Last Month Earnings
         const today = new Date();
         const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
         const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
@@ -178,7 +169,7 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
         let lastMonthEarnings = 0;
         tasks.forEach(task => {
             if (task.payment?.escrowStatus === "released" && task.payment.amount) {
-                const paymentDate = new Date(task.createdAt); // Approximation
+                const paymentDate = new Date(task.createdAt); 
                 if (paymentDate >= lastMonth && paymentDate <= lastMonthEnd) {
                     lastMonthEarnings += task.payment.amount;
                 }
