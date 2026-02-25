@@ -9,9 +9,6 @@ on:
 jobs:
   backend-ci:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./backend
     steps:
     - uses: actions/checkout@v4
     
@@ -20,7 +17,6 @@ jobs:
       with:
         node-version: '20.x'
         cache: 'npm'
-        cache-dependency-path: './backend/package-lock.json'
         
     - name: Install Dependencies
       run: npm ci
