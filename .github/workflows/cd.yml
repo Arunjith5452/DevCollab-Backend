@@ -1,0 +1,17 @@
+name: CD
+
+on:
+  push:
+    branches: [ "master" ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deployment Placeholder
+        run: |
+          echo "No deployment configured yet."
+          echo "Please edit this workflow to add proper deployment credentials and steps (e.g., Vercel, AWS, Docker)."
