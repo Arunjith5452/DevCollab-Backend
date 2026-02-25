@@ -5,6 +5,7 @@ import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { SUBSCRIPTION_TYPES } from "@/infrastructure/di/types/subscription"; // Changed to SUBSCRIPTION_TYPES
 import { ISubscriptionRepository } from "@/domain/repository/subscription.interface"; // Changed to ISubscriptionRepository
 import { SubscriptionEntity } from "@/domain/entities/subscription.entity";
+import { plainToInstance } from "class-transformer";
 
 
 @injectable()
@@ -20,7 +21,7 @@ export class GetAllSubscriptionsUseCase implements IExecute<GetSubscriptionsQuer
         const result = await this._subscriptionRepository.findAllWithUserInfo(page, limit, status, search);
 
         return {
-            subscriptions: result.data,
+            subscriptions: plainToInstance(SubscriptionWithUserDTO, result.data),
             total: result.total
         };
     }

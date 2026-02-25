@@ -8,17 +8,17 @@ import { PROJECT_TYPES } from '@/infrastructure/di/types/project';
 import { UserEntity } from '@/domain/entities/user.entity';
 import { ProjectEntity } from '@/domain/entities/project.entity';
 import { ApplicationEntity } from '@/domain/entities/application.entity';
-import { ActivityItem } from '@/application/dtos/admin/activity.dto';
+import { ActivityItemDTO } from '@/application/dtos/admin/activity.dto';
 
 @injectable()
-export class GetAdminActivitiesUseCase implements IExecute<{ page: number; limit: number }, { activities: ActivityItem[]; total: number }> {
+export class GetAdminActivitiesUseCase implements IExecute<{ page: number; limit: number }, { activities: ActivityItemDTO[]; total: number }> {
     constructor(
         @inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>,
         @inject(PROJECT_TYPES.ProjectRepository) private readonly _projectRepository: IProjectRepository<ProjectEntity>,
         @inject(PROJECT_TYPES.ApplicationRepository) private readonly _applicationRepository: IApplicationRepository<ApplicationEntity>
     ) { }
 
-    async execute(query: { page: number; limit: number }): Promise<{ activities: ActivityItem[]; total: number }> {
+    async execute(query: { page: number; limit: number }): Promise<{ activities: ActivityItemDTO[]; total: number }> {
         try {
 
             const { page = 1, limit = 10 } = query;
@@ -31,8 +31,8 @@ export class GetAdminActivitiesUseCase implements IExecute<{ page: number; limit
                 this._applicationRepository.findLatestApproved(fetchLimit)
             ]);
 
-            const allActivities: ActivityItem[] = [
-                ...users.map((u: UserEntity): ActivityItem => ({
+            const allActivities: ActivityItemDTO[] = [
+                ...users.map((u: UserEntity): ActivityItemDTO => new ActivityItemDTO({
                     type: 'user' as const,
                     id: u.id!,
                     name: u.username,
@@ -41,7 +41,7 @@ export class GetAdminActivitiesUseCase implements IExecute<{ page: number; limit
                     email: u.email,
                     createdAt: u.createdAt!
                 })),
-                ...projects.map((p: ProjectEntity): ActivityItem => ({
+                ...projects.map((p: ProjectEntity): ActivityItemDTO => new ActivityItemDTO({
                     type: 'project' as const,
                     id: p.id!,
                     name: p.title,
@@ -49,7 +49,7 @@ export class GetAdminActivitiesUseCase implements IExecute<{ page: number; limit
                     desc: `New Project Created`,
                     createdAt: p.createdAt
                 })),
-                ...applications.map((a: ApplicationEntity): ActivityItem => ({
+                ...applications.map((a: ApplicationEntity): ActivityItemDTO => new ActivityItemDTO({
                     type: 'application' as const,
                     id: a.id!,
                     name: 'Application',
@@ -61,7 +61,7 @@ export class GetAdminActivitiesUseCase implements IExecute<{ page: number; limit
             ];
 
 
-            allActivities.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            allActivities.sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
 
 
             const [totalUsers, totalProjects, totalApps] = await Promise.all([
