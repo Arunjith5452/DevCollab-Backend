@@ -1,22 +1,4 @@
 services:
-  mongodb:
-    image: mongo:latest
-    container_name: devcollab-mongodb
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
-    restart: unless-stopped
-
-  redis:
-    image: redis:alpine
-    container_name: devcollab-redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    restart: unless-stopped
-
   backend:
     build: 
       context: .
@@ -26,11 +8,4 @@ services:
       - "3001:3001"
     env_file:
       - ./.env
-    depends_on:
-      - mongodb
-      - redis
     restart: always
-
-volumes:
-  mongodb_data:
-  redis_data:
