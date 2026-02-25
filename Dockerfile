@@ -3,13 +3,13 @@ FROM node:22.19.0-alpine AS base
 
 WORKDIR /app
 
-# Copy package.json and install dependencies
-COPY package.json ./
-RUN npm install
+# Copy package files and install ALL dependencies (including devDependencies) for building
+COPY package*.json ./
+RUN npm ci
 
 # Copy source code and tsconfig
 COPY src ./src
-COPY tsconfig.json ./
+COPY tsconfig*.json ./
 
 # Build TypeScript to /app/dist
 RUN npm run build
@@ -20,9 +20,11 @@ FROM node:22.19.0-alpine
 
 WORKDIR /app
 
-# Copy node_modules and build output from base stage
-COPY --from=base /app/node_modules ./node_modules
-COPY --from=base /app/package.json ./package.json
+# Copy package files and install ONLY production dependencies
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+# Copy the built output from the base stage
 COPY --from=base /app/dist ./dist
 
 # Expose port
