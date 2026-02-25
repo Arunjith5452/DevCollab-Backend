@@ -73,7 +73,6 @@ export class SubscriptionRepository extends BaseRepository<SubscriptionEntity, I
             { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } },
         ];
 
-        // Apply search BEFORE the $project stage so raw user fields are accessible
         if (search) {
             pipeline.push({
                 $match: {

@@ -39,8 +39,8 @@ export class GetUserProfileUseCase implements IExecute<{ userId: string }, UserR
       const [createdProjectsCount, contributionsCount, recentProjects, recentApps, subscription] = await Promise.all([
         this._projectRepository.count({ creatorId: userId }),
         this._applicationRepository.count({ userId, status: ApplicationStatus.APPROVED }),
-        this._projectRepository.find({ creatorId: userId }, { skip: 0, limit: 3 }),
-        this._applicationRepository.find({ userId, status: ApplicationStatus.APPROVED }, { skip: 0, limit: 3 }),
+        this._projectRepository.find({ creatorId: userId }, { skip: 0, limit: 5 }),
+        this._applicationRepository.find({ userId, status: ApplicationStatus.APPROVED }, { skip: 0, limit: 5 }),
         this._subscriptionRepository.findByUserId(userId)
       ]);
 
@@ -66,7 +66,7 @@ export class GetUserProfileUseCase implements IExecute<{ userId: string }, UserR
         createdProjects: createdProjectsCount,
         contributions: contributionsCount,
         activities,
-        subscription
+        subscription,
       });
 
     } catch (error) {

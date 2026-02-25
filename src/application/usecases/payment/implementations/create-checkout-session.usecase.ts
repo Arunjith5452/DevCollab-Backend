@@ -25,7 +25,7 @@ export class CreateCheckoutSessionUseCase implements IExecute<CreateCheckoutSess
       let mode = dto.mode || 'payment';
       let priceId = dto.priceId;
       let metadata = { ...dto.metadata };
-      const paymentType = dto.paymentType; // Use the new field
+      const paymentType = dto.paymentType; 
 
       switch (paymentType) {
         case 'SUBSCRIPTION':
@@ -34,32 +34,27 @@ export class CreateCheckoutSessionUseCase implements IExecute<CreateCheckoutSess
           if (!plan) throw new Error("Plan not found");
 
           amount = plan.price * 100;
-          mode = 'payment'; // Plans are currently one-time purchases (duration based)
-          priceId = undefined; // Use dynamic price_data
+          mode = 'payment'; 
+          priceId = undefined; 
 
           metadata.planId = plan.id!;
           metadata.durationInDays = plan.durationInDays.toString();
           metadata.productName = plan.name;
           metadata.productDescription = plan.description;
           metadata.type = 'plan_purchase';
-          // Make sure userId is in metadata
           if (dto.metadata?.userId) {
             metadata.userId = dto.metadata.userId;
           }
           break;
 
         case 'TASK_PAYMENT':
-          // logic for task payment
-          // amount is passed in DTO
+
           mode = 'payment';
           metadata.type = 'task_payment';
-          // Ensure task specific metadata is passed in dto.metadata
           break;
 
         default:
-          // Fallback / Generic handling (e.g. if paymentType not explicitly set but logic inferred)
           if (dto.planId) {
-            // ... same as subscription logic, legacy support if needed, or remove if strict
             const plan = await this._planRepository.findById(dto.planId);
             if (plan) {
               amount = plan.price * 100;
@@ -77,7 +72,6 @@ export class CreateCheckoutSessionUseCase implements IExecute<CreateCheckoutSess
           break;
       }
 
-      // If price is 0 (Free plan), skip Stripe and auto-provision
       if (metadata.type === 'plan_purchase' && amount === 0) {
         const userId = metadata.userId;
         if (!userId) throw new Error("User ID is required for free plan activation");
@@ -107,7 +101,6 @@ export class CreateCheckoutSessionUseCase implements IExecute<CreateCheckoutSess
           await this._subscriptionRepository.createSubscription(newSub);
         }
 
-        // Return a mock Stripe Session object to satisfy frontend redirect
         return {
           id: 'free_plan_activation_' + Date.now(),
           url: dto.success_url,

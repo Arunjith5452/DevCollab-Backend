@@ -5,7 +5,6 @@ import { Status } from "../enums/status.enums";
 
 
 export class UserEntity {
-  // ... existing properties
   private readonly _id?: string;
   private _email: string;
   private _password: string;

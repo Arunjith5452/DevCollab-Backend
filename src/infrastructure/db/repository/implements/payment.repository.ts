@@ -29,9 +29,6 @@ export class PaymentRepository extends BaseRepository<PaymentEntity, IPayment> i
     async getAllSubscriptions(page: number, limit: number, search?: string): Promise<{ data: PaymentWithUserDTO[], total: number }> {
         const query: FilterQuery<IPayment> = { purpose: 'SUBSCRIPTION' };
 
-        // If search is implemented, it would require aggregation to filter by user details
-        // For now, we return all subscriptions paginated
-
         const skip = (page - 1) * limit;
 
         const [data, total] = await Promise.all([

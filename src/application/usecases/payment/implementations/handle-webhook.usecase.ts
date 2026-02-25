@@ -33,10 +33,6 @@ export class HandleWebhookUseCase implements IExecute<WebhookDTO, { received: bo
     async execute(dto: WebhookDTO): Promise<{ received: boolean; eventType?: string }> {
         try {
             const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-            console.log('🔔 [WEBHOOK] Received webhook request');
-            console.log('🔔 [WEBHOOK] Body type:', typeof dto.payload, '| Is Buffer:', Buffer.isBuffer(dto.payload));
-            console.log('🔔 [WEBHOOK] Signature present:', !!dto.signature);
-            console.log('🔔 [WEBHOOK] Secret present:', !!webhookSecret);
 
             if (!webhookSecret) {
                 throw new Error('STRIPE_WEBHOOK_SECRET is not defined in environment variables');
@@ -54,45 +50,35 @@ export class HandleWebhookUseCase implements IExecute<WebhookDTO, { received: bo
                     dto.signature,
                     webhookSecret
                 );
-                console.log('✅ [WEBHOOK] Signature verified! Event type:', event.type);
             } catch (error) {
                 let err = error as Error
-                console.error('❌ [WEBHOOK] Signature verification failed:', err.message);
                 throw new Error(`Webhook Error: ${err.message}`);
             }
 
             switch (event.type) {
                 case 'checkout.session.completed':
                     const session = event.data.object as Stripe.Checkout.Session;
-                    console.log('✅ [WEBHOOK] checkout.session.completed received');
-                    console.log('📋 [WEBHOOK] Session mode:', session.mode);
-                    console.log('📋 [WEBHOOK] Session metadata:', JSON.stringify(session.metadata));
 
-                    // Handle Subscription / Plan Purchase
                     if ((session.mode === 'payment' && session.metadata?.type === 'plan_purchase') || session.mode === 'subscription') {
                         const userId = session.metadata?.userId || session.client_reference_id;
-                        const planId = session.metadata?.planId; // For dynamic plans
+                        const planId = session.metadata?.planId; 
                         const durationInDays = parseInt(session.metadata?.durationInDays || '30');
                         const productName = session.metadata?.productName || 'pro';
-                        console.log('📋 [WEBHOOK] userId:', userId, '| planId:', planId, '| productName:', productName, '| durationInDays:', durationInDays);
 
                         if (!userId) {
-                            console.error('❌ [WEBHOOK] Missing userId in session metadata - cannot provision subscription!');
                             return { received: true };
                         }
 
-                        const subscriptionId = session.subscription as string; // Might be null for one-time
+                        const subscriptionId = session.subscription as string;
                         const customerId = session.customer as string;
                         const paymentId = session.payment_intent as string;
 
-                        // Always calculate dates from today — prevents inheriting old plan's duration
                         const existingSub = await this._subscriptionRepository.findByUserId(userId);
                         const startDate = new Date();
                         const endDate = new Date();
                         endDate.setDate(endDate.getDate() + durationInDays);
 
                         if (existingSub) {
-                            // Update existing subscription with fresh dates and new plan
                             await this._subscriptionRepository.updateSubscription(existingSub.id!, {
                                 startDate,
                                 endDate,
@@ -101,7 +87,6 @@ export class HandleWebhookUseCase implements IExecute<WebhookDTO, { received: bo
                                 paymentId
                             });
                         } else {
-                            // Create brand new subscription
                             const newSub = SubscriptionEntity.create({
                                 userId,
                                 plan: productName,
@@ -114,12 +99,9 @@ export class HandleWebhookUseCase implements IExecute<WebhookDTO, { received: bo
                             });
                             await this._subscriptionRepository.createSubscription(newSub);
                         }
-                    } // end if (plan_purchase || subscription mode)
+                    }
 
-                    // Also update UserEntity subscription summary if needed
-                    // (Optional depending on if UserEntity stores a copy)
 
-                    // Handle Task Payment
                     const taskId = session.metadata?.task_id;
                     const projectId = session.metadata?.project_id;
 
@@ -130,7 +112,6 @@ export class HandleWebhookUseCase implements IExecute<WebhookDTO, { received: bo
                             task.updateStatus(TaskStatus.TODO);
                             await this._taskRepository.updateTask(task);
 
-                            // Also create/update payment record
                             const paymentIntentId = session.payment_intent as string;
                             const payment = PaymentEntity.create({
                                 userId: task.assignedId,

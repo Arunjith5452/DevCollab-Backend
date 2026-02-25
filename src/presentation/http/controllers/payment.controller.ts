@@ -41,7 +41,7 @@ export class PaymentController {
             if (!successUrl) {
                 successUrl = mode === 'subscription'
                     ? `${baseUrl}/dashboard/settings?session_id={CHECKOUT_SESSION_ID}`
-                    : `${baseUrl}/create-task?projectId=${projectId}&session_id={CHECKOUT_SESSION_ID}`;
+                    : `${baseUrl}/task-listing?projectId=${projectId}&session_id={CHECKOUT_SESSION_ID}`;
             }
 
             if (!cancelUrl) {
@@ -57,7 +57,8 @@ export class PaymentController {
                 cancel_url: cancelUrl,
                 mode,
                 priceId,
-                planId
+                planId,
+                paymentType: mode === 'subscription' ? 'SUBSCRIPTION' : 'TASK_PAYMENT'
             });
 
             return successResponse(res, MESSAGES.PAYMENT.SUCCESS.CHECKOUT_SESSION_CREATED, {
