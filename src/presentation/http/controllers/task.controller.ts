@@ -44,8 +44,6 @@ export class TaskController {
     async createTask(req: Request, res: Response): Promise<Response> {
         try {
 
-            console.log("backend receving data of createTask >", req.body)
-
             const result = await this._createTaskUseCase.execute(req.body)
 
             return successResponse(res, MESSAGES.TASK.SUCCESS.CREATED, result)

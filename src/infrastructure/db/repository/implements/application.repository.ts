@@ -39,14 +39,22 @@ export class ApplicationRepository extends BaseRepository<ApplicationEntity, Mon
         await this.update(applicationId, { status: newStatus } as UpdateQuery<ApplicationEntity>);
     }
 
-    async findAppliedProjectsByUser(userId: string): Promise<ApplicationEntity[]> {
-        const docs = await this.model
-            .find({ userId: new Types.ObjectId(userId) } as FilterQuery<MongoApplication>)
+    async findAppliedProjectsByUser(userId: string, options?: { skip: number; limit: number }): Promise<{ applications: ApplicationEntity[], total: number }> {
+        const query = { userId: new Types.ObjectId(userId) };
+        const total = await this.model.countDocuments(query as FilterQuery<MongoApplication>);
+        let mongoQuery = this.model.find(query as FilterQuery<MongoApplication>)
             .populate("projectId")
-            .sort({ createdAt: -1 })
-            .lean();
+            .sort({ createdAt: -1 });
 
-        return docs.map(doc => this.mapper.fromMongo(doc as MongoApplication));
+        if (options) {
+            mongoQuery = mongoQuery.skip(options.skip).limit(options.limit);
+        }
+
+        const docs = await mongoQuery.lean().exec();
+        return {
+            applications: docs.map(doc => this.mapper.fromMongo(doc as MongoApplication)),
+            total
+        };
     }
     async findLatestApproved(limit: number): Promise<ApplicationEntity[]> {
         const docs = await this.model

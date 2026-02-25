@@ -24,7 +24,7 @@ export class PaymentController {
      */
     async createCheckoutSession(req: Request, res: Response): Promise<Response> {
         try {
-            const { amount, metadata } = req.body;
+            const { amount, metadata, mode, priceId, planId, success_url, cancel_url } = req.body;
 
 
             const baseUrl = (process.env.FRONTEND_URL || 'http://localhost:3000').trim();
@@ -32,11 +32,33 @@ export class PaymentController {
             const metadataParams = metadata || {};
             const projectId = metadataParams.project_id || metadataParams.projectId || '';
 
+            const userId = (req as Request & { user: { userId: string } }).user?.userId;
+            const enhancedMetadata = { ...metadataParams, userId };
+
+            let successUrl = success_url;
+            let cancelUrl = cancel_url;
+
+            if (!successUrl) {
+                successUrl = mode === 'subscription'
+                    ? `${baseUrl}/dashboard/settings?session_id={CHECKOUT_SESSION_ID}`
+                    : `${baseUrl}/task-listing?projectId=${projectId}&session_id={CHECKOUT_SESSION_ID}`;
+            }
+
+            if (!cancelUrl) {
+                cancelUrl = mode === 'subscription'
+                    ? `${baseUrl}/subscription`
+                    : `${baseUrl}/task-listing?projectId=${projectId}`;
+            }
+
             const session = await this._createCheckoutSessionUseCase.execute({
                 amount,
-                metadata,
-                success_url: `${baseUrl}/create-task?projectId=${projectId}&session_id={CHECKOUT_SESSION_ID}`,
-                cancel_url: `${baseUrl}/task-listing?projectId=${projectId}`,
+                metadata: enhancedMetadata,
+                success_url: successUrl,
+                cancel_url: cancelUrl,
+                mode,
+                priceId,
+                planId,
+                paymentType: mode === 'subscription' ? 'SUBSCRIPTION' : 'TASK_PAYMENT'
             });
 
             return successResponse(res, MESSAGES.PAYMENT.SUCCESS.CHECKOUT_SESSION_CREATED, {

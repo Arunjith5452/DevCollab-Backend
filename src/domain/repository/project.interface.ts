@@ -9,7 +9,7 @@ export interface IProjectRepository<T> extends IBaseRepository<T> {
     findByIdWithCreator(id: string): Promise<T | null>
     findEntityById(id: string): Promise<T | null>
     updateEntity(project: ProjectEntity): Promise<T | null>
-    findByCreatorId(userId: string): Promise<ProjectEntity[]>
+    findByCreatorId(userId: string, options?: { skip: number; limit: number }): Promise<{ projects: ProjectEntity[], total: number }>;
     findByIdWithPopulation(projectId: string): Promise<ProjectEntity | null>;
     getProjectMembersForAssignee(projectId: string): Promise<ProjectMemberNameOnly[]>;
     findFeatured(filter: ProjectFilter, options: { skip: number; limit: number }): Promise<ProjectEntity[]>;

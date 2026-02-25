@@ -9,7 +9,6 @@ export class UpdateStatusDTO {
     @IsOptional()
     newStatus:string
     
-
     constructor (){
         this.newStatus = ""
     }

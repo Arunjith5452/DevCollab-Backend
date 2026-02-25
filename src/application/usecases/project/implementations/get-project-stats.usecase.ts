@@ -11,13 +11,13 @@ import { inject, injectable } from "inversify";
 import { Types, FilterQuery } from "mongoose";
 
 @injectable()
-export class GetProjectStatsUseCase implements IExecute<{ projectId: string; startDate?: Date; endDate?: Date }, ProjectStatsDTO> {
+export class GetProjectStatsUseCase implements IExecute<{ projectId: string; userId?: string; startDate?: Date; endDate?: Date }, ProjectStatsDTO> {
     constructor(
         @inject(PROJECT_TYPES.ProjectRepository) private readonly _projectRepository: IProjectRepository<ProjectEntity>,
         @inject(TASK_TYPES.TaskRepository) private readonly _taskRepository: ITasksRepository<TaskEntity>
     ) { }
 
-    async execute(input: { projectId: string; startDate?: Date; endDate?: Date }): Promise<ProjectStatsDTO> {
+    async execute(input: { projectId: string; userId?: string; startDate?: Date; endDate?: Date }): Promise<ProjectStatsDTO> {
         const { projectId, startDate, endDate } = input;
 
         const project = await this._projectRepository.findByIdWithCreator(projectId);
@@ -25,9 +25,12 @@ export class GetProjectStatsUseCase implements IExecute<{ projectId: string; sta
             throw new Error("Project not found");
         }
 
+        if (project.creatorId.toString() !== input.userId?.toString()) {
+            throw new Error("Forbidden: You are not the creator of this project");
+        }
+
         const projectObjectId = new Types.ObjectId(projectId);
 
-        // 2. Fetch all tasks for the project with optional date filtering
         const query: FilterQuery<TaskEntity> = { projectId: projectObjectId };
 
         if (startDate || endDate) {
@@ -44,10 +47,8 @@ export class GetProjectStatsUseCase implements IExecute<{ projectId: string; sta
         const completedTasks = tasks.filter(t => t.status === TaskStatus.DONE).length;
         const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
-        // 3. Calculate contributor performance
         const memberStats = new Map<string, { name: string, completed: number, total: number }>();
 
-        // Initialize for all members
         project.members.forEach(member => {
             if (member.user) {
                 memberStats.set(member.userId.toString(), {
@@ -58,7 +59,6 @@ export class GetProjectStatsUseCase implements IExecute<{ projectId: string; sta
             }
         });
 
-        // Tally tasks
         tasks.forEach(task => {
             if (task.assignedId) {
                 const stats = memberStats.get(task.assignedId.toString());
@@ -78,7 +78,6 @@ export class GetProjectStatsUseCase implements IExecute<{ projectId: string; sta
             totalAssigned: stats.total
         }));
 
-        // 4. Determine grouping and time range
         let groupBy: 'day' | 'month' = 'month';
         let start = startDate;
         let end = endDate || new Date();
@@ -90,12 +89,10 @@ export class GetProjectStatsUseCase implements IExecute<{ projectId: string; sta
                 groupBy = 'day';
             }
         } else {
-            // Default to last 6 months if no date range provided
             const today = new Date();
             start = new Date(today.getFullYear(), today.getMonth() - 5, 1);
         }
 
-        // 5. Calculate Earnings Timeline
         const earningsMap = new Map<string, number>();
 
         tasks.forEach(task => {
@@ -109,7 +106,6 @@ export class GetProjectStatsUseCase implements IExecute<{ projectId: string; sta
                     label = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
                 }
 
-                // Only include if within range (though repo query already filters, this handles default 6mo view if repo returns more)
                 if (start && date < start) return;
 
                 const current = earningsMap.get(label) || 0;
@@ -120,19 +116,12 @@ export class GetProjectStatsUseCase implements IExecute<{ projectId: string; sta
         const earningsTimeline = Array.from(earningsMap.entries())
             .map(([month, earnings]) => ({ month, earnings }))
             .sort((a, b) => {
-                // Sort by date 
-                // Note: This simple sort works if format is consistent, but for robust sorting we might need original dates.
-                // However, since we are building from tasks, we can just sort the result. 
-                // A better way is to iterate correctly or parse the label back to date.
-                // For simplicity, let's rely on the fact that we can parse the label or improved sorting.
                 return new Date(a.month).getTime() - new Date(b.month).getTime();
             });
 
-        // 6. Calculate Activity Timeline
         const activityMap = new Map<string, { created: number; completed: number }>();
 
         tasks.forEach(task => {
-            // Created count
             const createdDate = task.createdAt;
             if (!start || createdDate >= start) {
                 let createdLabel: string;
@@ -148,7 +137,6 @@ export class GetProjectStatsUseCase implements IExecute<{ projectId: string; sta
                 activityMap.get(createdLabel)!.created += 1;
             }
 
-            // Completed count
             if (task.status === TaskStatus.DONE) {
                 const completedDate = task.updatedAt || task.createdAt;
                 if (!start || completedDate >= start) {
@@ -181,10 +169,4 @@ export class GetProjectStatsUseCase implements IExecute<{ projectId: string; sta
         };
     }
 
-    // Removed private methods as logic is now inline and dynamic
-    /*
-    private calculateEarningsTimeline(tasks: TaskEntity[]): { month: string; earnings: number }[] { ... }
-    private calculateActivityTimeline(tasks: TaskEntity[]): { month: string; created: number; completed: number }[] { ... }
-    private getLast6Months(): string[] { ... }
-    */
 }

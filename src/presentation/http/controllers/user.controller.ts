@@ -14,7 +14,7 @@ import { MESSAGES } from "@/shared/constants/messages";
 @injectable()
 export class UserController {
     constructor(
-        @inject(USER_TYPES.GetUserProfileUseCase) private readonly _getUserProfileUseCase: IExecute<{ userId: string }, UserEntity>,
+        @inject(USER_TYPES.GetUserProfileUseCase) private readonly _getUserProfileUseCase: IExecute<{ userId: string}, UserEntity>,
         @inject(USER_TYPES.UpdateUserProfileUseCase) private readonly _updateUserProfileUseCase: IExecute<{ userId: string, dto: UpdateProfileDTO }, UserEntity | null>
     ) { }
 
@@ -30,7 +30,9 @@ export class UserController {
         try {
 
             let userId = req.user.userId
-            let result = await this._getUserProfileUseCase.execute({ userId })
+
+
+            let result = await this._getUserProfileUseCase.execute({ userId})
 
             return successResponse(res, "", result)
 
@@ -44,7 +46,6 @@ export class UserController {
             )
 
         }
-
     }
 
     /**
@@ -79,9 +80,6 @@ export class UserController {
         try {
             const userId = req.user?.userId;
             const { githubAccessToken, githubUrl } = req.body;
-
-            console.log("DEBUG: Connect GitHub Controller - UserId:", userId);
-            console.log("DEBUG: Connect GitHub Controller - Body:", req.body);
 
             if (!githubAccessToken) {
                 return errorResponse(

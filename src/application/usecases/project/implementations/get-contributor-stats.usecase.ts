@@ -1,4 +1,5 @@
 import { ContributorStatsDTO, TaskBreakdownItem, EarningsTimelineItem } from "@/application/dtos/project/res/contributor-stats.dto";
+import { GetContributorStatsQueryDTO } from "@/application/dtos/project/get-contributor-stats.dto";
 import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { ProjectEntity } from "@/domain/entities/project.entity";
 import { TaskEntity } from "@/domain/entities/task.entity";
@@ -10,23 +11,14 @@ import { TASK_TYPES } from "@/infrastructure/di/types/tasks";
 import { inject, injectable } from "inversify";
 import { FilterQuery } from "mongoose";
 
-interface GetContributorStatsQuery {
-    projectId: string;
-    userId: string;
-    page?: number;
-    limit?: number;
-    startDate?: Date;
-    endDate?: Date;
-}
-
 @injectable()
-export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQuery, ContributorStatsDTO> {
+export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQueryDTO, ContributorStatsDTO> {
     constructor(
         @inject(PROJECT_TYPES.ProjectRepository) private readonly _projectRepository: IProjectRepository<ProjectEntity>,
         @inject(TASK_TYPES.TaskRepository) private readonly _taskRepository: ITasksRepository<TaskEntity>
     ) { }
 
-    async execute(query: GetContributorStatsQuery): Promise<ContributorStatsDTO> {
+    async execute(query: GetContributorStatsQueryDTO): Promise<ContributorStatsDTO> {
 
         const { projectId, userId } = query;
 
@@ -40,27 +32,22 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
             throw new Error("User is not a member of this project");
         }
 
-        // 2. Fetch all tasks assigned to the contributor in this project
         const queryFilter: FilterQuery<TaskEntity> = {
             projectId: projectId,
-            assignedId: userId
+            assignedId: userId,
+            ...(query.startDate || query.endDate ? {
+                createdAt: {
+                    ...(query.startDate ? { $gte: query.startDate } : {}),
+                    ...(query.endDate ? { $lte: query.endDate } : {})
+                }
+            } : {})
         };
-
-        if (query.startDate || query.endDate) {
-            const dateQuery: { $gte?: Date; $lte?: Date } = {};
-            if (query.startDate) dateQuery.$gte = query.startDate;
-            if (query.endDate) dateQuery.$lte = query.endDate;
-            // Use Object.defineProperty or cast to any to bypass readonly check on createdAt
-            // or simply recreate the object
-            Object.assign(queryFilter, { createdAt: dateQuery });
-        }
 
         const tasks = await this._taskRepository.findTask(
             queryFilter,
             { skip: 0, limit: 1000 }
         );
 
-        // 3. Calculate earnings
         let totalEarnings = 0;
         let paidEarnings = 0;
         let pendingEarnings = 0;
@@ -76,13 +63,11 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
             }
         });
 
-        // 4. Calculate task statistics
         const totalTasks = tasks.length;
         const completedTasks = tasks.filter(t => t.status === TaskStatus.DONE).length;
         const pendingTasks = totalTasks - completedTasks;
         const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
-        // 5. Generate task breakdown
         const allTaskBreakdown: TaskBreakdownItem[] = tasks.map(task => ({
             taskId: task.id || "",
             title: task.title,
@@ -94,7 +79,6 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
             approval: task.approval
         }));
 
-        // 5a. Apply pagination to task breakdown
         const page = query.page || 1;
         const limit = query.limit || 10;
         const startIndex = (page - 1) * limit;
@@ -102,7 +86,6 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
         const taskBreakdown = allTaskBreakdown.slice(startIndex, endIndex);
         const totalTasksInBreakdown = allTaskBreakdown.length;
 
-        // Determine grouping granularity
         let groupBy: 'day' | 'month' = 'month';
         if (query.startDate && query.endDate) {
             const diffTime = Math.abs(query.endDate.getTime() - query.startDate.getTime());
@@ -112,7 +95,6 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
             }
         }
 
-        // 6. Generate earnings timeline
         const earningsMap = new Map<string, number>();
 
         tasks.forEach(task => {
@@ -142,7 +124,6 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
                 return dateA.getTime() - dateB.getTime();
             });
 
-        // 7. Calculate Activity Timeline
         const activityMap = new Map<string, { assigned: number; completed: number }>();
 
         tasks.forEach(task => {
@@ -181,7 +162,6 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
             .map(([month, stats]) => ({ month, ...stats }))
             .sort((a, b) => new Date(a.month).getTime() - new Date(b.month).getTime());
 
-        // 8. Calculate Last Month Earnings
         const today = new Date();
         const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
         const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
@@ -189,7 +169,7 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
         let lastMonthEarnings = 0;
         tasks.forEach(task => {
             if (task.payment?.escrowStatus === "released" && task.payment.amount) {
-                const paymentDate = new Date(task.createdAt); // Approximation
+                const paymentDate = new Date(task.createdAt); 
                 if (paymentDate >= lastMonth && paymentDate <= lastMonthEnd) {
                     lastMonthEarnings += task.payment.amount;
                 }

@@ -9,17 +9,17 @@ import { UserEntity } from '@/domain/entities/user.entity';
 import { ProjectEntity } from '@/domain/entities/project.entity';
 import { IApplicationRepository } from '@/domain/repository/application.interface';
 import { ApplicationEntity } from '@/domain/entities/application.entity';
-import { DashboardStats } from '@/application/dtos/admin/dashboard-stats.dto';
+import { DashboardStatsDTO, DailyRegistrationDTO, TechStackDistributionDTO, NewThisWeekStatsDTO } from '@/application/dtos/admin/dashboard-stats.dto';
 
 @injectable()
-export class GetAdminDashboardStatsUseCase implements IExecute<{ startDate?: Date; endDate?: Date } | void, { message: string; stats: DashboardStats }> {
+export class GetAdminDashboardStatsUseCase implements IExecute<{ startDate?: Date; endDate?: Date } | void, { message: string; stats: DashboardStatsDTO }> {
     constructor(
         @inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>,
         @inject(PROJECT_TYPES.ProjectRepository) private readonly _projectRepository: IProjectRepository<ProjectEntity>,
         @inject(PROJECT_TYPES.ApplicationRepository) private readonly _applicationRepository: IApplicationRepository<ApplicationEntity>,
     ) { }
 
-    async execute(query?: { startDate?: Date; endDate?: Date }): Promise<{ message: string; stats: DashboardStats }> {
+    async execute(query?: { startDate?: Date; endDate?: Date }): Promise<{ message: string; stats: DashboardStatsDTO }> {
         const endDate = query?.endDate || new Date();
         const startDate = query?.startDate || new Date(new Date().setDate(endDate.getDate() - 7));
 
@@ -56,20 +56,20 @@ export class GetAdminDashboardStatsUseCase implements IExecute<{ startDate?: Dat
 
         return {
             message: SuccessMessage.USERS_FETCHED,
-            stats: {
+            stats: new DashboardStatsDTO({
                 totalUsers,
                 totalProjects,
                 activeContributors,
                 totalCreators,
-                dailyRegistrations,
-                techStackDistribution: techStackDistribution.map(t => ({ _id: t.name, count: t.count })),
-                newThisWeek: {
+                dailyRegistrations: dailyRegistrations.map(d => new DailyRegistrationDTO(d)),
+                techStackDistribution: techStackDistribution.map(t => new TechStackDistributionDTO({ _id: t.name, count: t.count })),
+                newThisWeek: new NewThisWeekStatsDTO({
                     users: newUsersThisWeek,
                     projects: newProjectsThisWeek,
                     creators: newCreatorsThisWeek,
                     contributors: newContributorsApproveThisWeek
-                },
-            },
+                }),
+            }),
         };
     }
 }

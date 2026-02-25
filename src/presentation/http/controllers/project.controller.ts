@@ -31,18 +31,18 @@ export class ProjectController {
     constructor(
         @inject(PROJECT_TYPES.CreateProjectUseCase) private readonly _createProjectUseCase: IExecute<{ userId: string, dto: CreateProjectDTO }, { message: string }>,
         @inject(PROJECT_TYPES.ListProjectUseCase) private readonly _listProjectUseCase: IExecute<GetAllProjectsQuery, { message: string, projects: ProjectResponseDTO[], total: number }>,
-        @inject(PROJECT_TYPES.ProjectDetailsUseCase) private readonly _projectDetailsUseCase: IExecute<string, { project: ProjectResponseDTO, message: string }>,
+        @inject(PROJECT_TYPES.ProjectDetailsUseCase) private readonly _projectDetailsUseCase: IExecute<{ projectId: string; userId?: string }, { project: ProjectResponseDTO, message: string }>,
         @inject(PROJECT_TYPES.ApplyToProjectUseCase) private readonly _applyToProjectUseCase: IExecute<ApplyToProjectDTO, { message: string }>,
         @inject(PROJECT_TYPES.GetPendingApplicationUseCase) private readonly _getPendingApplicationUseCase: IExecute<string, ApplicationEntity[]>,
         @inject(PROJECT_TYPES.ApproveApplcationUseCase) private readonly _approveApplicationUseCase: IExecute<ApproveApplicationDTO, { message: string }>,
         @inject(PROJECT_TYPES.RejectApplicationUseCase) private readonly _rejectApplicationUseCase: IExecute<RejectApplicationDTO, { message: string }>,
-        @inject(PROJECT_TYPES.GetMyCreatedProjectUseCase) private readonly _getMyCreatedProjectUseCase: IExecute<{ userId: string }, ProjectEntity[]>,
-        @inject(PROJECT_TYPES.GetMyAppliedProjectUseCase) private readonly _getMyAppliedProjectUseCase: IExecute<{ userId: string }, ApplicationEntity[]>,
+        @inject(PROJECT_TYPES.GetMyCreatedProjectUseCase) private readonly _getMyCreatedProjectUseCase: IExecute<{ userId: string, page?: number, limit?: number }, { projects: ProjectEntity[], total: number }>,
+        @inject(PROJECT_TYPES.GetMyAppliedProjectUseCase) private readonly _getMyAppliedProjectUseCase: IExecute<{ userId: string, page?: number, limit?: number }, { applications: ApplicationEntity[], total: number }>,
         @inject(PROJECT_TYPES.GetProjectMembersUseCase) private readonly _getProjectMembersUseCase: IExecute<GetProjectMembersQuery, ProjectEntity[]>,
         @inject(PROJECT_TYPES.DisableProjectUseCase) private readonly _disableProjectUseCase: IExecute<{ userId: string, projectId: string }, void>,
         @inject(PROJECT_TYPES.UpdateProjectUseCase) private readonly _updateProjectUseCase: IExecute<{ userId: string, projectId: string, dto: UpdateProjectDTO }, { message: string }>,
         @inject(PROJECT_TYPES.GetProjectForEditUseCase) private readonly _getProjectForEditUseCase: IExecute<{ userId: string, projectId: string }, ProjectEntity>,
-        @inject(PROJECT_TYPES.GetProjectStatsUseCase) private readonly _getProjectStatsUseCase: IExecute<{ projectId: string; startDate?: Date; endDate?: Date }, ProjectStatsDTO>,
+        @inject(PROJECT_TYPES.GetProjectStatsUseCase) private readonly _getProjectStatsUseCase: IExecute<{ projectId: string; userId?: string; startDate?: Date; endDate?: Date }, ProjectStatsDTO>,
         @inject(PROJECT_TYPES.GetContributorStatsUseCase) private readonly _getContributorStatsUseCase: IExecute<{ projectId: string, userId: string, page?: number, limit?: number, startDate?: Date, endDate?: Date }, ContributorStatsDTO>,
         @inject(PROJECT_TYPES.GetPlatformStatsUseCase) private readonly _getPlatformStatsUseCase: IExecute<void, PlatformStatsDTO>,
         @inject(PROJECT_TYPES.GetFeaturedProjectsUseCase) private readonly _getFeaturedProjectsUseCase: IExecute<void, FeaturedProjectDTO[]>,
@@ -183,8 +183,9 @@ export class ProjectController {
         try {
 
             const { projectId } = req.params
+            const userId = req.user?.userId;
 
-            const result = await this._projectDetailsUseCase.execute(projectId)
+            const result = await this._projectDetailsUseCase.execute({ projectId, userId })
 
             return successResponse(
                 res,
@@ -317,7 +318,9 @@ export class ProjectController {
         try {
 
             let userId = req.user.userId
-            const result = await this._getMyCreatedProjectUseCase.execute({ userId })
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+            const result = await this._getMyCreatedProjectUseCase.execute({ userId, page, limit })
 
             return successResponse(res, '', result)
 
@@ -345,7 +348,9 @@ export class ProjectController {
         try {
 
             let userId = req.user.userId
-            const result = await this._getMyAppliedProjectUseCase.execute({ userId })
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+            const result = await this._getMyAppliedProjectUseCase.execute({ userId, page, limit })
             return successResponse(res, '', result)
 
         } catch (error) {
@@ -430,10 +435,11 @@ export class ProjectController {
     async getProjectStats(req: Request, res: Response): Promise<Response> {
         try {
             const { projectId } = req.params;
+            const userId = req.user?.userId;
             const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
             const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
 
-            const stats = await this._getProjectStatsUseCase.execute({ projectId, startDate, endDate });
+            const stats = await this._getProjectStatsUseCase.execute({ projectId, userId, startDate, endDate });
             return successResponse(res, "Stats fetched successfully", stats);
         } catch (error) {
             return errorResponse(

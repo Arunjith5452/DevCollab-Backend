@@ -12,6 +12,12 @@ export interface UserResponseDTO {
     contributionsCount?: number;
     recentActivities?: UserActivity[];
     isGithubConnected?: boolean;
+    subscription?: {
+        plan: string;
+        startDate: string;
+        endDate: string;
+        status: 'active' | 'inactive' | 'cancelled' | 'expired';
+    };
 }
 
 export interface UserActivity {

@@ -51,7 +51,7 @@ export class MeetingRepository extends BaseRepository<MeetingEntity, IMeeting> i
         const [meetings, total] = await Promise.all([
             this.model.find(query)
                 .populate("createdBy", "name")
-                .sort({ date: -1 }) // Sort by date descending
+                .sort({ date: -1 })
                 .skip(skip)
                 .limit(limit)
                 .lean(),

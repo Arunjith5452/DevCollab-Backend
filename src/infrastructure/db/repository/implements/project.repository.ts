@@ -58,13 +58,20 @@ export class ProjectRepository extends BaseRepository<ProjectEntity, MongoProjec
         return this.update(project.id, this.mapper.toMongo(project) as unknown as UpdateQuery<ProjectEntity>);
     }
 
-    async findByCreatorId(userId: string): Promise<ProjectEntity[]> {
-        const docs = await this.model.find({ creatorId: userId })
-            .sort({ createdAt: -1 })
-            .lean()
-            .exec();
+    async findByCreatorId(userId: string, options?: { skip: number; limit: number }): Promise<{ projects: ProjectEntity[], total: number }> {
+        const query = { creatorId: userId };
+        const total = await this.model.countDocuments(query);
+        let mongoQuery = this.model.find(query).sort({ createdAt: -1 });
 
-        return docs.map(doc => this.mapper.fromMongo(doc as unknown as MongoProject));
+        if (options) {
+            mongoQuery = mongoQuery.skip(options.skip).limit(options.limit);
+        }
+
+        const docs = await mongoQuery.lean().exec();
+        return {
+            projects: docs.map(doc => this.mapper.fromMongo(doc as unknown as MongoProject)),
+            total
+        };
     }
 
     async findByIdWithPopulation(projectId: string): Promise<ProjectEntity | null> {

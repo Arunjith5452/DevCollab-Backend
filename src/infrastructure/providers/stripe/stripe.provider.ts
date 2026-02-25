@@ -21,23 +21,38 @@ export class StripeProvider implements IPaymentService {
         currency: string = 'inr',
         metadata: Record<string, string>,
         successUrl: string,
-        cancelUrl: string
+        cancelUrl: string,
+        mode: 'payment' | 'subscription' = 'payment',
+        priceId?: string
     ): Promise<Stripe.Checkout.Session> {
-        return await this.stripe.checkout.sessions.create({
-            mode: 'payment',
-            line_items: [
+        let line_items: Stripe.Checkout.SessionCreateParams.LineItem[];
+
+        if (mode === 'subscription' && priceId) {
+            line_items = [
+                {
+                    price: priceId,
+                    quantity: 1,
+                },
+            ];
+        } else {
+            line_items = [
                 {
                     price_data: {
                         currency,
                         product_data: {
-                            name: 'Task Advance Payment',
-                            description: metadata.task_title || 'Advance for freelance task',
+                            name: metadata.productName || 'Task Advance Payment',
+                            description: metadata.productDescription || metadata.task_title || 'Advance for freelance task',
                         },
                         unit_amount: Math.round(amount),
                     },
                     quantity: 1,
                 },
-            ],
+            ];
+        }
+
+        return await this.stripe.checkout.sessions.create({
+            mode: mode,
+            line_items: line_items,
             metadata,
             success_url: successUrl,
             cancel_url: cancelUrl,

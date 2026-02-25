@@ -12,7 +12,7 @@ import { ApplicationRepository } from "@/infrastructure/db/repository/implements
 import { applicationModel } from "@/infrastructure/db/models/application.model";
 import { GetPendingApplicationUseCase } from "@/application/usecases/project/implementations/getPending-application.usecase";
 import { RejectApplicationUseCase } from "@/application/usecases/project/implementations/reject-application.usecase";
-import { ApproveApplcationUseCase } from "@/application/usecases/project/implementations/approve-application.usecase";
+import { ApproveApplicationUseCase } from "@/application/usecases/project/implementations/approve-application.usecase";
 import { GetMyCreatedProjectUseCase } from "@/application/usecases/project/implementations/get-my-created-projects.usecase";
 import { GetMyAppliedProjectUseCase } from "@/application/usecases/project/implementations/get-my-applied-projects.usecase";
 import { GetProjectMembersUseCase } from "@/application/usecases/project/implementations/get-team-members.usecase";
@@ -23,6 +23,7 @@ import { ProjectPresentationMapper } from "@/infrastructure/mappers/project-pres
 import { ProjectPersistenceMapper } from "@/infrastructure/mappers/project-persistence.mapper";
 import { ApplicationPresentationMapper } from "@/infrastructure/mappers/application-presentation.mapper";
 import { ApplicationPersistenceMapper } from "@/infrastructure/mappers/application-persistence.mapper";
+import { PendingApplicationMapper } from "@/application/mapper/project/pending-application.mapper";
 import { IProject } from "@/infrastructure/db/interface/project.interface";
 import { IApplication } from "@/infrastructure/db/interface/application.interface";
 import { GetProjectStatsUseCase } from "@/application/usecases/project/implementations/get-project-stats.usecase";
@@ -37,6 +38,7 @@ export const ProjectModule = new ContainerModule(({ bind }) => {
     bind<ProjectPersistenceMapper>(ProjectPersistenceMapper).toSelf().inSingletonScope()
     bind<ApplicationPresentationMapper>(ApplicationPresentationMapper).toSelf().inSingletonScope()
     bind<ApplicationPersistenceMapper>(ApplicationPersistenceMapper).toSelf().inSingletonScope()
+    bind<PendingApplicationMapper>(PendingApplicationMapper).toSelf().inSingletonScope()
     bind<ProjectRepository>(PROJECT_TYPES.ProjectRepository).to(ProjectRepository)
     bind<Model<IProject>>("ProjectModel").toConstantValue(projectModel)
     bind<ProjectController>(PROJECT_TYPES.ProjectController).to(ProjectController)
@@ -47,7 +49,7 @@ export const ProjectModule = new ContainerModule(({ bind }) => {
     bind<ApplicationRepository>(PROJECT_TYPES.ApplicationRepository).to(ApplicationRepository)
     bind<Model<IApplication>>("ApplicationModel").toConstantValue(applicationModel)
     bind<GetPendingApplicationUseCase>(PROJECT_TYPES.GetPendingApplicationUseCase).to(GetPendingApplicationUseCase)
-    bind<ApproveApplcationUseCase>(PROJECT_TYPES.ApproveApplcationUseCase).to(ApproveApplcationUseCase)
+    bind<ApproveApplicationUseCase>(PROJECT_TYPES.ApproveApplcationUseCase).to(ApproveApplicationUseCase)
     bind<RejectApplicationUseCase>(PROJECT_TYPES.RejectApplicationUseCase).to(RejectApplicationUseCase)
     bind<GetMyCreatedProjectUseCase>(PROJECT_TYPES.GetMyCreatedProjectUseCase).to(GetMyCreatedProjectUseCase)
     bind<GetMyAppliedProjectUseCase>(PROJECT_TYPES.GetMyAppliedProjectUseCase).to(GetMyAppliedProjectUseCase)

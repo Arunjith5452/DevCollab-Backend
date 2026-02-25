@@ -12,6 +12,12 @@ import { ILLMService } from "@/infrastructure/providers/interface/llm.interface"
 import { COMMON_TYPES } from "@/infrastructure/di/types/common";
 import { ICacheService } from "@/application/interface/cache.service.interface";
 import { ErrorMessage } from "@/domain/enums/messages/error-message.enum";
+import { PlanFeature } from "@/domain/enums/plan/plan-feature.enum";
+import { PLAN_TYPES } from "@/infrastructure/di/types/plan";
+import { SUBSCRIPTION_TYPES } from "@/infrastructure/di/types/subscription";
+import { ISubscriptionRepository } from "@/domain/repository/subscription.interface";
+import { SubscriptionEntity } from "@/domain/entities/subscription.entity";
+import { IPlanRepository } from "@/domain/repository/plan.repository.interface";
 
 
 
@@ -54,8 +60,8 @@ export class GetAiContributorSuggestionsUseCase implements IExecute<string, AiSu
         const candidates = applications.map(app => {
             const user = app.userId as unknown as PopulatedUser;
             return {
-                id: app.id!, 
-                role: "Applicant", 
+                id: app.id!,
+                role: "Applicant",
                 skills: app.techStack || [],
                 name: user?.name || "Unknown Candidate",
                 bio: user?.bio || ""

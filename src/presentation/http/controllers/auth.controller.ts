@@ -231,6 +231,12 @@ export class AuthController {
         }
     }
 
+    /**
+     * Handles Google login authentication.
+     * @param req - Express request containing Google token.
+     * @param res - Express response object.
+     * @returns JSON with auth result and cookies.
+     */
     async googleLogin(req: Request, res: Response): Promise<Response> {
 
         try {
@@ -266,6 +272,12 @@ export class AuthController {
 
     }
 
+    /**
+     * Handles GitHub login authentication.
+     * @param req - Express request containing GitHub code.
+     * @param res - Express response object.
+     * @returns JSON with auth result and cookies.
+     */
     async gitHubLogin(req: Request, res: Response): Promise<Response> {
 
         try {

@@ -15,6 +15,10 @@ import { ApplicationEntity } from "@/domain/entities/application.entity";
 import { ApplicationStatus } from "@/domain/enums/project/application.enums";
 import { ProjectEntity } from "@/domain/entities/project.entity";
 
+import { ISubscriptionRepository } from "@/domain/repository/subscription.interface";
+import { SubscriptionEntity } from "@/domain/entities/subscription.entity";
+import { SUBSCRIPTION_TYPES } from "@/infrastructure/di/types/subscription";
+
 @injectable()
 export class GetUserProfileUseCase implements IExecute<{ userId: string }, UserResponseDTO> {
 
@@ -22,7 +26,8 @@ export class GetUserProfileUseCase implements IExecute<{ userId: string }, UserR
     @inject(USER_TYPES.UserRepository) private readonly _userRepository: IUserRepository<UserEntity>,
     @inject(USER_TYPES.UserPresentationMapper) private readonly _userPresentationMapper: UserPresentationMapper,
     @inject(PROJECT_TYPES.ProjectRepository) private readonly _projectRepository: IProjectRepository<ProjectEntity>,
-    @inject(PROJECT_TYPES.ApplicationRepository) private readonly _applicationRepository: IApplicationRepository<ApplicationEntity>
+    @inject(PROJECT_TYPES.ApplicationRepository) private readonly _applicationRepository: IApplicationRepository<ApplicationEntity>,
+    @inject(SUBSCRIPTION_TYPES.SubscriptionRepository) private readonly _subscriptionRepository: ISubscriptionRepository<SubscriptionEntity>
   ) { }
 
   async execute({ userId }: { userId: string }): Promise<UserResponseDTO> {
@@ -31,11 +36,12 @@ export class GetUserProfileUseCase implements IExecute<{ userId: string }, UserR
       const user = await this._userRepository.findEntityByIdWithToken(userId);
       if (!user) throw new Error(ErrorMessage.USER_NOT_FOUND);
 
-      const [createdProjectsCount, contributionsCount, recentProjects, recentApps] = await Promise.all([
+      const [createdProjectsCount, contributionsCount, recentProjects, recentApps, subscription] = await Promise.all([
         this._projectRepository.count({ creatorId: userId }),
         this._applicationRepository.count({ userId, status: ApplicationStatus.APPROVED }),
-        this._projectRepository.find({ creatorId: userId }, { skip: 0, limit: 3 }),
-        this._applicationRepository.find({ userId, status: ApplicationStatus.APPROVED }, { skip: 0, limit: 3 })
+        this._projectRepository.find({ creatorId: userId }, { skip: 0, limit: 5 }),
+        this._applicationRepository.find({ userId, status: ApplicationStatus.APPROVED }, { skip: 0, limit: 5 }),
+        this._subscriptionRepository.findByUserId(userId)
       ]);
 
       // Map to activities
@@ -59,7 +65,8 @@ export class GetUserProfileUseCase implements IExecute<{ userId: string }, UserR
       return this._userPresentationMapper.toResponseDTO(user, {
         createdProjects: createdProjectsCount,
         contributions: contributionsCount,
-        activities
+        activities,
+        subscription,
       });
 
     } catch (error) {

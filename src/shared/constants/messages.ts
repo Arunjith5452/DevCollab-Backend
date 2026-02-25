@@ -130,6 +130,20 @@ export const MESSAGES = {
             MISSING_SIGNATURE: "Missing stripe-signature header",
         }
     },
+    PLAN: {
+        SUCCESS: {
+            CREATED: "Plan created successfully.",
+            UPDATED: "Plan updated successfully.",
+            FETCHED: "Plans fetched successfully.",
+            DELETED: "Plan deleted successfully."
+        },
+        ERROR: {
+            CREATION_FAILED: "Failed to create plan.",
+            UPDATE_FAILED: "Failed to update plan.",
+            FETCH_FAILED: "Failed to fetch plans.",
+            NOT_FOUND: "Plan not found."
+        }
+    },
     COMMON: {
         ERROR: {
             INTERNAL_SERVER: "Internal server error",

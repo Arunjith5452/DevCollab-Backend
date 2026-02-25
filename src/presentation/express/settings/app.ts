@@ -1,40 +1,16 @@
-import express from 'express'
-const app = express()
-import compression from 'compression'
-import cors from "cors"
-import cookieParser from "cookie-parser"
-import { appRouter } from '../router/index'
-import { errorHandler } from '../middlewares/error-handler.middlware'
+import express from 'express';
+import { applyCorsAndSecurity } from '../middlewares/cors-security.middleware';
+import { applyBodyParsers } from '../middlewares/body-parser.middleware';
+import { appRouter } from '../router/index';
+import { errorHandler } from '../middlewares/error-handler.middlware';
 
+const app = express();
 
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-}))
+applyCorsAndSecurity(app);
+applyBodyParsers(app);
 
-app.use(cookieParser())
-app.use(compression())
+app.use('/api', appRouter);
 
-
-app.use((req, res, next) => {
-  if (req.originalUrl === "/api/payment/webhook") {
-    next()
-    } else {
-    express.json()(req, res, next)
-  }
-})
-
-
-app.use("/api", appRouter)
-
-/* =====  GLOBAL DEBUG  ===== */
-app.use((req, res, next) => {
-  console.log(' GLOBAL – method:', req.method, '  url:', req.originalUrl)
-  next()     
-})
-
-app.use(errorHandler)
-
+app.use(errorHandler);
 
 export default app;

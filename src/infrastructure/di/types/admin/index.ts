@@ -5,5 +5,6 @@ export const ADMIN_TYPES = {
     UpdateUserStatusUseCase: Symbol.for("UpdateUserStatusUseCase"),
     GetAllProjectsUseCase: Symbol.for("GetAllProjectsUseCase"),
     GetAdminDashboardStatsUseCase: Symbol.for("GetAdminDashboardStatsUseCase"),
-    GetAdminActivitiesUseCase: Symbol.for("GetAdminActivitiesUseCase")
+    GetAdminActivitiesUseCase: Symbol.for("GetAdminActivitiesUseCase"),
+    GetAllSubscriptionsUseCase: Symbol.for("GetAllSubscriptionsUseCase")
 }
