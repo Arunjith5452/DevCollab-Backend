@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "dev" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "master", "dev" ]
 
 jobs:
   backend-ci:
@@ -27,6 +27,9 @@ jobs:
       
     - name: Run Linter
       run: npm run lint
+      
+    - name: Run Security Audit
+      run: npm audit --audit-level=high
       
     - name: Build
       run: npm run build
