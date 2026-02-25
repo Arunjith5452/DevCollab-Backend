@@ -1,10 +1,8 @@
 import { PlanEntity } from "../entities/plan.entity";
 
-export interface IPlanRepository {
-    create(plan: PlanEntity): Promise<PlanEntity>;
-    findById(id: string): Promise<PlanEntity | null>;
+import { IBaseRepository } from "./base-repository.interface";
+
+export interface IPlanRepository extends IBaseRepository<PlanEntity> {
     findByName(name: string): Promise<PlanEntity | null>;
-    findAll(filter?: { isActive?: boolean }): Promise<PlanEntity[]>;
-    update(plan: PlanEntity): Promise<PlanEntity>;
-    delete(id: string): Promise<boolean>;
+    findAllPaginated(filter?: { isActive?: boolean }, page?: number, limit?: number): Promise<{ data: PlanEntity[], total: number }>;
 }

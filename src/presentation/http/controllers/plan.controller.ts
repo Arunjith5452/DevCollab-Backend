@@ -15,8 +15,8 @@ export class PlanController {
     constructor(
         @inject(PLAN_TYPES.CreatePlanUseCase) private readonly _createPlanUseCase: IExecute<CreatePlanDTO, PlanResponseDTO>,
         @inject(PLAN_TYPES.EditPlanUseCase) private readonly _editPlanUseCase: IExecute<EditPlanDTO, PlanResponseDTO>,
-        @inject(PLAN_TYPES.GetActivePlansUseCase) private readonly _getActivePlansUseCase: IExecute<void, PlanResponseDTO[]>,
-        @inject(PLAN_TYPES.GetAllPlansUseCase) private readonly _getAllPlansUseCase: IExecute<void, PlanResponseDTO[]>,
+        @inject(PLAN_TYPES.GetActivePlansUseCase) private readonly _getActivePlansUseCase: IExecute<{ page?: number; limit?: number }, { plans: PlanResponseDTO[]; total: number }>,
+        @inject(PLAN_TYPES.GetAllPlansUseCase) private readonly _getAllPlansUseCase: IExecute<{ page?: number; limit?: number }, { plans: PlanResponseDTO[]; total: number }>,
         @inject(PLAN_TYPES.TogglePlanStatusUseCase) private readonly _togglePlanStatusUseCase: IExecute<string, PlanResponseDTO>
     ) { }
 
@@ -61,8 +61,10 @@ export class PlanController {
      */
     async getActivePlans(req: Request, res: Response): Promise<Response> {
         try {
-            const plans = await this._getActivePlansUseCase.execute();
-            return successResponse(res, MESSAGES.PLAN.SUCCESS.FETCHED, plans);
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+            const result = await this._getActivePlansUseCase.execute({ page, limit });
+            return successResponse(res, MESSAGES.PLAN.SUCCESS.FETCHED, result);
         } catch (error) {
             const statusCode = error instanceof AppError ? error.statusCode : ServerErrorStatus.INTERNAL_SERVER_ERROR;
             return errorResponse(res, MESSAGES.PLAN.ERROR.FETCH_FAILED, statusCode, error);
@@ -77,8 +79,10 @@ export class PlanController {
      */
     async getAllPlans(req: Request, res: Response): Promise<Response> {
         try {
-            const plans = await this._getAllPlansUseCase.execute();
-            return successResponse(res, MESSAGES.PLAN.SUCCESS.FETCHED, plans);
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+            const result = await this._getAllPlansUseCase.execute({ page, limit });
+            return successResponse(res, MESSAGES.PLAN.SUCCESS.FETCHED, result);
         } catch (error) {
             const statusCode = error instanceof AppError ? error.statusCode : ServerErrorStatus.INTERNAL_SERVER_ERROR;
             return errorResponse(res, MESSAGES.PLAN.ERROR.FETCH_FAILED, statusCode, error);

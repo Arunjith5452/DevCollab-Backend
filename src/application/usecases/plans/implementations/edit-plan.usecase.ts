@@ -36,7 +36,18 @@ export class EditPlanUseCase implements IExecute<EditPlanDTO, PlanResponseDTO> {
             });
         }
 
-        const updatedPlan = await this._planRepository.update(plan);
+        const updatedPlan = await this._planRepository.update(plan.id!, {
+            name: plan.name,
+            description: plan.description,
+            price: plan.price,
+            durationInDays: plan.durationInDays,
+            features: plan.features,
+            projectLimit: plan.projectLimit,
+            maxContributors: plan.maxContributors,
+            participationLimit: plan.participationLimit
+        });
+        if (!updatedPlan) throw new AppError("Failed to update plan", 500);
         return this._planPresentationMapper.toResponseDTO(updatedPlan);
+
     }
 }

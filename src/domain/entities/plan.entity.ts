@@ -1,3 +1,4 @@
+import { PlanFeature } from "../enums/plan/plan-feature.enum";
 
 export class PlanEntity {
     private readonly _id?: string;
@@ -5,20 +6,20 @@ export class PlanEntity {
     private _description: string;
     private _price: number;
     private _durationInDays: number;
-    private _features: string[];
+    private _features: PlanFeature[];
     private _isActive: boolean;
     private _type: 'one-time';
     private _projectLimit: number;
     private _maxContributors: number;
     private _participationLimit: number;
-    private _stripePriceId?: string; // Optional: if we decide to sync with Stripe later
+    private _stripePriceId?: string;
 
     private constructor(
         name: string,
         description: string,
         price: number,
         durationInDays: number,
-        features: string[],
+        features: PlanFeature[],
         isActive: boolean,
         type: 'one-time',
         projectLimit: number,
@@ -46,7 +47,7 @@ export class PlanEntity {
         description: string;
         price: number;
         durationInDays: number;
-        features: string[];
+        features: PlanFeature[];
         isActive?: boolean;
         type?: 'one-time';
         projectLimit?: number;
@@ -91,7 +92,7 @@ export class PlanEntity {
         return this._durationInDays;
     }
 
-    get features(): string[] {
+    get features(): PlanFeature[] {
         return this._features;
     }
 
@@ -128,7 +129,7 @@ export class PlanEntity {
         this._isActive = false;
     }
 
-    updateDetails(data: { name?: string; description?: string; price?: number; durationInDays?: number; features?: string[]; projectLimit?: number; maxContributors?: number; participationLimit?: number }) {
+    updateDetails(data: { name?: string; description?: string; price?: number; durationInDays?: number; features?: PlanFeature[]; projectLimit?: number; maxContributors?: number; participationLimit?: number }) {
         if (data.name) this._name = data.name;
         if (data.description) this._description = data.description;
         if (data.price !== undefined) this._price = data.price;

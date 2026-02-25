@@ -8,10 +8,8 @@ import { AuthGuard } from "../../middlewares/auth-guard.middlware";
 const router = Router();
 const planController = container.get<PlanController>(PLAN_TYPES.PlanController);
 
-// Public Routes (or Authenticated User)
 router.get("/plans", (req: Request, res: Response) => planController.getActivePlans(req, res));
 
-// Admin Routes
 router.post("/admin/plans", AuthGuard([Role.ADMIN]), (req: Request, res: Response) => planController.createPlan(req, res));
 router.get("/admin/plans", AuthGuard([Role.ADMIN]), (req: Request, res: Response) => planController.getAllPlans(req, res));
 router.put("/admin/plans/:id", AuthGuard([Role.ADMIN]), (req: Request, res: Response) => planController.editPlan(req, res));

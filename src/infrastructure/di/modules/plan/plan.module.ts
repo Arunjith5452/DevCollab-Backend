@@ -11,8 +11,11 @@ import { PlanController } from "@/presentation/http/controllers/plan.controller"
 import { PlanPersistenceMapper } from "@/infrastructure/mappers/plan-persistence.mapper";
 import { PlanPresentationMapper } from "@/infrastructure/mappers/plan-presentation.mapper";
 
+import { PlanModel } from "@/infrastructure/db/schema/plan.schema";
+
 export const planModule = new ContainerModule(({ bind }) => {
     bind<IPlanRepository>(PLAN_TYPES.PlanRepository).to(PlanRepository);
+    bind("PlanModel").toConstantValue(PlanModel);
 
     bind<CreatePlanUseCase>(PLAN_TYPES.CreatePlanUseCase).to(CreatePlanUseCase);
     bind<EditPlanUseCase>(PLAN_TYPES.EditPlanUseCase).to(EditPlanUseCase);

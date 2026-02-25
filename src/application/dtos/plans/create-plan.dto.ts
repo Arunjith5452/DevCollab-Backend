@@ -1,4 +1,6 @@
-import { IsString, IsNotEmpty, IsNumber, Min, IsArray, IsOptional } from "class-validator";
+import { IsString, IsNotEmpty, IsNumber, Min, IsArray, IsOptional, IsEnum } from "class-validator";
+import { PlanFeature } from "@/domain/enums/plan/plan-feature.enum";
+
 
 export class CreatePlanDTO {
     @IsString({ message: "Plan name must be a string." })
@@ -18,8 +20,9 @@ export class CreatePlanDTO {
     durationInDays!: number;
 
     @IsArray({ message: "Features must be a list." })
-    @IsString({ each: true, message: "Each feature must be a text string." })
-    features!: string[];
+    @IsEnum(PlanFeature, { each: true, message: "Each feature must be a valid PlanFeature." })
+    features!: PlanFeature[];
+
 
     @IsOptional()
     @IsNumber({}, { message: "Project limit must be a valid number." })

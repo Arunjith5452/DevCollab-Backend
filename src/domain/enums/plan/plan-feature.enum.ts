@@ -1,0 +1,8 @@
+export enum PlanFeature {
+    CREATE_PROJECTS = "CREATE_PROJECTS",
+
+    JOIN_PROJECTS = "JOIN_PROJECTS",
+    MAX_CONTRIBUTORS = "MAX_CONTRIBUTORS",
+}
+
+

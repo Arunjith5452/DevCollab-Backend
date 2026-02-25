@@ -16,10 +16,8 @@ export class CreatePlanUseCase implements IExecute<CreatePlanDTO, PlanResponseDT
     ) { }
 
     async execute(data: CreatePlanDTO): Promise<PlanResponseDTO> {
-        const activePlans = await this._planRepository.findAll({ isActive: true });
-
-        // Check if there are already 3 or more active plans
-        if (activePlans.length >= 3) {
+        const activePlans = await this._planRepository.findAllPaginated({ isActive: true });
+        if (activePlans.total >= 3) {
             throw new AppError("Maximum of 3 active plans allowed. Please disable or delete an existing plan to create a new one.", 400);
         }
 
@@ -29,7 +27,7 @@ export class CreatePlanUseCase implements IExecute<CreatePlanDTO, PlanResponseDT
             price: data.price,
             durationInDays: data.durationInDays,
             features: data.features,
-            isActive: true, // Default to active
+            isActive: true,
             projectLimit: data.projectLimit,
             maxContributors: data.maxContributors,
             participationLimit: data.participationLimit

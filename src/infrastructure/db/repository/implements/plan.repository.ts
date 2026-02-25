@@ -1,54 +1,41 @@
 import { injectable, inject } from "inversify";
-import { IPlanRepository } from "@/domain/repository/plan.repository.interface";
-import { PlanEntity } from "@/domain/entities/plan.entity";
-import { PlanModel, IPlanDocument } from "@/infrastructure/db/schema/plan.schema";
+import { Model } from "mongoose";
+import { BaseRepository } from "./base.repository";
 import { PLAN_TYPES } from "@/infrastructure/di/types/plan";
 import { PlanPersistenceMapper } from "@/infrastructure/mappers/plan-persistence.mapper";
+import { PlanEntity } from "@/domain/entities/plan.entity";
+import { IPlanDocument } from "@/infrastructure/db/schema/plan.schema";
+import { IPlanRepository } from "@/domain/repository/plan.repository.interface";
 
 @injectable()
-export class PlanRepository implements IPlanRepository {
+export class PlanRepository extends BaseRepository<PlanEntity, IPlanDocument> implements IPlanRepository {
     constructor(
-        @inject(PLAN_TYPES.PlanPersistenceMapper) private _mapper: PlanPersistenceMapper
-    ) { }
-
-    async create(plan: PlanEntity): Promise<PlanEntity> {
-        const newPlan = new PlanModel(this._mapper.toMongo(plan));
-        const saved = await newPlan.save();
-        return this._mapper.fromMongo(saved as unknown as IPlanDocument);
-    }
-
-    async findById(id: string): Promise<PlanEntity | null> {
-        const found = await PlanModel.findById(id);
-        return found ? this._mapper.fromMongo(found as unknown as IPlanDocument) : null;
+        @inject("PlanModel") model: Model<IPlanDocument>,
+        @inject(PLAN_TYPES.PlanPersistenceMapper) mapper: PlanPersistenceMapper
+    ) {
+        super(model, mapper);
     }
 
     async findByName(name: string): Promise<PlanEntity | null> {
-        const found = await PlanModel.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') } });
-        return found ? this._mapper.fromMongo(found as unknown as IPlanDocument) : null;
+        const escapedName = name.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+        const found = await this.model.findOne({ name: { $regex: new RegExp(`^${escapedName}$`, 'i') } });
+        return found ? this.mapper.fromMongo(found as unknown as IPlanDocument) : null;
     }
 
-    async findAll(filter?: { isActive?: boolean }): Promise<PlanEntity[]> {
+    async findAllPaginated(filter?: { isActive?: boolean }, page?: number, limit?: number): Promise<{ data: PlanEntity[], total: number }> {
         const query = filter ? { ...filter } : {};
-        const plans = await PlanModel.find(query);
-        return plans.map(p => this._mapper.fromMongo(p as unknown as IPlanDocument));
-    }
 
-    async update(plan: PlanEntity): Promise<PlanEntity> {
-        const mongoData = this._mapper.toMongo(plan);
-        // Exclude _id from update data if present, though findByIdAndUpdate ignores it usually
-        const { _id, ...updateData } = mongoData as unknown as IPlanDocument;
+        let mongoQuery = this.model.find(query);
+        const total = await this.model.countDocuments(query);
 
-        const updated = await PlanModel.findByIdAndUpdate(
-            plan.id,
-            updateData,
-            { new: true }
-        );
-        if (!updated) throw new Error("Plan not found");
-        return this._mapper.fromMongo(updated as unknown as IPlanDocument);
-    }
+        if (page && limit) {
+            mongoQuery = mongoQuery.skip((page - 1) * limit).limit(limit);
+        }
 
-    async delete(id: string): Promise<boolean> {
-        const deleted = await PlanModel.findByIdAndDelete(id);
-        return !!deleted;
+        const plans = await mongoQuery;
+        return {
+            data: plans.map(p => this.mapper.fromMongo(p as unknown as IPlanDocument)),
+            total
+        };
     }
 }
