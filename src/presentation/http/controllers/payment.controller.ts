@@ -24,7 +24,7 @@ export class PaymentController {
      */
     async createCheckoutSession(req: Request, res: Response): Promise<Response> {
         try {
-            const { amount, metadata, mode, priceId, planId, success_url, cancel_url } = req.body;
+            const { amount, metadata, mode, priceId, planId, success_url, cancel_url, paymentType } = req.body;
 
 
             const baseUrl = (process.env.FRONTEND_URL || 'http://localhost:3000').trim();
@@ -58,7 +58,7 @@ export class PaymentController {
                 mode,
                 priceId,
                 planId,
-                paymentType: mode === 'subscription' ? 'SUBSCRIPTION' : 'TASK_PAYMENT'
+                paymentType: paymentType || (mode === 'subscription' ? 'SUBSCRIPTION' : 'TASK_PAYMENT')
             });
 
             return successResponse(res, MESSAGES.PAYMENT.SUCCESS.CHECKOUT_SESSION_CREATED, {
