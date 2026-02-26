@@ -33,13 +33,18 @@ export class SubmitWorkUseCase implements IExecute<{ userId: string, taskId: str
                 throw new Error("Task must be in progress to submit work");
             }
 
+            const incompleteCriteria = task.acceptanceCriteria.filter(c => !c.completed);
+            if (incompleteCriteria.length > 0) {
+                throw new Error("All acceptance criteria must be completed before submitting work");
+            }
+
             task.submitWork(prLink, workDescription);
 
             await this._taskRepository.updateTask(task);
 
 
         } catch (error) {
-             throw error
+            throw error
         }
     }
 }
