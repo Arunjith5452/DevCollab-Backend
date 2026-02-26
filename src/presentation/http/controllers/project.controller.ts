@@ -1,0 +1,538 @@
+import { ApplyToProjectDTO } from "@/application/dtos/project/apply-project.dto";
+import { ApproveApplicationDTO } from "@/application/dtos/project/approve-application.dto";
+import { CreateProjectDTO } from "@/application/dtos/project/createProject.dto";
+import { UpdateProjectDTO } from "@/application/dtos/project/edit-project.dto";
+import { RejectApplicationDTO } from "@/application/dtos/project/reject-application.dto";
+import { IExecute } from "@/application/interface/execute.usecase.interface";
+import { GetAllProjectsQuery } from "@/application/usecases/project/interface/project-listing.usecase.interface";
+import { GetProjectMembersQuery } from "@/application/usecases/project/interface/team-members-listing.usecase.interface";
+import { ApplicationEntity } from "@/domain/entities/application.entity";
+import { ProjectEntity } from "@/domain/entities/project.entity";
+import { ServerErrorStatus } from "@/domain/enums/status-codes/server-error-status.enum";
+import { PROJECT_TYPES } from "@/infrastructure/di/types";
+import { errorResponse, successResponse } from "@/shared/utils/response.util";
+import { Request, Response } from "express";
+import { inject, injectable } from "inversify";
+import { MESSAGES } from "@/shared/constants/messages";
+
+
+
+
+import { ProjectResponseDTO } from "@/application/dtos/project/res/project-response.dto";
+import { ProjectStatsDTO } from "@/application/dtos/project/res/project-stats.dto";
+import { ContributorStatsDTO } from "@/application/dtos/project/res/contributor-stats.dto";
+import { PlatformStatsDTO } from "@/application/dtos/platform/platform-stats.dto";
+import { FeaturedProjectDTO } from "@/application/dtos/project/res/featured-project.dto";
+import { GetAiContributorSuggestionsUseCase } from "@/application/usecases/project/implementations/get-ai-contributor-suggestions.usecase";
+import { logger } from "@/infrastructure/providers/logs/logger";
+
+@injectable()
+export class ProjectController {
+
+    constructor(
+        @inject(PROJECT_TYPES.CreateProjectUseCase) private readonly _createProjectUseCase: IExecute<{ userId: string, dto: CreateProjectDTO }, { message: string }>,
+        @inject(PROJECT_TYPES.ListProjectUseCase) private readonly _listProjectUseCase: IExecute<GetAllProjectsQuery, { message: string, projects: ProjectResponseDTO[], total: number }>,
+        @inject(PROJECT_TYPES.ProjectDetailsUseCase) private readonly _projectDetailsUseCase: IExecute<{ projectId: string; userId?: string }, { project: ProjectResponseDTO, message: string }>,
+        @inject(PROJECT_TYPES.ApplyToProjectUseCase) private readonly _applyToProjectUseCase: IExecute<ApplyToProjectDTO, { message: string }>,
+        @inject(PROJECT_TYPES.GetPendingApplicationUseCase) private readonly _getPendingApplicationUseCase: IExecute<string, ApplicationEntity[]>,
+        @inject(PROJECT_TYPES.ApproveApplcationUseCase) private readonly _approveApplicationUseCase: IExecute<ApproveApplicationDTO, { message: string }>,
+        @inject(PROJECT_TYPES.RejectApplicationUseCase) private readonly _rejectApplicationUseCase: IExecute<RejectApplicationDTO, { message: string }>,
+        @inject(PROJECT_TYPES.GetMyCreatedProjectUseCase) private readonly _getMyCreatedProjectUseCase: IExecute<{ userId: string, page?: number, limit?: number }, { projects: ProjectEntity[], total: number }>,
+        @inject(PROJECT_TYPES.GetMyAppliedProjectUseCase) private readonly _getMyAppliedProjectUseCase: IExecute<{ userId: string, page?: number, limit?: number }, { applications: ApplicationEntity[], total: number }>,
+        @inject(PROJECT_TYPES.GetProjectMembersUseCase) private readonly _getProjectMembersUseCase: IExecute<GetProjectMembersQuery, ProjectEntity[]>,
+        @inject(PROJECT_TYPES.DisableProjectUseCase) private readonly _disableProjectUseCase: IExecute<{ userId: string, projectId: string }, void>,
+        @inject(PROJECT_TYPES.UpdateProjectUseCase) private readonly _updateProjectUseCase: IExecute<{ userId: string, projectId: string, dto: UpdateProjectDTO }, { message: string }>,
+        @inject(PROJECT_TYPES.GetProjectForEditUseCase) private readonly _getProjectForEditUseCase: IExecute<{ userId: string, projectId: string }, ProjectEntity>,
+        @inject(PROJECT_TYPES.GetProjectStatsUseCase) private readonly _getProjectStatsUseCase: IExecute<{ projectId: string; userId?: string; startDate?: Date; endDate?: Date }, ProjectStatsDTO>,
+        @inject(PROJECT_TYPES.GetContributorStatsUseCase) private readonly _getContributorStatsUseCase: IExecute<{ projectId: string, userId: string, page?: number, limit?: number, startDate?: Date, endDate?: Date }, ContributorStatsDTO>,
+        @inject(PROJECT_TYPES.GetPlatformStatsUseCase) private readonly _getPlatformStatsUseCase: IExecute<void, PlatformStatsDTO>,
+        @inject(PROJECT_TYPES.GetFeaturedProjectsUseCase) private readonly _getFeaturedProjectsUseCase: IExecute<void, FeaturedProjectDTO[]>,
+        @inject(PROJECT_TYPES.GetAiContributorSuggestionsUseCase) private readonly _getAiContributorSuggestionsUseCase: GetAiContributorSuggestionsUseCase
+    ) { }
+
+
+    /**
+    * Creates a new project for a user.
+    * @param req - Express request containing project data in the body and user ID in the request object.
+    * @param res - Express response object.
+    * @returns JSON response with success message upon successful project creation.
+    */
+    async createProject(req: Request, res: Response): Promise<Response> {
+        try {
+
+            const userId = req.user?.userId
+            const result = await this._createProjectUseCase.execute({ userId, dto: req.body })
+
+            return successResponse(res, result.message)
+
+        } catch (error) {
+            logger.error(`Error in createProject: ${error}`);
+            return errorResponse(res,
+                MESSAGES.PROJECT.ERROR.CREATION_FAILED,
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            )
+
+        }
+    }
+
+
+    /**
+     * Updates a project based on projectId and logged-in userId.
+     * @param req - Express request containing projectId in params and updated data in body.
+     * @param res - Express response object.
+     * @returns JSON with updated project data.
+     */
+    async editProject(req: Request, res: Response): Promise<Response> {
+        try {
+
+            let { projectId } = req.params
+            let userId = req.user.userId
+
+            let result = await this._updateProjectUseCase.execute({ userId, projectId, dto: req.body })
+
+            return successResponse(res, "", result)
+
+        } catch (error) {
+            logger.error(`Error in editProject: ${error}`);
+            return errorResponse(res,
+                MESSAGES.PROJECT.ERROR.EDIT_FAILED,
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            )
+        }
+    }
+
+
+    /**
+ * Fetches a project’s details for editing.
+ * Ensures the logged-in user owns the project.
+ * @param req - Express request containing projectId in params.
+ * @param res - Express response object.
+ * @returns JSON with editable project details.
+ */
+    async getProjectForEdit(req: Request, res: Response): Promise<Response> {
+
+        try {
+
+            let { projectId } = req.params
+            let userId = req.user.userId
+
+            let result = await this._getProjectForEditUseCase.execute({ userId, projectId })
+
+            return successResponse(res, "", result)
+
+        } catch (error) {
+            return errorResponse(res,
+                MESSAGES.PROJECT.ERROR.FETCH_EDIT_FAILED,
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            )
+        }
+    }
+
+    /**
+         * Fetches all projects with optional filters and pagination.
+         * @param req - Express request containing query parameters (search, techStack, difficulty, teamSize, page, limit).
+         * @param res - Express response object.
+         * @returns JSON response containing a list of projects and total count.
+         */
+    async getAllProjects(req: Request, res: Response): Promise<Response> {
+
+        try {
+
+            const { search, techStack, difficulty, teamSize, page, limit } = req.query;
+
+            const query = {
+                search: search as string,
+                techStack: techStack as string,
+                difficulty: difficulty as string,
+                teamSize: teamSize as string,
+                page: Number(page) || 1,
+                limit: Number(limit) || 10,
+                sort: req.query.sort as string
+            };
+
+            const result = await this._listProjectUseCase.execute(query)
+
+            return successResponse(res, result.message, {
+                projects: result.projects,
+                total: result.total
+            })
+
+
+        } catch (error) {
+
+            return errorResponse(
+                res,
+                MESSAGES.PROJECT.ERROR.USERS_FETCH_FAILED,
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            )
+
+        }
+    }
+
+    /**
+     * Retrieves detailed information of a specific project.
+     * @param req - Express request containing the project ID in parameters.
+     * @param res - Express response object.
+     * @returns JSON response containing detailed project data.
+     */
+    async projectDetails(req: Request, res: Response): Promise<Response> {
+
+        try {
+
+            const { projectId } = req.params
+            const userId = req.user?.userId;
+
+            const result = await this._projectDetailsUseCase.execute({ projectId, userId })
+
+            return successResponse(
+                res,
+                result.message,
+                result.project
+            )
+
+        } catch (error) {
+
+            return errorResponse(res,
+                MESSAGES.PROJECT.ERROR.DETAILS_FAILED,
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            )
+        }
+    }
+
+    /**
+ * Allows a user to apply to join a project.
+ * @param req - Express request containing projectId in params and application data in body.
+ * @param res - Express response object.
+ * @returns JSON with success message and application result.
+ */
+    async applyToProject(req: Request, res: Response): Promise<Response> {
+
+        try {
+
+            const { projectId } = req.params;
+            const userId = req.user.userId;
+
+            let result = await this._applyToProjectUseCase.execute({
+                ...req.body,
+                userId,
+                projectId,
+            });
+
+            return successResponse(res, result.message, result)
+
+        } catch (error) {
+            return errorResponse(res,
+                MESSAGES.PROJECT.ERROR.APPLY_FAILED,
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            )
+        }
+    }
+
+
+    /**
+ * Fetches all pending applications for a project.
+ * @param req - Express request containing projectId in params.
+ * @param res - Express response object.
+ * @returns JSON list of pending applications.
+ */
+    async getPendingApplication(req: Request, res: Response): Promise<Response> {
+        try {
+            const { projectId } = req.params
+            const result = await this._getPendingApplicationUseCase.execute(projectId)
+            return successResponse(res, MESSAGES.PROJECT.SUCCESS.APPLICATIONS_FETCHED, result);
+        } catch (error) {
+            return errorResponse(res, MESSAGES.PROJECT.ERROR.APPLICATIONS_FETCH_FAILED, ServerErrorStatus.INTERNAL_SERVER_ERROR, error);
+
+        }
+    }
+
+
+    /**
+ * Approves a pending project application.
+ * @param req - Express request containing projectId and applicationId in params.
+ * @param res - Express response object.
+ * @returns JSON with approval message.
+ */
+    async approveApplication(req: Request, res: Response): Promise<Response> {
+        try {
+
+            const { projectId, applicationId } = req.params
+
+            let result = await this._approveApplicationUseCase.execute({ projectId, applicationId })
+
+            return successResponse(res, result.message)
+
+        } catch (error) {
+            return errorResponse(
+                res,
+                MESSAGES.PROJECT.ERROR.APPROVE_APPLICATION_FAILED,
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+        }
+    }
+
+
+
+    /**
+     * Rejects a project application.
+     * @param req - Express request containing applicationId in params.
+     * @param res - Express response object.
+     * @returns JSON with rejection message.
+     */
+    async rejectApplication(req: Request, res: Response): Promise<Response> {
+
+        try {
+
+            const { applicationId } = req.params
+
+            let result = await this._rejectApplicationUseCase.execute({ applicationId })
+
+            return successResponse(res, result.message)
+
+        } catch (error) {
+            return errorResponse(
+                res,
+                MESSAGES.PROJECT.ERROR.REJECT_APPLICATION_FAILED,
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+        }
+    }
+
+
+
+    /**
+ * Fetches all projects created by the logged-in user.
+ * @param req - Express request containing authenticated userId.
+ * @param res - Express response object.
+ * @returns JSON list of created projects.
+ */
+    async getMyCreatedProject(req: Request, res: Response): Promise<Response> {
+
+        try {
+
+            let userId = req.user.userId
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+            const result = await this._getMyCreatedProjectUseCase.execute({ userId, page, limit })
+
+            return successResponse(res, '', result)
+
+        } catch (error) {
+
+            return errorResponse(
+                res,
+                MESSAGES.PROJECT.ERROR.LOAD_CREATED_FAILED,
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+        }
+
+    }
+
+
+    /**
+ * Fetches all projects the user has applied to.
+ * @param req - Express request containing authenticated userId.
+ * @param res - Express response object.
+ * @returns JSON list of applied projects.
+ */
+    async getMyAppliedProject(req: Request, res: Response): Promise<Response> {
+
+        try {
+
+            let userId = req.user.userId
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+            const result = await this._getMyAppliedProjectUseCase.execute({ userId, page, limit })
+            return successResponse(res, '', result)
+
+        } catch (error) {
+
+            return errorResponse(
+                res,
+                MESSAGES.PROJECT.ERROR.LOAD_APPLIED_FAILED,
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+        }
+
+    }
+
+    /**
+ * Fetches project members with optional filters like search & pagination.
+ * @param req - Express request containing projectId in params and query filters.
+ * @param res - Express response object.
+ * @returns JSON paginated list of project members.
+ */
+    async getProjectMember(req: Request, res: Response): Promise<Response> {
+
+        try {
+
+            const { projectId } = req.params;
+            const { search, page, limit } = req.query;
+
+
+            let result = await this._getProjectMembersUseCase.execute({
+                projectId,
+                search: search as string,
+                page: parseInt(page as string),
+                limit: parseInt(limit as string)
+            })
+
+            return successResponse(res, MESSAGES.PROJECT.SUCCESS.MEMBERS_FETCHED, result)
+
+        } catch (error) {
+            return errorResponse(
+                res,
+                MESSAGES.PROJECT.ERROR.LOAD_MEMBERS_FAILED,
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+        }
+    }
+
+
+    /**
+ * Disables a project created by the logged-in user.
+ * @param req - Express request containing projectId in params.
+ * @param res - Express response object.
+ * @returns JSON confirmation of project disable action.
+ */
+    async disableProject(req: Request, res: Response): Promise<Response> {
+        try {
+
+            const { projectId } = req.params
+            const userId = req.user.userId
+
+            const result = await this._disableProjectUseCase.execute({ userId, projectId })
+
+            return successResponse(res, '', result)
+
+        } catch (error) {
+            return errorResponse(
+                res,
+                MESSAGES.PROJECT.ERROR.DISABLE_FAILED,
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+
+        }
+    }
+
+    /**
+     * Fetches project statistics including completion rate and contributor performance.
+     * @param req - Express request containing projectId in params.
+     * @param res - Express response object.
+     * @returns JSON response with project statistics.
+     */
+    async getProjectStats(req: Request, res: Response): Promise<Response> {
+        try {
+            const { projectId } = req.params;
+            const userId = req.user?.userId;
+            const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
+            const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
+
+            const stats = await this._getProjectStatsUseCase.execute({ projectId, userId, startDate, endDate });
+            return successResponse(res, "Stats fetched successfully", stats);
+        } catch (error) {
+            return errorResponse(
+                res,
+                "Failed to fetch project stats",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+        }
+    }
+
+    /**
+     * Fetches contributor statistics for a specific project.
+     * @param req - Express request containing projectId in params and authenticated userId.
+     * @param res - Express response object.
+     * @returns JSON response with contributor statistics including earnings and task breakdown.
+     */
+    async getContributorStats(req: Request, res: Response): Promise<Response> {
+        try {
+            const { projectId } = req.params;
+            const userId = req.user?.userId;
+            const page = req.query.page ? parseInt(req.query.page as string, 10) : 1;
+            const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 10;
+
+            const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
+            const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
+
+            const stats = await this._getContributorStatsUseCase.execute({
+                projectId,
+                userId,
+                page,
+                limit,
+                startDate,
+                endDate
+            });
+            return successResponse(res, "Contributor stats fetched successfully", stats);
+        } catch (error) {
+            return errorResponse(
+                res,
+                "Failed to fetch contributor stats",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+        }
+    }
+
+    /**
+     * Get platform statistics (public endpoint)
+     */
+    async getPlatformStats(req: Request, res: Response): Promise<Response> {
+        try {
+            const stats = await this._getPlatformStatsUseCase.execute();
+            return successResponse(res, "Platform stats fetched successfully", stats);
+        } catch (error) {
+            return errorResponse(
+                res,
+                "Failed to fetch platform stats",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+        }
+    }
+
+    /**
+     * Get featured projects (public endpoint)
+     */
+    async getFeaturedProjects(req: Request, res: Response): Promise<Response> {
+        try {
+            const projects = await this._getFeaturedProjectsUseCase.execute();
+            return successResponse(res, "Featured projects fetched successfully", projects);
+        } catch (error) {
+            return errorResponse(
+                res,
+                "Failed to fetch featured projects",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+        }
+    }
+
+    /**
+     * Get AI suggestions for contributors for a project
+     */
+
+    async getAiSuggestions(req: Request, res: Response): Promise<Response> {
+        try {
+            const { projectId } = req.params;
+            const result = await this._getAiContributorSuggestionsUseCase.execute(projectId);
+            return successResponse(res, MESSAGES.PROJECT.SUCCESS.APPLICATIONS_FETCHED, result);
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'An unknown error occurred';
+            return errorResponse(res, message);
+        }
+    }
+}

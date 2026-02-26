@@ -1,12 +1,16 @@
-import express from 'express'
-const app = express()
-import { authRouter } from '../router/auth/regsiter.router'
-import compression from 'compression'
-import cors from "cors"
+import express from 'express';
+import { applyCorsAndSecurity } from '../middlewares/cors-security.middleware';
+import { applyBodyParsers } from '../middlewares/body-parser.middleware';
+import { appRouter } from '../router/index';
+import { errorHandler } from '../middlewares/error-handler.middlware';
 
-app.use(cors())
-app.use(compression())
-app.use(express.json())
+const app = express();
 
-app.use("/api",authRouter)
+applyCorsAndSecurity(app);
+applyBodyParsers(app);
+
+app.use('/api', appRouter);
+
+app.use(errorHandler);
+
 export default app;

@@ -1,0 +1,33 @@
+name: CD
+
+on:
+  push:
+    branches: [ "master" ]
+  workflow_dispatch:
+
+jobs:
+  deploy-to-ec2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script: |
+            # Navigate to the backend directory on your remote EC2 server
+            # Note: Update this path to where your backend is actually cloned on your server
+            cd /home/${{ secrets.EC2_USERNAME }}/DevCollab/backend
+            
+            # Pull the latest changes
+            git pull origin master
+            
+            # Install dependencies and build
+            npm ci
+            npm run build
+            
+            # Restart the backend process
+            # PM2 is the standard way to run production Node.js apps without Docker.
+            # If PM2 is not installed globally on the server, you will need to install it first: npm install -g pm2
+            npx pm2 restart backend-api || npx pm2 start dist/index.js --name "backend-api"

@@ -1,0 +1,23 @@
+node_modules
+dist
+.tsbuildinfo
+
+# Environment configurations
+.env
+.env.*
+!.env.example
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Git and OS
+.git
+.gitignore
+.DS_Store
+
+# Docker itself
+Dockerfile
+.dockerignore
+docker-compose.yml

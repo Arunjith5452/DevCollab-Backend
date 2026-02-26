@@ -1,0 +1,45 @@
+import { injectable } from "inversify";
+import { IGitHubService } from "@/application/interface/git.service.interface";
+import { logger } from "../logs/logger";
+
+interface GitHubErrorResponse {
+    message: string;
+}
+
+interface GitHubRepoResponse {
+    html_url: string;
+    [key: string]: unknown;
+}
+
+@injectable()
+export class GitHubService implements IGitHubService {
+    async createRepository(accessToken: string, name: string, description?: string): Promise<string> {
+        try {
+            const response = await fetch("https://api.github.com/user/repos", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${accessToken}`,
+                    "Content-Type": "application/json",
+                    "Accept": "application/vnd.github.v3+json"
+                },
+                body: JSON.stringify({
+                    name,
+                    description,
+                    private: false, // Default to public, or could be passed as arg
+                    auto_init: true
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json() as unknown as GitHubErrorResponse;
+                throw new Error(errorData.message || "Failed to create GitHub repository");
+            }
+
+            const data = await response.json() as unknown as GitHubRepoResponse;
+            return data.html_url;
+        } catch (error) {
+            logger.error("GitHub API Error:", error);
+            throw error;
+        }
+    }
+}

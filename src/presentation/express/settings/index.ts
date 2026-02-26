@@ -1,19 +1,26 @@
+import "dotenv/config";
 import "reflect-metadata";
-import "source-map-support"
+import "source-map-support";
 import app from "./app";
-import { config } from "dotenv";
 import { DatabaseService } from "@/infrastructure/db/mongoose/connect.db";
+import { SignalingGateway } from "../../socket/signaling.gateway";
 
 
-config()
 const PORT = process.env.PORT;
+
+import { seedDefaultFreePlan } from "@/infrastructure/db/seeders/plan.seeder";
+import { logger } from "@/infrastructure/providers/logs/logger";
 
 const bootstrap = async () => {
   await DatabaseService.connect()
-  app.listen(PORT, () => {
-    console.log(`🚀 Server started on http://localhost:${PORT}`);
+  await seedDefaultFreePlan();
+
+  const server = app.listen(PORT, () => {
+    logger.info(`🚀 Server started on http://localhost:${PORT}`);
   });
+
+  // Initialize Socket.io Signaling Gateway
+  new SignalingGateway(server);
 };
 
 bootstrap()
-

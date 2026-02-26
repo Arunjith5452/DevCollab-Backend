@@ -1,0 +1,53 @@
+import { IsEnum, IsISO8601, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { Expose } from "class-transformer";
+
+export class CreateMeetingDTO {
+    @Expose()
+    @IsString()
+    @IsNotEmpty()
+    public readonly projectId: string;
+
+    @Expose()
+    @IsString()
+    @IsNotEmpty()
+    public readonly title: string;
+
+    @Expose()
+    @IsISO8601()
+    public readonly date: string;
+
+    @Expose()
+    @IsISO8601()
+    public readonly endTime: string;
+
+    @Expose()
+    @IsString()
+    @IsOptional()
+    public readonly createdBy?: string;
+
+    @IsString()
+    @IsOptional()
+    public readonly link?: string;
+
+    @Expose()
+    @IsEnum(["single", "group"])
+    public readonly type: "single" | "group" = "group";
+
+    constructor(data: {
+        projectId?: string,
+        title?: string,
+        date?: string,
+        endTime?: string,
+        createdBy?: string,
+        link?: string,
+        type?: "single" | "group"
+    }) {
+        this.projectId = data?.projectId || "";
+        this.title = data?.title || "";
+        this.date = data?.date || "";
+        this.endTime = data?.endTime || "";
+        this.createdBy = data?.createdBy || "";
+        this.link = data?.link || "";
+        this.type = data?.type || "group";
+    }
+}

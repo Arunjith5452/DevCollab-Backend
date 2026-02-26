@@ -16,7 +16,11 @@ export const userSchema = new Schema({
     },
     role: {
         type: String,
-        defalt: "user"
+        enum: ["user", "admin"],
+        default: "user"
+    },
+    title: {
+        type: String
     },
     techStack: [{
         type: String,
@@ -24,41 +28,26 @@ export const userSchema = new Schema({
     githubProfile: {
         type: String,
     },
+    githubAccessToken: {
+        type: String,
+        select: false
+    },
+    googleId: { type: String, required: false },
     bio: {
         type: String,
+    },
+    profileImage: {
+        type: String
     },
     status: {
         type: String,
         default: "active"
     },
-    subscription: [
-        {
-            plan: {
-                type: String,
-                enum: ['free', 'pro'],
-                // required: true,
-                default: 'free'
-            },
-            startDate: {
-                type: Date,
-                // required: true,
-            },
-            endDate: {
-                type: Date,
-                // required: true,
-            },
-            status: {
-                type: String,
-                enum: ['active', 'inactive', 'cancelled'],
-                // required: true,
-                default: 'active',
-            },
-        }
-    ],
+
     verification: {
         email: {
             type: Boolean,
-            default: false
+            default: true
         },
         phone: {
             type: Boolean,
@@ -66,7 +55,7 @@ export const userSchema = new Schema({
         },
         payment: {
             type: Boolean,
-            default: false 
+            default: false
         }
     },
 

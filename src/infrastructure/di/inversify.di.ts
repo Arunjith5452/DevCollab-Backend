@@ -1,16 +1,33 @@
+import "reflect-metadata";
 import { Container } from 'inversify'
 import { AuthModule } from './modules/auth'
 import { UserModule } from './modules/user'
+import { AdminModule } from './modules/admin'
+import { ProjectModule } from './modules/project'
+import { TaskModule } from './modules/tasks'
+import { PaymentModule } from "./modules/payment/payment";
+import { MeetingModule } from "./modules/meetings";
+import { CommonModule } from "./modules/common";
+import { subscriptionModule } from "./modules/subscription/subscription.module";
+import { planModule } from "./modules/plan/plan.module";
 
-const conatiner = new Container({
-    defaultScope:"Singleton",
-    autobind:true
+const container = new Container({
+    defaultScope: "Singleton",
+    autobind: true
 })
 
-conatiner.load(
+container.load(
+    UserModule,
     AuthModule,
-    UserModule
-)
+    AdminModule,
+    ProjectModule,
+    TaskModule,
+    PaymentModule,
+    MeetingModule,
+    CommonModule,
+    subscriptionModule,
+    planModule
+);
 
 
-export {conatiner}
+export { container }

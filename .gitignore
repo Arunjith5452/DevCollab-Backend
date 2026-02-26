@@ -2,3 +2,5 @@
 .env
 /dist
 .tsbuildinfo
+/logs
+lint_*.txt
