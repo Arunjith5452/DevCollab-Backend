@@ -15,6 +15,7 @@ import { StartTaskUseCase } from "@/application/usecases/tasks/implementations/s
 import { SubmitWorkUseCase } from "@/application/usecases/tasks/implementations/submit-work.usecase";
 import { ApproveTaskUseCase } from "@/application/usecases/tasks/implementations/approve-task.usecase";
 import { RequestImprovementUseCase } from "@/application/usecases/tasks/implementations/request-improvement.usecase";
+import { UpdateTaskCriteriaUseCase } from "@/application/usecases/tasks/implementations/update-task-criteria.usecase";
 import { TaskResponseMapper } from "@/application/mapper/tasks/task-response.mapper";
 
 export const TaskModule = new ContainerModule(({ bind }) => {
@@ -30,5 +31,6 @@ export const TaskModule = new ContainerModule(({ bind }) => {
     bind<SubmitWorkUseCase>(TASK_TYPES.SubmitWorkUseCase).to(SubmitWorkUseCase)
     bind<ApproveTaskUseCase>(TASK_TYPES.ApproveTaskUseCase).to(ApproveTaskUseCase)
     bind<RequestImprovementUseCase>(TASK_TYPES.RequestImprovementUseCase).to(RequestImprovementUseCase)
+    bind<UpdateTaskCriteriaUseCase>(TASK_TYPES.UpdateTaskCriteriaUseCase).to(UpdateTaskCriteriaUseCase)
     bind<TaskResponseMapper>(TASK_TYPES.TaskResponseMapper).to(TaskResponseMapper)
 })  
