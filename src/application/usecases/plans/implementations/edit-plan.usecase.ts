@@ -36,7 +36,7 @@ export class EditPlanUseCase implements IExecute<EditPlanDTO, PlanResponseDTO> {
             });
         }
 
-        const updatedPlan = await this._planRepository.update(plan.id!, {
+        const updatedPlan = await this._planRepository.update(plan.id || "", {
             name: plan.name,
             description: plan.description,
             price: plan.price,

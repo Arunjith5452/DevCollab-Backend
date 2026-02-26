@@ -10,7 +10,7 @@ import { CreateTaskResponseDTO } from "@/application/dtos/tasks/res/create-task-
 export class TaskResponseMapper {
     toResponse(task: TaskEntity): CreateTaskResponseDTO {
         return new CreateTaskResponseDTO({
-            id: task.id!,
+            id: task.id || "",
             title: task.title,
             description: task.description,
             projectId: task.projectId,

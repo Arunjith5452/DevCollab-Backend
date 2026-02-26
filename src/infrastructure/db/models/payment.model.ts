@@ -1,4 +1,4 @@
-import { model, models } from "mongoose";
+import { model } from "mongoose";
 import { paymentSchema } from "../schema/payment.schema";
 import { IPayment } from "../interface/payment.interface";
 

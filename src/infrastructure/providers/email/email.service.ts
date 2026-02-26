@@ -2,6 +2,7 @@ import nodemailer, { Transporter } from 'nodemailer';
 import { injectable } from 'inversify';
 import { IEmailService } from '../interface/email.interface';
 import { otpEmailTemplate } from '../templates/email/otp-email.template';
+import { logger } from '../logs/logger';
 
 @injectable()
 export class EmailService implements IEmailService {
@@ -26,9 +27,9 @@ export class EmailService implements IEmailService {
     private async verifyConnection(): Promise<void> {
         try {
             await this.transporter.verify();
-            console.log('Email service is ready to send emails');
+            logger.info('Email service is ready to send emails');
         } catch (error) {
-            console.error('Email service configuration error:', error);
+            logger.error('Email service configuration error:', error);
         }
     }
 
@@ -47,13 +48,12 @@ export class EmailService implements IEmailService {
                 to: email,
                 subject: 'Your DevCollab Verification Code',
                 html: htmlContent,
-                // Fallback plain text for email clients that don't support HTML
                 text: `Your DevCollab verification code is: ${otp}. This code will expire in ${expiryMinutes} minutes. Never share this code with anyone.`
             });
 
-            console.log(`📧 OTP email sent successfully to ${email}`);
+            logger.info(`📧 OTP email sent successfully to ${email}`);
         } catch (error) {
-            console.error(`❌ Failed to send OTP email to ${email}:`, error);
+            logger.error(`❌ Failed to send OTP email to ${email}:`, error);
             throw new Error('Failed to send verification email. Please try again later.');
         }
     }
@@ -72,9 +72,9 @@ export class EmailService implements IEmailService {
                 text: `Welcome ${name}! Thank you for joining DevCollab.`
             });
 
-            console.log(`Welcome email sent successfully to ${email}`);
+            logger.info(`Welcome email sent successfully to ${email}`);
         } catch (error) {
-            console.error(`Failed to send welcome email to ${email}:`, error);
+            logger.error(`Failed to send welcome email to ${email}:`, error);
         }
     }
 
@@ -92,9 +92,9 @@ export class EmailService implements IEmailService {
                 text: `Click the following link to reset your password: ${resetLink}`
             });
 
-            console.log(`Password reset email sent successfully to ${email}`);
+            logger.info(`Password reset email sent successfully to ${email}`);
         } catch (error) {
-            console.error(`Failed to send password reset email to ${email}:`, error);
+            logger.error(`Failed to send password reset email to ${email}:`, error);
             throw new Error('Failed to send password reset email. Please try again later.');
         }
     }

@@ -26,7 +26,7 @@ export class TogglePlanStatusUseCase implements IExecute<string, PlanResponseDTO
             plan.activate();
         }
 
-        const updatedPlan = await this._planRepository.update(plan.id!, {
+        const updatedPlan = await this._planRepository.update(plan.id || "", {
             isActive: plan.isActive
         });
         if (!updatedPlan) throw new AppError("Failed to update plan status", 500);

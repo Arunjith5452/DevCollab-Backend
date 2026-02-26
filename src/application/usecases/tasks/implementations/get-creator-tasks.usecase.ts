@@ -12,7 +12,6 @@ import { PROJECT_TYPES } from '@/infrastructure/di/types/project';
 import { TaskEntity } from '@/domain/entities/task.entity';
 import { ProjectEntity } from '@/domain/entities/project.entity';
 import { TaskFilter } from '@/domain/types/task-filter.type';
-import { TaskStatus } from '@/domain/enums/tasks/task-status.enums';
 
 @injectable()
 export class GetCreatorTasksUseCase implements IExecute<GetAllTaskQuery, { message: string; tasks: TaskListItemDto[]; total: number }> {

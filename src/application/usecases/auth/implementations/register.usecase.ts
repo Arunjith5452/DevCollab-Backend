@@ -12,6 +12,7 @@ import { IUserRepository } from "@/domain/repository/user.interface"
 import { IEmailService } from "@/infrastructure/providers/interface/email.interface"
 import { COMMON_TYPES } from "@/infrastructure/di/types/common"
 import { ICacheService } from "@/application/interface/cache.service.interface"
+import { logger } from "@/infrastructure/providers/logs/logger"
 
 @injectable()
 export class RegiserUseCase implements IExecute<RegisterDTO, { token: string }> {
@@ -49,7 +50,7 @@ export class RegiserUseCase implements IExecute<RegisterDTO, { token: string }> 
 
             await this._emailService.sendOtpEmail(email, otp, 3);
 
-            console.log(`OTP for ${email}:`, otp)
+            logger.info(`OTP for ${email}: ${otp}`)
 
             return { token }
 

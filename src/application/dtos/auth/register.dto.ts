@@ -14,17 +14,17 @@ import { Exclude, Expose } from "class-transformer";
 
 @ValidatorConstraint({ name: "passwordMatch", async: false })
 class PasswordMatchConstraint implements ValidatorConstraintInterface {
-  validate(confirmPassword: string, args: ValidationArguments) {
-    const obj = args.object as RegisterDTO;
+  validate(confirmPassword: string, _args: ValidationArguments) {
+    const obj = _args.object as RegisterDTO;
     return obj.password === confirmPassword;
   }
 
-  defaultMessage(args: ValidationArguments) {
+  defaultMessage(_args: ValidationArguments) {
     return "Confirm password must match the password";
   }
 }
 
-@Exclude() 
+@Exclude()
 export class RegisterDTO {
   @Expose()
   @IsString({ message: "Name must be a string" })

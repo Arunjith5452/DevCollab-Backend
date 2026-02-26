@@ -134,7 +134,8 @@ export class GetProjectStatsUseCase implements IExecute<{ projectId: string; use
                 if (!activityMap.has(createdLabel)) {
                     activityMap.set(createdLabel, { created: 0, completed: 0 });
                 }
-                activityMap.get(createdLabel)!.created += 1;
+                const createdStats = activityMap.get(createdLabel);
+                if (createdStats) createdStats.created += 1;
             }
 
             if (task.status === TaskStatus.DONE) {
@@ -150,7 +151,8 @@ export class GetProjectStatsUseCase implements IExecute<{ projectId: string; use
                     if (!activityMap.has(completedLabel)) {
                         activityMap.set(completedLabel, { created: 0, completed: 0 });
                     }
-                    activityMap.get(completedLabel)!.completed += 1;
+                    const completedStats = activityMap.get(completedLabel);
+                    if (completedStats) completedStats.completed += 1;
                 }
             }
         });

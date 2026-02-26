@@ -151,7 +151,7 @@ export class AuthController {
                 maxAge: Number(process.env.ACCESS_TOKEN_MAX_AGE),
             });
 
-            return successResponse(res, result.message!, {
+            return successResponse(res, result.message || "", {
                 accessToken: result.accessToken,
             });
 
@@ -200,7 +200,7 @@ export class AuthController {
      */
     async ForgotPassword(req: Request, res: Response): Promise<Response> {
         try {
-            const result = await this._forgotPasswordUseCase.execute(req.body);
+            await this._forgotPasswordUseCase.execute(req.body);
 
             return successResponse(res, '')
 

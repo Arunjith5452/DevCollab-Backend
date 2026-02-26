@@ -11,7 +11,7 @@ export class RedisService implements ICacheService {
 
     async set(key: string, value: string, mode?: string, duration?: number): Promise<string | null> {
         if (mode && duration) {
-            // @ts-ignore - types mismatch with ioredis overloads but valid at runtime
+            // @ts-expect-error - types mismatch with ioredis overloads but valid at runtime
             return await redisClient.set(key, value, mode, duration);
         }
         return await redisClient.set(key, value);

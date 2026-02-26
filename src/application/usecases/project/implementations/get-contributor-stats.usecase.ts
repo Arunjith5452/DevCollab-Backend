@@ -100,14 +100,11 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
         tasks.forEach(task => {
             if (task.payment?.amount && task.payment.amount > 0) {
                 const date = new Date(task.createdAt);
-                let key: string;
                 let label: string;
 
                 if (groupBy === 'day') {
-                    key = date.toISOString().split('T')[0];
                     label = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                 } else {
-                    key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
                     label = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
                 }
 
@@ -139,7 +136,8 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
             if (!activityMap.has(createdKey)) {
                 activityMap.set(createdKey, { assigned: 0, completed: 0 });
             }
-            activityMap.get(createdKey)!.assigned += 1;
+            const createdStats = activityMap.get(createdKey);
+            if (createdStats) createdStats.assigned += 1;
 
             if (task.status === TaskStatus.DONE) {
                 const updatedDate = new Date(task.updatedAt || task.createdAt);
@@ -154,7 +152,8 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
                 if (!activityMap.has(updatedKey)) {
                     activityMap.set(updatedKey, { assigned: 0, completed: 0 });
                 }
-                activityMap.get(updatedKey)!.completed += 1;
+                const updatedStats = activityMap.get(updatedKey);
+                if (updatedStats) updatedStats.completed += 1;
             }
         });
 
@@ -169,7 +168,7 @@ export class GetContributorStatsUseCase implements IExecute<GetContributorStatsQ
         let lastMonthEarnings = 0;
         tasks.forEach(task => {
             if (task.payment?.escrowStatus === "released" && task.payment.amount) {
-                const paymentDate = new Date(task.createdAt); 
+                const paymentDate = new Date(task.createdAt);
                 if (paymentDate >= lastMonth && paymentDate <= lastMonthEnd) {
                     lastMonthEarnings += task.payment.amount;
                 }

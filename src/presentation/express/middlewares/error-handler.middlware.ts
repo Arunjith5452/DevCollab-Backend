@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { ServerErrorStatus } from "@/domain/enums/status-codes/server-error-status.enum";
 import { errorResponse } from "@/shared/utils/response.util";
 import { AppError } from "@/shared/utils/app-error";
+import { logger } from "@/infrastructure/providers/logs/logger";
 
 const isMongoCastError = (err: unknown): err is { name: string; message: string } => {
   return (
@@ -17,9 +18,9 @@ export const errorHandler = (
   err: unknown,
   req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ) => {
-  console.error("this is the errorHandler:", err);
+  logger.error("this is the errorHandler:", err);
 
   let error: AppError;
 

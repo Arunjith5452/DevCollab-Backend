@@ -3,6 +3,7 @@ import { injectable } from "inversify";
 import { ILLMService } from "../interface/llm.interface";
 import { RequiredRole } from "@/domain/types/required-role.type";
 import { OpenRouterResponse } from "../interface/openrouter-response.interface";
+import { logger } from "../logs/logger";
 
 @injectable()
 export class LLMService implements ILLMService {
@@ -52,7 +53,7 @@ export class LLMService implements ILLMService {
             return JSON.parse(jsonString);
 
         } catch (error) {
-            console.error("LLM Error:", error);
+            logger.error("LLM Error:", error);
             return { suggestions: [] };
         }
     }

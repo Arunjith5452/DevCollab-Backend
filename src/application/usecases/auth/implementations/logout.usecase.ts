@@ -4,6 +4,7 @@ import { JwtPayload } from "jsonwebtoken";
 import { inject, injectable } from "inversify";
 import { COMMON_TYPES } from "@/infrastructure/di/types/common";
 import { ICacheService } from "@/application/interface/cache.service.interface";
+import { logger } from "@/infrastructure/providers/logs/logger";
 
 @injectable()
 export class LogoutUseCase implements IExecute<string, void> {
@@ -23,7 +24,7 @@ export class LogoutUseCase implements IExecute<string, void> {
                 await this._cacheService.del(`refresh:${decoded.email}`)
             }
 
-            console.log("Logout successfully")
+            logger.info("Logout successfully")
 
         } catch (error) {
             throw error

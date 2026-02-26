@@ -16,7 +16,7 @@ import { injectable } from "inversify";
 export class PendingApplicationMapper {
     toResponse(application: ApplicationWithUser): ResponsePendingApplicationDto {
         return {
-            id: application.id!,
+            id: application.id || "",
             user: {
                 name: application.user?.name || "Anonymous User",
                 github: application.user?.github || null,

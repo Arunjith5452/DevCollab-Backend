@@ -10,6 +10,7 @@ import { IUserRepository } from "@/domain/repository/user.interface";
 import { IEmailService } from "@/infrastructure/providers/interface/email.interface";
 import { COMMON_TYPES } from "@/infrastructure/di/types/common";
 import { ICacheService } from "@/application/interface/cache.service.interface";
+import { logger } from "@/infrastructure/providers/logs/logger";
 
 @injectable()
 export class ForgotPasswordUseCase implements IExecute<forgotPasswordDTO, void> {
@@ -38,7 +39,7 @@ export class ForgotPasswordUseCase implements IExecute<forgotPasswordDTO, void> 
         expiryTime
       );
 
-      console.log(`Forgot password OTP sent to ${email}:`, otp);
+      logger.info(`Forgot password OTP sent to ${email}: ${otp}`);
       await this._emailService.sendOtpEmail(email, otp, 3);
 
     } catch (error) {
