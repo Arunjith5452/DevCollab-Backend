@@ -198,6 +198,11 @@ export class TaskEntity {
         }
     }
 
+    updateAcceptanceCriteria(criteria: Array<{ text: string; completed: boolean }>) {
+        this._acceptanceCriteria = criteria;
+        this._updatedAt = new Date();
+    }
+
     submitWork(prLink: string, workDescription?: string) {
         this._prLink = prLink;
         this._workDescription = workDescription;

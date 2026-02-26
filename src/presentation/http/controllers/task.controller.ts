@@ -17,8 +17,7 @@ import { TaskListItemDto } from "@/application/dtos/tasks/res/list-task.dto";
 import { RequestImprovementDTO } from "@/application/dtos/tasks/request-improvement.dto";
 import { MESSAGES } from "@/shared/constants/messages";
 import { CreateTaskResponseDTO } from "@/application/dtos/tasks/res/create-task-response.dto";
-
-
+import { UpdateTaskCriteriaDTO } from "@/application/dtos/tasks/update-task-criteria.dto";
 
 @injectable()
 export class TaskController {
@@ -32,7 +31,8 @@ export class TaskController {
         @inject(TASK_TYPES.StartTaskUseCase) private readonly _startTaskUseCase: IExecute<StartTaskDTO, void>,
         @inject(TASK_TYPES.SubmitWorkUseCase) private readonly _submitWorkUseCase: IExecute<{ userId: string, taskId: string, data: SubmitWorkDTO }, void>,
         @inject(TASK_TYPES.RequestImprovementUseCase) private readonly _requestImprovementUseCase: IExecute<{ userId: string, taskId: string, data: RequestImprovementDTO }, void>,
-        @inject(TASK_TYPES.ApproveTaskUseCase) private readonly _approveTaskUseCase: IExecute<{ userId: string, taskId: string }, void>
+        @inject(TASK_TYPES.ApproveTaskUseCase) private readonly _approveTaskUseCase: IExecute<{ userId: string, taskId: string }, void>,
+        @inject(TASK_TYPES.UpdateTaskCriteriaUseCase) private readonly _updateTaskCriteriaUseCase: IExecute<{ taskId: string, dto: UpdateTaskCriteriaDTO }, TaskEntity | null>
     ) { }
 
     /**
@@ -286,6 +286,32 @@ export class TaskController {
             );
         }
     }
+
+    /**
+     * Updates the acceptance criteria for a task.
+     * @param req - Express request containing taskId in params and acceptance criteria array in body.
+     * @param res - Express response object.
+     * @returns JSON response with success message.
+     */
+    async updateCriteria(req: Request, res: Response): Promise<Response> {
+        try {
+            const { taskId } = req.params;
+            const dto: UpdateTaskCriteriaDTO = req.body;
+
+            await this._updateTaskCriteriaUseCase.execute({ taskId, dto });
+
+            return successResponse(res, "Acceptance criteria updated successfully");
+
+        } catch (error) {
+            return errorResponse(
+                res,
+                "Failed to update acceptance criteria",
+                ServerErrorStatus.INTERNAL_SERVER_ERROR,
+                error
+            );
+        }
+    }
+
 
 
 
