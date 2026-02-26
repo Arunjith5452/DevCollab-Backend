@@ -1,5 +1,6 @@
 import { injectable } from "inversify";
 import { IGitHubService } from "@/application/interface/git.service.interface";
+import { logger } from "../logs/logger";
 
 interface GitHubErrorResponse {
     message: string;
@@ -37,7 +38,7 @@ export class GitHubService implements IGitHubService {
             const data = await response.json() as unknown as GitHubRepoResponse;
             return data.html_url;
         } catch (error) {
-            console.error("GitHub API Error:", error);
+            logger.error("GitHub API Error:", error);
             throw error;
         }
     }

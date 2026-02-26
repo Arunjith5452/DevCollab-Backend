@@ -25,7 +25,7 @@ export class CreateCheckoutSessionUseCase implements IExecute<CreateCheckoutSess
       let mode = dto.mode || 'payment';
       let priceId = dto.priceId;
       let metadata = { ...dto.metadata };
-      const paymentType = dto.paymentType; 
+      const paymentType = dto.paymentType;
 
       switch (paymentType) {
         case 'SUBSCRIPTION':
@@ -34,8 +34,8 @@ export class CreateCheckoutSessionUseCase implements IExecute<CreateCheckoutSess
           if (!plan) throw new Error("Plan not found");
 
           amount = plan.price * 100;
-          mode = 'payment'; 
-          priceId = undefined; 
+          mode = 'payment';
+          priceId = undefined;
 
           metadata.planId = plan.id!;
           metadata.durationInDays = plan.durationInDays.toString();

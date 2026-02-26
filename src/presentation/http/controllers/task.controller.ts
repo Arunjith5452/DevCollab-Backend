@@ -18,6 +18,7 @@ import { RequestImprovementDTO } from "@/application/dtos/tasks/request-improvem
 import { MESSAGES } from "@/shared/constants/messages";
 import { CreateTaskResponseDTO } from "@/application/dtos/tasks/res/create-task-response.dto";
 import { UpdateTaskCriteriaDTO } from "@/application/dtos/tasks/update-task-criteria.dto";
+import { logger } from "@/infrastructure/providers/logs/logger";
 
 @injectable()
 export class TaskController {
@@ -124,7 +125,7 @@ export class TaskController {
             return successResponse(res, '', result)
 
         } catch (error) {
-            console.log("console.ller", error)
+            logger.error(`Error fetching contributor tasks: ${error}`);
             return errorResponse(
                 res,
                 MESSAGES.TASK.ERROR.FETCH_FAILED,
@@ -245,7 +246,7 @@ export class TaskController {
             let { taskId } = req.params
             let userId = req.user.userId
 
-            console.log(taskId, req.body)
+            logger.info(`Request improvement for task ${taskId}:`, req.body)
 
             await this._requestImprovementUseCase.execute({ userId, taskId, data: req.body })
 

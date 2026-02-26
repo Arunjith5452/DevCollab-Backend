@@ -20,7 +20,7 @@ export class ScheduleMeetingUseCase implements IExecute<CreateMeetingDTO, void> 
                 title: data.title,
                 date: new Date(data.date),
                 endTime: new Date(data.endTime),
-                createdBy: data.createdBy!,
+                createdBy: data.createdBy || "",
                 link: data.link,
                 type: data.type,
                 status: MeetingStatus.SCHEDULED

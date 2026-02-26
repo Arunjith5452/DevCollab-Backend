@@ -19,16 +19,10 @@ export class StartTaskUseCase implements IExecute<StartTaskDTO, void> {
         const task = await this._taskRepository.findById(taskId);
 
         if (!task) {
-            throw new Error(ErrorMessage.TASK_NOT_FOUND )
+            throw new Error(ErrorMessage.TASK_NOT_FOUND)
         }
 
-        console.log("StartTask Debug:", {
-            reqUserId: userId,
-            reqUserIdType: typeof userId,
-            taskAssignedId: task.assignedId,
-            taskAssignedIdType: typeof task.assignedId,
-            isMatch: task.assignedId == userId
-        });
+
 
         if (task.assignedId.toString() !== userId.toString()) {
             throw new Error(ErrorMessage.UNAUTHORIZED);

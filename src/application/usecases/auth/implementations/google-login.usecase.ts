@@ -40,7 +40,7 @@ export class GoogleLoginUseCase implements IExecute<GoogleLoginDTO, AuthResult> 
 
                 const newUser = UserEntity.create({
                     email,
-                    username: name!,
+                    username: name || "",
                     password: randomPassword,
                     role: Role.USER,
                     status: Status.ACTIVE,

@@ -4,7 +4,7 @@ import { MeetingListItemDto } from "../../dtos/meetings/res/meeting-list-item.dt
 export class MeetingResponseMapper {
     static toList(meetings: MeetingEntity[]): MeetingListItemDto[] {
         return meetings.map(meeting => new MeetingListItemDto({
-            id: meeting.id!,
+            id: meeting.id || "",
             projectId: meeting.projectId,
             title: meeting.title,
             link: meeting.link,

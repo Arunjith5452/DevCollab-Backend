@@ -3,6 +3,7 @@ import { injectable } from "inversify";
 import { IStorageService, SignedUrlResponse } from "@/application/interface/storage.service.interface";
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { logger } from "../logs/logger";
 
 @injectable()
 export class StorageService implements IStorageService {
@@ -16,7 +17,7 @@ export class StorageService implements IStorageService {
         this.bucketName = process.env.AWS_BUCKET_NAME || "";
 
         if (!region || !accessKeyId || !secretAccessKey || !this.bucketName) {
-            console.error("FATAL ERROR: AWS Credentials or Region are missing.");
+            logger.error("FATAL ERROR: AWS Credentials or Region are missing.");
             throw new Error("Missing AWS configuration for S3 client.");
         }
 
@@ -44,7 +45,7 @@ export class StorageService implements IStorageService {
 
             return { uploadUrl, fileUrl };
         } catch (error) {
-            console.error("S3 Generate Signed URL failed:", error);
+            logger.error("S3 Generate Signed URL failed:", error);
             throw error;
         }
     }
@@ -60,10 +61,10 @@ export class StorageService implements IStorageService {
             });
 
             await this.s3.send(command);
-            console.log(`Successfully deleted file from S3: ${key}`);
+            logger.info(`Successfully deleted file from S3: ${key}`);
 
         } catch (error) {
-            console.error("Error deleting file from S3:", error);
+            logger.error("Error deleting file from S3:", error);
             // We might not want to throw here to avoid breaking the flow if deletion fails?
             // But for consistency with original interface, we'll log.
         }

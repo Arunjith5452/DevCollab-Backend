@@ -34,16 +34,16 @@ export class GetAdminActivitiesUseCase implements IExecute<{ page: number; limit
             const allActivities: ActivityItemDTO[] = [
                 ...users.map((u: UserEntity): ActivityItemDTO => new ActivityItemDTO({
                     type: 'user' as const,
-                    id: u.id!,
+                    id: u.id || "",
                     name: u.username,
                     title: u.username,
                     desc: `Joined the platform`,
                     email: u.email,
-                    createdAt: u.createdAt!
+                    createdAt: u.createdAt || new Date()
                 })),
                 ...projects.map((p: ProjectEntity): ActivityItemDTO => new ActivityItemDTO({
                     type: 'project' as const,
-                    id: p.id!,
+                    id: p.id || "",
                     name: p.title,
                     title: p.title,
                     desc: `New Project Created`,
@@ -51,7 +51,7 @@ export class GetAdminActivitiesUseCase implements IExecute<{ page: number; limit
                 })),
                 ...applications.map((a: ApplicationEntity): ActivityItemDTO => new ActivityItemDTO({
                     type: 'application' as const,
-                    id: a.id!,
+                    id: a.id || "",
                     name: 'Application',
                     title: 'New Application',
                     desc: `Status: ${a.status}`,
@@ -61,7 +61,7 @@ export class GetAdminActivitiesUseCase implements IExecute<{ page: number; limit
             ];
 
 
-            allActivities.sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+            allActivities.sort((a, b) => new Date(b.createdAt || new Date()).getTime() - new Date(a.createdAt || new Date()).getTime());
 
 
             const [totalUsers, totalProjects, totalApps] = await Promise.all([

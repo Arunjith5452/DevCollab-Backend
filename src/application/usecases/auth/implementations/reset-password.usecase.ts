@@ -33,7 +33,7 @@ export class ResetPasswordUseCase implements IExecute<ResetPasswordDTO, { messag
             userEntity.setPassword(hashedPassword)
 
 
-            await this._userRepository.updatePassword(user.id!, userEntity.password)
+            await this._userRepository.updatePassword(user.id || "", userEntity.password)
 
             return { message: SuccessMessage.PASSWORD_RESET }
 

@@ -1,5 +1,6 @@
 import { Server, Socket } from 'socket.io';
 import { Server as HttpServer } from 'http';
+import { logger } from "@/infrastructure/providers/logs/logger";
 
 export class SignalingGateway {
     private io: Server;
@@ -19,7 +20,7 @@ export class SignalingGateway {
 
     private initialize() {
         this.io.on('connection', (socket: Socket) => {
-            console.log(`User connected: ${socket.id}`);
+            logger.info(`User connected: ${socket.id}`);
 
             socket.on('join-room', (roomId: string, userId: string, userName: string) => {
                 socket.join(roomId);
@@ -51,11 +52,11 @@ export class SignalingGateway {
                     audio: roomAudioState
                 });
 
-                console.log(`User ${userName} (${userId}) joined room ${roomId}`);
+                logger.info(`User ${userName} (${userId}) joined room ${roomId}`);
                 socket.to(roomId).emit('user-connected', { userId, userName });
 
                 socket.on('disconnect', () => {
-                    console.log(`User ${userName} (${userId}) disconnected`);
+                    logger.info(`User ${userName} (${userId}) disconnected`);
                     socket.to(roomId).emit('user-disconnected', { userId, userName, videoEnabled: this.userVideoState.get(userId) ?? true });
                     this.userVideoState.delete(userId); // Use cleanup with caution if reconnection logic exists
                     this.userAudioState.delete(userId);

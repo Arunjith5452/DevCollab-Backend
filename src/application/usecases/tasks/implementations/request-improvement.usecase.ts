@@ -35,7 +35,11 @@ export class RequestImprovementUseCase implements IExecute<{ userId: string, tas
             throw new Error("Task must be under review to request improvements");
         }
 
-        task.requestImprovement(data.feedBack!);
+        if (!data.feedBack) {
+            throw new Error("Feedback is required for requesting improvements");
+        }
+
+        task.requestImprovement(data.feedBack);
 
         await this._taskRepository.updateTask(task);
     }

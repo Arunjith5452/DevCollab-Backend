@@ -1,5 +1,6 @@
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { logger } from "../logs/logger";
 
 export interface SignedUrlResponse {
   uploadUrl: string;
@@ -13,7 +14,7 @@ const getS3Client = () => {
   const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
 
   if (!region || !accessKeyId || !secretAccessKey) {
-    console.error("FATAL ERROR: AWS Credentials or Region are missing in environment variables.");
+    logger.error("FATAL ERROR: AWS Credentials or Region are missing in environment variables.");
     throw new Error("Missing AWS configuration for S3 client.");
   }
   return new S3Client({
@@ -53,7 +54,7 @@ export const generateUploadSignedUrl = async (
 
     return { uploadUrl, fileUrl };
   } catch (error) {
-    console.error("S3 Generate Signed URL failed:", error);
+    logger.error("S3 Generate Signed URL failed:", error);
     throw error;
   }
 };
@@ -73,9 +74,9 @@ export const deleteFile = async (fileUrl: string): Promise<void> => {
     });
 
     await s3.send(command);
-    console.log(`Successfully deleted file from S3: ${key}`);
+    logger.info(`Successfully deleted file from S3: ${key}`);
 
   } catch (error) {
-    console.error("Error deleting file from S3:", error);
+    logger.error("Error deleting file from S3:", error);
   }
 };

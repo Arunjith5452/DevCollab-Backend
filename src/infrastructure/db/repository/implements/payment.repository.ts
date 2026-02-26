@@ -26,7 +26,7 @@ export class PaymentRepository extends BaseRepository<PaymentEntity, IPayment> i
         await this.update(payment.id, this.mapper.toMongo(payment) as unknown as UpdateQuery<PaymentEntity>);
     }
 
-    async getAllSubscriptions(page: number, limit: number, search?: string): Promise<{ data: PaymentWithUserDTO[], total: number }> {
+    async getAllSubscriptions(page: number, limit: number, _search?: string): Promise<{ data: PaymentWithUserDTO[], total: number }> {
         const query: FilterQuery<IPayment> = { purpose: 'SUBSCRIPTION' };
 
         const skip = (page - 1) * limit;

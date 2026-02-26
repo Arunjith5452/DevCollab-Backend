@@ -7,6 +7,7 @@ import { EMAIL_TYPES } from "@/infrastructure/di/types/email";
 import { IEmailService } from "@/infrastructure/providers/interface/email.interface";
 import { COMMON_TYPES } from "@/infrastructure/di/types/common";
 import { ICacheService } from "@/application/interface/cache.service.interface";
+import { logger } from "@/infrastructure/providers/logs/logger";
 
 
 @injectable()
@@ -37,7 +38,7 @@ export class ResendOtpUseCase implements IExecute<ResendOtp, { message: string }
             'EX',
             expiryTime
         );
-        console.log(`Resent OTP for ${tempUser.email}:`, newOtp);
+        logger.info(`Resent OTP for ${tempUser.email}: ${newOtp}`);
 
         await this._emailService.sendOtpEmail(tempUser.email, newOtp, 3);
 

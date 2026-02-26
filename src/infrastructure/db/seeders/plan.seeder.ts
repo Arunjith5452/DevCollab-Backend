@@ -3,6 +3,7 @@ import { PLAN_TYPES } from "@/infrastructure/di/types/plan";
 import { IPlanRepository } from "@/domain/repository/plan.repository.interface";
 import { PlanEntity } from "@/domain/entities/plan.entity";
 import { PlanFeature } from "@/domain/enums/plan/plan-feature.enum";
+import { logger } from "@/infrastructure/providers/logs/logger";
 
 export const seedDefaultFreePlan = async () => {
     try {
@@ -10,7 +11,7 @@ export const seedDefaultFreePlan = async () => {
         const freePlan = await planRepository.findByName("Free");
 
         if (!freePlan) {
-            console.log("Seeding default Free plan...");
+            logger.info("Seeding default Free plan...");
             const newFreePlan = PlanEntity.create({
                 name: "Free",
                 description: "Basic features for getting started",
@@ -31,11 +32,11 @@ export const seedDefaultFreePlan = async () => {
             });
 
             await planRepository.create(newFreePlan);
-            console.log("Default Free plan seeded successfully.");
+            logger.info("Default Free plan seeded successfully.");
         } else {
-            console.log("Default Free plan already exists.");
+            logger.info("Default Free plan already exists.");
         }
     } catch (error) {
-        console.error("Error seeding default Free plan:", error);
+        logger.error("Error seeding default Free plan:", error);
     }
 };

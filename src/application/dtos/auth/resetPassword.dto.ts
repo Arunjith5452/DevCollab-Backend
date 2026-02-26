@@ -16,12 +16,12 @@ import {
 
 @ValidatorConstraint({ name: "passwordMatch", async: false })
 export class PasswordMatchConstraint implements ValidatorConstraintInterface {
-    validate(confirmPassword: string, args: ValidationArguments) {
-        const obj = args.object as ResetPasswordDTO;
+    validate(confirmPassword: string, _args: ValidationArguments) {
+        const obj = _args.object as ResetPasswordDTO;
         return obj.newPassword === confirmPassword;
     }
 
-    defaultMessage(args: ValidationArguments) {
+    defaultMessage(_args: ValidationArguments) {
         return "Confirm password must match the new password";
     }
 }

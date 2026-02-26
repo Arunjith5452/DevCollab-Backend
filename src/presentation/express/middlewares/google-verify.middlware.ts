@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { OAuth2Client } from "google-auth-library";
+import { logger } from "@/infrastructure/providers/logs/logger";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -35,7 +36,7 @@ export const verifyGoogleToken = async (
         next();
 
     } catch (error) {
-        console.error("Google verification failed:", error);
+        logger.error("Google verification failed:", error);
         return res.status(401).json({ message: "Google verification failed" });
     }
 };
