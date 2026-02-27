@@ -16,18 +16,17 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            # Navigate to the backend directory on your remote EC2 server
-            # Note: Update this path to where your backend is actually cloned on your server
-            cd /home/${{ secrets.EC2_USERNAME }}/DevCollab/backend
-            
-            # Pull the latest changes
-            git pull origin master
-            
-            # Install dependencies and build
-            npm ci
-            npm run build
-            
-            # Restart the backend process
-            # PM2 is the standard way to run production Node.js apps without Docker.
-            # If PM2 is not installed globally on the server, you will need to install it first: npm install -g pm2
-            npx pm2 restart backend-api || npx pm2 start dist/index.js --name "backend-api"
+            # 1. Pull the latest image you pushed to Docker Hub
+            sudo docker pull arunjith5452/devcollab-backend:latest
+
+            # 2. Stop and remove the old version
+            sudo docker stop devcollab-backend || true
+            sudo docker rm devcollab-backend || true
+
+            # 3. Start the container using your server's .env file
+            sudo docker run -d \
+              --name devcollab-backend \
+              -p 3001:3001 \
+              --env-file /home/${{ secrets.EC2_USERNAME }}/.env \
+              --restart always \
+              arunjith5452/devcollab-backend:latest
