@@ -16,6 +16,7 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
+<<<<<<< HEAD
             # 1. Pull the newest image from Docker Hub
             sudo docker pull arunjith5452/devcollab-backend:latest
             
@@ -24,9 +25,23 @@ jobs:
             sudo docker rm devcollab-backend || true
             
             # 3. Start the new container using your existing .env file on the server
+=======
+            # 1. Pull the latest image you pushed to Docker Hub
+            sudo docker pull arunjith5452/devcollab-backend:latest
+
+            # 2. Stop and remove the old version
+            sudo docker stop devcollab-backend || true
+            sudo docker rm devcollab-backend || true
+
+            # 3. Start the container using your server's .env file
+>>>>>>> 0ddbb01 (fix:cd error)
             sudo docker run -d \
               --name devcollab-backend \
               -p 3001:3001 \
               --env-file /home/${{ secrets.EC2_USERNAME }}/.env \
               --restart always \
+<<<<<<< HEAD
               arunjith5452/devcollab-backend:latest
+=======
+              arunjith5452/devcollab-backend:latest
+>>>>>>> 0ddbb01 (fix:cd error)
