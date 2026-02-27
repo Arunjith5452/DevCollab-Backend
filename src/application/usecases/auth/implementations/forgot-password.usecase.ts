@@ -39,7 +39,7 @@ export class ForgotPasswordUseCase implements IExecute<forgotPasswordDTO, void> 
         expiryTime
       );
 
-      logger.info(`Forgot password OTP sent to ${email}: ${otp}`);
+      console.log(`Forgot password OTP sent to ${email}: ${otp}`);
       await this._emailService.sendOtpEmail(email, otp, 3);
 
     } catch (error) {
