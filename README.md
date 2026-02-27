@@ -73,7 +73,6 @@ Integrated **Stripe Connect** for complex marketplace flows.
 | **Language** | TypeScript | Strict Type Safety |
 | **Database** | MongoDB + Mongoose | Flexible Document Design |
 | **Cache** | Redis | Performance & Pub/Sub |
-| **Testing** | Jest | Unit & Integration Testing |
 | **DevOps** | Docker | Containerization |
 
 ## 🚀 Deployment & Setup
