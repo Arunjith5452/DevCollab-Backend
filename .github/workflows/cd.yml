@@ -30,4 +30,4 @@ jobs:
             # Restart the backend process
             # PM2 is the standard way to run production Node.js apps without Docker.
             # If PM2 is not installed globally on the server, you will need to install it first: npm install -g pm2
-            npx pm2 restart backend-api || npx pm2 start dist/index.js --name "backend-api"
+            npx pm2 restart backend-api || npx pm2 start npm --name "backend-api" -- start
