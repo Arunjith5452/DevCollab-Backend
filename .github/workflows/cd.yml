@@ -16,12 +16,15 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            # Navigate to the backend directory on your remote EC2 server
-            # Note: Update this path to where your backend is actually cloned on your server
-            cd /home/${{ secrets.EC2_USERNAME }}/DevCollab/backend
-            
-            # Pull the latest changes
-            git pull origin master
+            # Ensure the backend directory exists. If not, clone it.
+            if [ ! -d "/home/${{ secrets.EC2_USERNAME }}/DevCollab" ]; then
+              cd /home/${{ secrets.EC2_USERNAME }}
+              git clone https://github.com/${{ github.repository_owner }}/DevCollab.git
+              cd DevCollab/backend
+            else
+              cd /home/${{ secrets.EC2_USERNAME }}/DevCollab/backend
+              git pull origin master
+            fi
             
             # Install dependencies and build
             npm ci
