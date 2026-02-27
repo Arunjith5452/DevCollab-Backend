@@ -1,5 +1,4 @@
-import { createLogger, format } from "winston";
-import DailyRotateFile from "winston-daily-rotate-file";
+import winston, { createLogger, format } from "winston";
 import fs from "fs";
 import path from "path";
 import { LogLevel } from "@/domain/enums/logger/logger-level";
@@ -20,19 +19,13 @@ export const logger = createLogger({
     myFormat
   ),
   transports: [
-    new DailyRotateFile({
-      filename: path.join(logDir, "error-%DATE%.log"),
+    new winston.transports.File({
+      filename: path.join(logDir, "error.log"),
       level: LogLevel.ERROR,
-      datePattern: "YYYY-MM-DD",
-      maxFiles: "14d",
-      zippedArchive: true,
     }),
-
-    new DailyRotateFile({
-      filename: path.join(logDir, "combined-%DATE%.log"),
-      datePattern: "YYYY-MM-DD",
-      maxFiles: "14d",
-      zippedArchive: true,
+    new winston.transports.File({
+      filename: path.join(logDir, "combined.log"),
     }),
+    new winston.transports.Console()
   ],
 });
