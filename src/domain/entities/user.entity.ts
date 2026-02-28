@@ -89,11 +89,6 @@ export class UserEntity {
   }
 
 
-
-  // ... existing getters ...
-
-  // ... rest of the file
-
   updateProfile(data: {
     name?: string;
     bio?: string;

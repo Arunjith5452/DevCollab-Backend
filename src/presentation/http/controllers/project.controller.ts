@@ -24,7 +24,7 @@ import { ContributorStatsDTO } from "@/application/dtos/project/res/contributor-
 import { PlatformStatsDTO } from "@/application/dtos/platform/platform-stats.dto";
 import { FeaturedProjectDTO } from "@/application/dtos/project/res/featured-project.dto";
 import { GetAiContributorSuggestionsUseCase } from "@/application/usecases/project/implementations/get-ai-contributor-suggestions.usecase";
-import { logger } from "@/infrastructure/providers/logs/logger";
+import { logger } from "@/infrastructure/providers/logs/logger.service";
 
 @injectable()
 export class ProjectController {
@@ -66,7 +66,6 @@ export class ProjectController {
             return successResponse(res, result.message)
 
         } catch (error) {
-            logger.error(`Error in createProject: ${error}`);
             return errorResponse(res,
                 MESSAGES.PROJECT.ERROR.CREATION_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,
@@ -94,7 +93,6 @@ export class ProjectController {
             return successResponse(res, "", result)
 
         } catch (error) {
-            logger.error(`Error in editProject: ${error}`);
             return errorResponse(res,
                 MESSAGES.PROJECT.ERROR.EDIT_FAILED,
                 ServerErrorStatus.INTERNAL_SERVER_ERROR,

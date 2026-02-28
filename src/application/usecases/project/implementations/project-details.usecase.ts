@@ -21,7 +21,6 @@ export class ProjectDetailsUseCase implements IExecute<{ projectId: string; user
                 throw new Error("Project not found");
             }
 
-            // For private projects, only the creator or approved members can view details
             if (project.visibility === "private") {
                 if (!userId) {
                     throw new Error("This project is private");

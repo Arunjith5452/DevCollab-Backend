@@ -19,7 +19,6 @@ export class UpdateUserStatusUseCase implements IExecute<{userId:string,newStatu
 
         try {
 
-            
             let user = await this._userRepository.findById(userId)
         
 
@@ -40,7 +39,6 @@ export class UpdateUserStatusUseCase implements IExecute<{userId:string,newStatu
                 message : SuccessMessage.USER_UPDATED,
                 newStatus:userDoc.status
             }
-
             
         } catch (error) {
 

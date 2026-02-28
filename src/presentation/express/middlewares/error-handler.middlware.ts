@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { ServerErrorStatus } from "@/domain/enums/status-codes/server-error-status.enum";
 import { errorResponse } from "@/shared/utils/response.util";
 import { AppError } from "@/shared/utils/app-error";
-import { logger } from "@/infrastructure/providers/logs/logger";
+import { logger } from "@/infrastructure/providers/logs/logger.service";
 
 const isMongoCastError = (err: unknown): err is { name: string; message: string } => {
   return (

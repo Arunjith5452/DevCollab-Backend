@@ -38,7 +38,7 @@ export class MeetingPersistenceMapper implements IPersistenceMapper<MeetingEntit
                 createdByName = populated.name;
             }
         } else {
-            createdById = String(createdByRaw); // Fallback
+            createdById = String(createdByRaw); 
         }
 
         return MeetingEntity.create({

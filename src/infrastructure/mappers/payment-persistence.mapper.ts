@@ -22,7 +22,6 @@ export class PaymentPersistenceMapper implements IPersistenceMapper<PaymentEntit
     }
 
     fromMongo(doc: IPayment & { _id: Types.ObjectId }): PaymentEntity {
-        // userId in IPayment is ObjectId.
         return new PaymentEntity(
             String(doc.userId),
             doc.amount,
