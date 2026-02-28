@@ -11,13 +11,12 @@ import { plainToInstance } from "class-transformer";
 @injectable()
 export class GetAllSubscriptionsUseCase implements IExecute<GetSubscriptionsQueryDTO, { subscriptions: SubscriptionWithUserDTO[], total: number }> {
     constructor(
-        // Inject SubscriptionRepository
         @inject(SUBSCRIPTION_TYPES.SubscriptionRepository) private readonly _subscriptionRepository: ISubscriptionRepository<SubscriptionEntity>
     ) { }
 
     async execute(query: GetSubscriptionsQueryDTO): Promise<{ subscriptions: SubscriptionWithUserDTO[], total: number }> {
         const { page, limit, search, status } = query;
-        // Call the new method on subscription repository
+
         const result = await this._subscriptionRepository.findAllWithUserInfo(page, limit, status, search);
 
         return {

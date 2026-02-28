@@ -17,7 +17,6 @@ import { ProjectEntity } from "@/domain/entities/project.entity";
 import { Role } from "@/domain/enums/role.enum";
 import { IProjectRepository } from "@/domain/repository/project.interface";
 import { PlanFeature } from "@/domain/enums/plan/plan-feature.enum";
-import { COMMON_TYPES } from "@/infrastructure/di/types/common";
 
 
 
@@ -49,7 +48,6 @@ export class ApplyToProjectUseCase implements IExecute<ApplyToProjectDTO, { mess
             const participationLimit = plan ? plan.participationLimit : 1;
 
 
-            // Count projects where user is a member (but not the creator)
             const joinedProjectsCount = await this._projectRepository.count({
                 'members.userId': userId,
                 'members.role': { $ne: Role.CREATOR }

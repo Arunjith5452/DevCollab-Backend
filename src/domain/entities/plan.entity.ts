@@ -120,7 +120,6 @@ export class PlanEntity {
         return this._stripePriceId;
     }
 
-    // Methods to modify state
     activate() {
         this._isActive = true;
     }

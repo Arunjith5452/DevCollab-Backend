@@ -4,7 +4,7 @@ import { JwtPayload } from "jsonwebtoken";
 import { inject, injectable } from "inversify";
 import { COMMON_TYPES } from "@/infrastructure/di/types/common";
 import { ICacheService } from "@/application/interface/cache.service.interface";
-import { logger } from "@/infrastructure/providers/logs/logger";
+import { logger } from "@/infrastructure/providers/logs/logger.service";
 
 @injectable()
 export class LogoutUseCase implements IExecute<string, void> {

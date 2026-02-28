@@ -1,6 +1,6 @@
 import { Server, Socket } from 'socket.io';
 import { Server as HttpServer } from 'http';
-import { logger } from "@/infrastructure/providers/logs/logger";
+import { logger } from "@/infrastructure/providers/logs/logger.service";
 
 export class SignalingGateway {
     private io: Server;
@@ -10,7 +10,7 @@ export class SignalingGateway {
     constructor(server: HttpServer) {
         this.io = new Server(server, {
             cors: {
-                origin: '*', // Allow all origins for now, configure as needed
+                origin: '*', 
                 methods: ['GET', 'POST'],
             },
         });

@@ -18,7 +18,6 @@ import { SUBSCRIPTION_TYPES } from "@/infrastructure/di/types/subscription";
 import { PLAN_TYPES } from "@/infrastructure/di/types/plan";
 import { IPlanRepository } from "@/domain/repository/plan.repository.interface";
 import { PlanFeature } from "@/domain/enums/plan/plan-feature.enum";
-import { PlanEntity } from "@/domain/entities/plan.entity";
 
 
 @injectable()

@@ -18,14 +18,12 @@ export class GetProjectMeetingsUseCase implements IExecute<{ projectId: string, 
         const now = new Date();
 
         for (const meeting of meetings) {
-            // Check if meeting is SCHEDULED and time has passed
+
             if (meeting.status === 'scheduled' && new Date(meeting.endTime) < now) {
                 meeting.updateStatus(MeetingStatus.COMPLETED);
                 await this._meetingRepository.updateStatus(meeting.id || "", MeetingStatus.COMPLETED);
             }
         }
-
-        // Re-fetch or return modified list (returning modified for efficiency)
         return {
             items: MeetingResponseMapper.toList(meetings),
             total

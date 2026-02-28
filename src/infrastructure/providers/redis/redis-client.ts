@@ -1,5 +1,5 @@
 import Redis from "ioredis";
-import { logger } from "../logs/logger";
+import { logger } from "../logs/logger.service";
 
 
 export const redisClient = new Redis({

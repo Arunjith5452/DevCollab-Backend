@@ -1,13 +1,13 @@
 import "reflect-metadata";
 import { Container } from 'inversify'
-import { AuthModule } from './modules/auth'
+import { AuthModule } from './modules/auth/auth.module'
 import { UserModule } from './modules/user'
-import { AdminModule } from './modules/admin'
-import { ProjectModule } from './modules/project'
-import { TaskModule } from './modules/tasks'
-import { PaymentModule } from "./modules/payment/payment";
-import { MeetingModule } from "./modules/meetings";
-import { CommonModule } from "./modules/common";
+import { AdminModule } from './modules/admin/admin.module'
+import { ProjectModule } from './modules/project/project.module'
+import { TaskModule } from './modules/tasks/tasks.module'
+import { PaymentModule } from "./modules/payment/payment.module";
+import { MeetingModule } from "./modules/meetings/meetings.module";
+import { CommonModule } from "./modules/common/common.module";
 import { subscriptionModule } from "./modules/subscription/subscription.module";
 import { planModule } from "./modules/plan/plan.module";
 

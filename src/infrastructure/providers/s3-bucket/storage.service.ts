@@ -3,7 +3,7 @@ import { injectable } from "inversify";
 import { IStorageService, SignedUrlResponse } from "@/application/interface/storage.service.interface";
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { logger } from "../logs/logger";
+import { logger } from "../logs/logger.service";
 
 @injectable()
 export class StorageService implements IStorageService {
@@ -65,8 +65,6 @@ export class StorageService implements IStorageService {
 
         } catch (error) {
             logger.error("Error deleting file from S3:", error);
-            // We might not want to throw here to avoid breaking the flow if deletion fails?
-            // But for consistency with original interface, we'll log.
         }
     }
 }

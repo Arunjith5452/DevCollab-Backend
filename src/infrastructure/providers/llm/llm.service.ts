@@ -3,7 +3,7 @@ import { injectable } from "inversify";
 import { ILLMService } from "../interface/llm.interface";
 import { RequiredRole } from "@/domain/types/required-role.type";
 import { OpenRouterResponse } from "../interface/openrouter-response.interface";
-import { logger } from "../logs/logger";
+import { logger } from "../logs/logger.service";
 
 @injectable()
 export class LLMService implements ILLMService {

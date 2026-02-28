@@ -1,5 +1,5 @@
 import { ContainerModule } from "inversify";
-import { StripeProvider } from "@/infrastructure/providers/stripe/stripe.provider";
+import { StripeProvider } from "@/infrastructure/providers/stripe/stripe.service";
 import { PaymentController } from "@/presentation/http/controllers/payment.controller";
 import { PaymentRepository } from "@/infrastructure/db/repository/implements/payment.repository";
 import { PAYMENT_TYPES } from "../../types";
