@@ -5,7 +5,6 @@ import { TaskEntity } from "@/domain/entities/task.entity";
 import { PaymentEntity } from "@/domain/entities/payment.entity";
 import { PaymentPurpose } from "@/domain/enums/payment/payment-purpose.enums";
 import { PaymentStatus } from "@/domain/enums/payment/payment.enums";
-import { TaskStatus } from "@/domain/enums/tasks/task-status.enums";
 import { ITasksRepository } from "@/domain/repository/task.interface";
 import { IPaymentRepository } from "@/domain/repository/payment.interface";
 import { TASK_TYPES } from "@/infrastructure/di/types/tasks";

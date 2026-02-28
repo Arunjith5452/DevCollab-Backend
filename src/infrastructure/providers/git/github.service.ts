@@ -1,6 +1,6 @@
 import { injectable } from "inversify";
 import { IGitHubService } from "@/application/interface/git.service.interface";
-import { logger } from "../logs/logger";
+import { logger } from "../logs/logger.service";
 
 interface GitHubErrorResponse {
     message: string;
@@ -25,7 +25,7 @@ export class GitHubService implements IGitHubService {
                 body: JSON.stringify({
                     name,
                     description,
-                    private: false, // Default to public, or could be passed as arg
+                    private: false,
                     auto_init: true
                 })
             });

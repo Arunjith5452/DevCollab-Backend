@@ -10,7 +10,7 @@ import { IUserRepository } from "@/domain/repository/user.interface";
 import { IEmailService } from "@/infrastructure/providers/interface/email.interface";
 import { COMMON_TYPES } from "@/infrastructure/di/types/common";
 import { ICacheService } from "@/application/interface/cache.service.interface";
-import { logger } from "@/infrastructure/providers/logs/logger";
+import { logger } from "@/infrastructure/providers/logs/logger.service";
 
 @injectable()
 export class ForgotPasswordUseCase implements IExecute<forgotPasswordDTO, void> {

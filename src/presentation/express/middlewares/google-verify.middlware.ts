@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { OAuth2Client } from "google-auth-library";
-import { logger } from "@/infrastructure/providers/logs/logger";
+import { logger } from "@/infrastructure/providers/logs/logger.service";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -15,7 +15,6 @@ export const verifyGoogleToken = async (
             return res.status(400).json({ message: "Google token missing" });
         }
 
-        // Verify using Google API
         const ticket = await client.verifyIdToken({
             idToken: token,
             audience: process.env.GOOGLE_CLIENT_ID,
@@ -28,7 +27,6 @@ export const verifyGoogleToken = async (
 
         const { email, name, sub: googleId } = payload;
 
-        // Attach to request for next layers
         req.body.email = email;
         req.body.name = name;
         req.body.googleId = googleId;

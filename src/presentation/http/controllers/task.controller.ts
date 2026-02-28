@@ -18,7 +18,7 @@ import { RequestImprovementDTO } from "@/application/dtos/tasks/request-improvem
 import { MESSAGES } from "@/shared/constants/messages";
 import { CreateTaskResponseDTO } from "@/application/dtos/tasks/res/create-task-response.dto";
 import { UpdateTaskCriteriaDTO } from "@/application/dtos/tasks/update-task-criteria.dto";
-import { logger } from "@/infrastructure/providers/logs/logger";
+import { logger } from "@/infrastructure/providers/logs/logger.service";
 
 @injectable()
 export class TaskController {
@@ -125,7 +125,6 @@ export class TaskController {
             return successResponse(res, '', result)
 
         } catch (error) {
-            logger.error(`Error fetching contributor tasks: ${error}`);
             return errorResponse(
                 res,
                 MESSAGES.TASK.ERROR.FETCH_FAILED,

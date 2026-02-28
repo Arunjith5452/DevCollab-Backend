@@ -3,7 +3,7 @@ import { PLAN_TYPES } from "@/infrastructure/di/types/plan";
 import { IPlanRepository } from "@/domain/repository/plan.repository.interface";
 import { PlanEntity } from "@/domain/entities/plan.entity";
 import { PlanFeature } from "@/domain/enums/plan/plan-feature.enum";
-import { logger } from "@/infrastructure/providers/logs/logger";
+import { logger } from "@/infrastructure/providers/logs/logger.service";
 
 export const seedDefaultFreePlan = async () => {
     try {

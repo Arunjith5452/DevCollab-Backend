@@ -2,7 +2,7 @@ import nodemailer, { Transporter } from 'nodemailer';
 import { injectable } from 'inversify';
 import { IEmailService } from '../interface/email.interface';
 import { otpEmailTemplate } from '../templates/email/otp-email.template';
-import { logger } from '../logs/logger';
+import { logger } from '../logs/logger.service';
 
 @injectable()
 export class EmailService implements IEmailService {
@@ -17,7 +17,6 @@ export class EmailService implements IEmailService {
             }
         });
 
-        // Verify transporter configuration
         this.verifyConnection();
     }
 

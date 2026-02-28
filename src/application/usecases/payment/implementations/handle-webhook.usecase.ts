@@ -58,9 +58,6 @@ export class HandleWebhookUseCase implements IExecute<WebhookDTO, { received: bo
             switch (event.type) {
                 case 'checkout.session.completed':
                     const session = event.data.object as Stripe.Checkout.Session;
-                    console.log('--- STRIPE WEBHOOK: CHECKOUT SESSION COMPLETED ---');
-                    console.log('Session Mode:', session.mode);
-                    console.log('Session Metadata:', session.metadata);
 
                     if ((session.mode === 'payment' && session.metadata?.type === 'plan_purchase') || session.mode === 'subscription') {
                         const userId = session.metadata?.userId || session.client_reference_id;
@@ -68,10 +65,7 @@ export class HandleWebhookUseCase implements IExecute<WebhookDTO, { received: bo
                         const durationInDays = parseInt(session.metadata?.durationInDays || '30');
                         const productName = session.metadata?.productName || 'pro';
 
-                        console.log('Parsed Subscription Data:', { userId, planId, durationInDays, productName });
-
                         if (!userId) {
-                            console.error('WEBHOOK ERROR: No userId found in session.metadata or client_reference_id!');
                             return { received: true };
                         }
 
@@ -85,7 +79,6 @@ export class HandleWebhookUseCase implements IExecute<WebhookDTO, { received: bo
                         endDate.setDate(endDate.getDate() + durationInDays);
 
                         if (existingSub) {
-                            console.log('Updating existing subscription for user:', userId);
                             await this._subscriptionRepository.updateSubscription(existingSub.id!, {
                                 startDate,
                                 endDate,
@@ -94,7 +87,6 @@ export class HandleWebhookUseCase implements IExecute<WebhookDTO, { received: bo
                                 paymentId
                             });
                         } else {
-                            console.log('Creating new subscription for user:', userId);
                             const newSub = SubscriptionEntity.create({
                                 userId,
                                 plan: productName,

@@ -6,7 +6,7 @@ import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { CreateMeetingDTO } from "@/application/dtos/meetings/create-meeting.dto";
 import { successResponse, errorResponse } from "@/shared/utils/response.util";
 import { ServerErrorStatus } from "@/domain/enums/status-codes/server-error-status.enum";
-import { logger } from "@/infrastructure/providers/logs/logger";
+import { logger } from "@/infrastructure/providers/logs/logger.service";
 
 import { MeetingListItemDto } from "@/application/dtos/meetings/res/meeting-list-item.dto";
 
@@ -73,7 +73,6 @@ export class MeetingController {
         try {
             const { meetingId } = req.params;
             const { status, endTime } = req.body;
-            logger.info(`[MeetingController] Updating status for ${meetingId}: status=${status}, endTime=${endTime}`);
             await this._updateMeetingStatusUseCase.execute({ meetingId, status, endTime });
 
             return successResponse(res, MESSAGES.MEETING.SUCCESS.STATUS_UPDATED);

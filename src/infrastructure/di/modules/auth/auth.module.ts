@@ -19,10 +19,9 @@ import { ContainerModule } from "inversify";
 
 
 export const AuthModule = new ContainerModule(({ bind }) => {
-    // Email Service
+
     bind<IEmailService>(EMAIL_TYPES.EmailService).to(EmailService).inSingletonScope();
 
-    // Auth Controller and Use Cases
     bind<AuthController>(AUTH_TYPES.AuthController).to(AuthController)
     bind<RegiserUseCase>(AUTH_TYPES.RegisterUseCase).to(RegiserUseCase)
     bind<VerifyOtpUseCase>(AUTH_TYPES.VerifyOtpUseCase).to(VerifyOtpUseCase)
