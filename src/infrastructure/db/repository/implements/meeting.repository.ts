@@ -1,5 +1,5 @@
 
-import { MeetingEntity } from "@/domain/entities/meeting.entity";
+import { MeetingEntity, ParticipantNote } from "@/domain/entities/meeting.entity";
 import { IMeetingRepository } from "@/domain/repository/meeting.interface";
 import { BaseRepository } from "./base.repository";
 import { inject, injectable } from "inversify";
@@ -36,6 +36,43 @@ export class MeetingRepository extends BaseRepository<MeetingEntity, IMeeting> i
             updateData.endTime = endTime;
         }
         await this.update(meetingId, updateData);
+    }
+
+    async updateNotes(meetingId: string, notes: ParticipantNote[] | string): Promise<void> {
+        let notesData;
+        if (Array.isArray(notes)) {
+            notesData = notes;
+        } else {
+            // Convert legacy notes to array format to satisfy the schema
+            // We attribute to creator as a fallback
+            const meeting = await this.model.findById(meetingId);
+            notesData = [{ 
+                userId: meeting?.createdBy || new Types.ObjectId().toString(), 
+                userName: 'Creator', 
+                content: notes 
+            }]; 
+        }
+        await this.update(meetingId, { notes: notesData });
+    }
+
+    async updateParticipantNote(meetingId: string, userId: string, userName: string, content: string): Promise<void> {
+        // Atomic update to participant's note section
+        const existingMeeting = await this.model.findOne({
+            _id: new Types.ObjectId(meetingId),
+            "notes.userId": new Types.ObjectId(userId)
+        });
+
+        if (existingMeeting) {
+            await this.model.updateOne(
+                { _id: new Types.ObjectId(meetingId), "notes.userId": new Types.ObjectId(userId) },
+                { $set: { "notes.$.content": content, "notes.$.userName": userName } }
+            );
+        } else {
+            await this.model.updateOne(
+                { _id: new Types.ObjectId(meetingId) },
+                { $push: { notes: { userId: new Types.ObjectId(userId), userName, content } } }
+            );
+        }
     }
 
     async findByProjectIdAndStatus(projectId: string, status?: string, page: number = 1, limit: number = 10): Promise<{ items: MeetingEntity[], total: number }> {

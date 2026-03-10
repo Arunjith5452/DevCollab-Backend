@@ -14,7 +14,8 @@ export class MeetingResponseMapper {
             createdBy: meeting.createdBy,
             createdByName: meeting.createdByName || 'Unknown',
             status: meeting.status,
-            participants: meeting.participants
+            participants: meeting.participants,
+            notes: meeting.notes
         }));
     }
 }

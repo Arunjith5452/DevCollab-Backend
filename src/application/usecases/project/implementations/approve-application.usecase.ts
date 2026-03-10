@@ -60,7 +60,7 @@ export class ApproveApplicationUseCase implements IExecute<ApproveApplicationDTO
 
 
             project.addMember(application.userId.toString())
-            let data = await this._projectRepository.updateEntity(project)
+            await this._projectRepository.updateEntity(project)
 
             return { message: "Application approved and contributor added successfully" }
 

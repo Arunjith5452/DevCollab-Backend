@@ -1,0 +1,56 @@
+
+> backend@1.0.0 lint
+> eslint ./src --ext .ts
+
+
+/home/arunjith/Desktop/DevCollab/backend/src/application/dtos/meetings/res/meeting-list-item.dto.ts
+  47:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/arunjith/Desktop/DevCollab/backend/src/application/usecases/auth/implementations/forgot-password.usecase.ts
+  13:10  warning  'logger' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  42:7   warning  Unexpected console statement                                              no-console
+
+/home/arunjith/Desktop/DevCollab/backend/src/application/usecases/auth/implementations/github-login.usecase.ts
+  42:31  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  64:55  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+
+/home/arunjith/Desktop/DevCollab/backend/src/application/usecases/auth/implementations/register.usecase.ts
+  52:13  warning  Unexpected console statement  no-console
+
+/home/arunjith/Desktop/DevCollab/backend/src/application/usecases/auth/implementations/resend-otp.usecase.ts
+  40:9  warning  Unexpected console statement  no-console
+
+/home/arunjith/Desktop/DevCollab/backend/src/application/usecases/auth/implementations/resendForgot-otp.usecase.ts
+  40:9  warning  Unexpected console statement  no-console
+
+/home/arunjith/Desktop/DevCollab/backend/src/application/usecases/meetings/implementations/update-meeting-notes.usecase.ts
+  22:13  warning  Unexpected console statement  no-console
+  26:13  warning  Unexpected console statement  no-console
+
+/home/arunjith/Desktop/DevCollab/backend/src/application/usecases/payment/implementations/create-checkout-session.usecase.ts
+   40:29  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+   62:33  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+   87:65  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  114:9   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  115:9   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+
+/home/arunjith/Desktop/DevCollab/backend/src/application/usecases/payment/implementations/handle-webhook.usecase.ts
+   65:31  warning  'planId' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+   83:83  warning  Forbidden non-null assertion                                                       @typescript-eslint/no-non-null-assertion
+  140:83  warning  Forbidden non-null assertion                                                       @typescript-eslint/no-non-null-assertion
+  150:79  warning  Forbidden non-null assertion                                                       @typescript-eslint/no-non-null-assertion
+
+/home/arunjith/Desktop/DevCollab/backend/src/application/usecases/project/implementations/create-project.usecase.ts
+  85:28  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  89:33  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+
+/home/arunjith/Desktop/DevCollab/backend/src/application/usecases/project/implementations/get-ai-contributor-suggestions.usecase.ts
+   57:21  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  106:21  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+
+/home/arunjith/Desktop/DevCollab/backend/src/presentation/http/controllers/meeting.controller.ts
+   97:17  warning  Unexpected console statement  no-console
+  100:13  warning  Unexpected console statement  no-console
+
+✖ 25 problems (1 error, 24 warnings)
+

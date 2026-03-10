@@ -13,6 +13,7 @@ export class MeetingListItemDto {
     createdByName: string;
     status: MeetingStatus;
     participants: Array<{ userId: string; joinedAt?: string }>;
+    notes?: Array<{ userId: string; userName: string; content: string }>;
 
     constructor(data: {
         id: string;
@@ -26,6 +27,7 @@ export class MeetingListItemDto {
         createdByName: string;
         status: MeetingStatus;
         participants: Array<{ userId: string; joinedAt?: Date }>;
+        notes?: Array<{ userId: string; userName: string; content: string }>;
     }) {
         this.id = data.id;
         this._id = data.id;
@@ -42,5 +44,6 @@ export class MeetingListItemDto {
             userId: p.userId,
             joinedAt: p.joinedAt?.toISOString()
         }));
+        this.notes = data.notes;
     }
 }

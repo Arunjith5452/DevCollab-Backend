@@ -20,7 +20,8 @@ export class MeetingPersistenceMapper implements IPersistenceMapper<MeetingEntit
                 joinedAt: p.joinedAt
             })) as unknown as IMeeting['participants'],
             createdAt: meeting.createdAt,
-            updatedAt: meeting.updatedAt
+            updatedAt: meeting.updatedAt,
+            notes: meeting.notes as unknown as IMeeting['notes']
         };
     }
 
@@ -38,7 +39,7 @@ export class MeetingPersistenceMapper implements IPersistenceMapper<MeetingEntit
                 createdByName = populated.name;
             }
         } else {
-            createdById = String(createdByRaw); 
+            createdById = String(createdByRaw);
         }
 
         return MeetingEntity.create({
@@ -68,7 +69,15 @@ export class MeetingPersistenceMapper implements IPersistenceMapper<MeetingEntit
                 }
             }),
             createdAt: doc.createdAt,
-            updatedAt: doc.updatedAt
+            updatedAt: doc.updatedAt,
+            notes: Array.isArray(doc.notes) 
+                ? doc.notes.map(n => ({
+                    userId: n.userId?.toString() ?? "",
+                    userName: n.userName ?? "",
+                    content: n.content ?? ""
+                }))
+                : (typeof doc.notes === 'string' ? doc.notes : [])
         });
     }
 }
+
