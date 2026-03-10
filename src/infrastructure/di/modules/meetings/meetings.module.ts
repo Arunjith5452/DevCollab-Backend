@@ -2,6 +2,7 @@ import { MeetingRepository } from "@/infrastructure/db/repository/implements/mee
 import { ScheduleMeetingUseCase } from "@/application/usecases/meetings/implementations/schedule-meeting.usecase";
 import { GetProjectMeetingsUseCase } from "@/application/usecases/meetings/implementations/get-project-meetings.usecase";
 import { UpdateMeetingStatusUseCase } from "@/application/usecases/meetings/implementations/update-meeting-status.usecase";
+import { UpdateMeetingNotesUseCase } from "@/application/usecases/meetings/implementations/update-meeting-notes.usecase";
 import { MeetingController } from "@/presentation/http/controllers/meeting.controller";
 import { meetingModel } from "@/infrastructure/db/models/meeting.model";
 import { Model } from "mongoose";
@@ -17,5 +18,6 @@ export const MeetingModule = new ContainerModule(({ bind }) => {
     bind<ScheduleMeetingUseCase>(MEETING_TYPES.ScheduleMeetingUseCase).to(ScheduleMeetingUseCase);
     bind<GetProjectMeetingsUseCase>(MEETING_TYPES.GetProjectMeetingsUseCase).to(GetProjectMeetingsUseCase);
     bind<UpdateMeetingStatusUseCase>(MEETING_TYPES.UpdateMeetingStatusUseCase).to(UpdateMeetingStatusUseCase);
+    bind<UpdateMeetingNotesUseCase>(MEETING_TYPES.UpdateMeetingNotesUseCase).to(UpdateMeetingNotesUseCase);
     bind<MeetingController>(MeetingController).to(MeetingController);
 });

@@ -1,5 +1,11 @@
 import { MeetingStatus } from "../enums/meetings/meeting-status.enum";
 
+export interface ParticipantNote {
+    userId: string;
+    userName: string;
+    content: string;
+}
+
 export class MeetingEntity {
     private readonly _id?: string;
     private _projectId: string;
@@ -12,6 +18,7 @@ export class MeetingEntity {
     private _createdByName?: string;
     private _status: MeetingStatus;
     private _participants: Array<{ userId: string; joinedAt?: Date }>;
+    private _notes: ParticipantNote[];
     private readonly _createdAt?: Date;
     private _updatedAt?: Date;
 
@@ -27,6 +34,7 @@ export class MeetingEntity {
         createdByName?: string;
         status: MeetingStatus;
         participants?: Array<{ userId: string; joinedAt?: Date }>;
+        notes?: ParticipantNote[] | string;
         createdAt?: Date;
         updatedAt?: Date;
     }) {
@@ -41,6 +49,7 @@ export class MeetingEntity {
         this._createdByName = data.createdByName;
         this._status = data.status;
         this._participants = data.participants || [];
+        this._notes = Array.isArray(data.notes) ? data.notes : (data.notes ? [{ userId: data.createdBy, userName: data.createdByName || 'Creator', content: data.notes }] : []);
         this._createdAt = data.createdAt || new Date();
         this._updatedAt = data.updatedAt || new Date();
     }
@@ -57,6 +66,7 @@ export class MeetingEntity {
         createdByName?: string;
         status: MeetingStatus;
         participants?: Array<{ userId: string; joinedAt?: Date }>;
+        notes?: ParticipantNote[] | string;
         createdAt?: Date;
         updatedAt?: Date;
     }): MeetingEntity {
@@ -111,6 +121,10 @@ export class MeetingEntity {
         return this._participants;
     }
 
+    get notes(): ParticipantNote[] {
+        return this._notes;
+    }
+
     get createdAt(): Date | undefined {
         return this._createdAt;
     }
@@ -131,6 +145,26 @@ export class MeetingEntity {
 
     setEndTime(endTime: Date) {
         this._endTime = endTime;
+        this._updatedAt = new Date();
+    }
+
+    updateNotes(notes: ParticipantNote[] | string) {
+        if (Array.isArray(notes)) {
+            this._notes = notes;
+        } else {
+            // For backward compatibility or single string updates, assign to creator
+            this._notes = [{ userId: this._createdBy, userName: this._createdByName || 'Creator', content: notes }];
+        }
+        this._updatedAt = new Date();
+    }
+
+    updateParticipantNote(userId: string, userName: string, content: string) {
+        const index = this._notes.findIndex(n => n.userId === userId);
+        if (index !== -1) {
+            this._notes[index].content = content;
+        } else {
+            this._notes.push({ userId, userName, content });
+        }
         this._updatedAt = new Date();
     }
 }

@@ -6,7 +6,6 @@ import { IExecute } from "@/application/interface/execute.usecase.interface";
 import { CreateMeetingDTO } from "@/application/dtos/meetings/create-meeting.dto";
 import { successResponse, errorResponse } from "@/shared/utils/response.util";
 import { ServerErrorStatus } from "@/domain/enums/status-codes/server-error-status.enum";
-import { logger } from "@/infrastructure/providers/logs/logger.service";
 
 import { MeetingListItemDto } from "@/application/dtos/meetings/res/meeting-list-item.dto";
 
@@ -15,7 +14,8 @@ export class MeetingController {
     constructor(
         @inject(MEETING_TYPES.ScheduleMeetingUseCase) private readonly _scheduleMeetingUseCase: IExecute<CreateMeetingDTO, void>,
         @inject(MEETING_TYPES.GetProjectMeetingsUseCase) private readonly _getProjectMeetingsUseCase: IExecute<{ projectId: string, status?: string, page?: number, limit?: number }, { items: MeetingListItemDto[], total: number }>,
-        @inject(MEETING_TYPES.UpdateMeetingStatusUseCase) private readonly _updateMeetingStatusUseCase: IExecute<{ meetingId: string, status: string, endTime?: Date }, void>
+        @inject(MEETING_TYPES.UpdateMeetingStatusUseCase) private readonly _updateMeetingStatusUseCase: IExecute<{ meetingId: string, status: string, endTime?: Date }, void>,
+        @inject(MEETING_TYPES.UpdateMeetingNotesUseCase) private readonly _updateMeetingNotesUseCase: IExecute<{ meetingId: string; notes: string; userId?: string; userName?: string }, void>
     ) { }
 
     /**
@@ -78,6 +78,36 @@ export class MeetingController {
             return successResponse(res, MESSAGES.MEETING.SUCCESS.STATUS_UPDATED);
         } catch (error) {
             return errorResponse(res, MESSAGES.MEETING.ERROR.UPDATE_STATUS_FAILED, ServerErrorStatus.INTERNAL_SERVER_ERROR, error);
+        }
+    }
+
+    /**
+     * Updates the notes of a meeting.
+     * @param req - Express request containing meetingId in params and notes in body.
+     * @param res - Express response object.
+     * @returns JSON response with success message.
+     */
+    async updateMeetingNotes(req: Request, res: Response): Promise<Response> {
+        try {
+            const { meetingId } = req.params;
+            const { notes } = req.body;
+            const { userId, username: userName } = req.user;
+            
+            if (!userName) {
+                console.warn(`[MeetingController] Warning: Missing username in req.user for userId ${userId}`);
+            }
+
+            console.log(`[MeetingController] Updating notes for meeting ${meetingId} by ${userName || 'Unknown'}: "${notes?.substring(0, 50)}..."`);
+            await this._updateMeetingNotesUseCase.execute({ 
+                meetingId, 
+                notes, 
+                userId, 
+                userName: userName || 'Participant' 
+            });
+
+            return successResponse(res, "Meeting notes updated successfully");
+        } catch (error) {
+            return errorResponse(res, "Failed to update meeting notes", ServerErrorStatus.INTERNAL_SERVER_ERROR, error);
         }
     }
 }

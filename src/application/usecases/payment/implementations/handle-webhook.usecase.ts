@@ -19,6 +19,7 @@ import { SUBSCRIPTION_TYPES } from "@/infrastructure/di/types/subscription";
 import { IUserRepository } from "@/domain/repository/user.interface";
 import { USER_TYPES } from "@/infrastructure/di/types/user";
 import { UserEntity } from "@/domain/entities/user.entity";
+import { logger } from "@/infrastructure/providers/logs/logger.service";
 
 @injectable()
 export class HandleWebhookUseCase implements IExecute<WebhookDTO, { received: boolean; eventType?: string }> {
@@ -151,10 +152,10 @@ export class HandleWebhookUseCase implements IExecute<WebhookDTO, { received: bo
                     break;
 
                 default:
-                    console.log(`Unhandled event type: ${event.type}`);
+                    logger.info(`Unhandled event type: ${event.type}`);
             }
 
-            return { received: true, eventType: event.type };
+            return { received: true, eventType: event.type }
 
         } catch (error) {
             throw error
