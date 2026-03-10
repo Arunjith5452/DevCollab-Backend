@@ -92,12 +92,7 @@ export class MeetingController {
             const { meetingId } = req.params;
             const { notes } = req.body;
             const { userId, username: userName } = req.user;
-            
-            if (!userName) {
-                console.warn(`[MeetingController] Warning: Missing username in req.user for userId ${userId}`);
-            }
 
-            console.log(`[MeetingController] Updating notes for meeting ${meetingId} by ${userName || 'Unknown'}: "${notes?.substring(0, 50)}..."`);
             await this._updateMeetingNotesUseCase.execute({ 
                 meetingId, 
                 notes, 
