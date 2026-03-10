@@ -24,7 +24,6 @@ import { ContributorStatsDTO } from "@/application/dtos/project/res/contributor-
 import { PlatformStatsDTO } from "@/application/dtos/platform/platform-stats.dto";
 import { FeaturedProjectDTO } from "@/application/dtos/project/res/featured-project.dto";
 import { GetAiContributorSuggestionsUseCase } from "@/application/usecases/project/implementations/get-ai-contributor-suggestions.usecase";
-import { logger } from "@/infrastructure/providers/logs/logger.service";
 
 @injectable()
 export class ProjectController {

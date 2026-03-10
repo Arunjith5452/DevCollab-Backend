@@ -57,6 +57,13 @@ export const meetingSchema = new Schema(
       enum: Object.values(MeetingStatus),
       default: MeetingStatus.SCHEDULED,
     },
+    notes: [
+      {
+        userId: { type: Schema.Types.ObjectId, ref: "Users" },
+        userName: { type: String },
+        content: { type: String },
+      },
+    ],
   },
   { timestamps: true }
 );
