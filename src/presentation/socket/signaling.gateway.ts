@@ -10,7 +10,7 @@ export class SignalingGateway {
     constructor(server: HttpServer) {
         this.io = new Server(server, {
             cors: {
-                origin: '*', 
+                origin: '*',
                 methods: ['GET', 'POST'],
             },
         });
@@ -88,7 +88,7 @@ export class SignalingGateway {
                 this.userAudioState.set(payload.userId, payload.enabled);
                 socket.to(payload.roomId).emit('audio-state', payload);
             });
-            
+
             socket.on('sync-note', (payload: { roomId: string; userId: string; userName: string; content: string }) => {
                 socket.to(payload.roomId).emit('note-synced', payload);
             });
