@@ -44,6 +44,6 @@ export class MeetingListItemDto {
             userId: p.userId,
             joinedAt: p.joinedAt?.toISOString()
         }));
-        this.notes = data.notes as any;
+        this.notes = data.notes;
     }
 }
