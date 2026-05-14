@@ -24,6 +24,7 @@ export class GetProjectMeetingsUseCase implements IExecute<{ projectId: string, 
                 await this._meetingRepository.updateStatus(meeting.id || "", MeetingStatus.COMPLETED);
             }
         }
+        
         return {
             items: MeetingResponseMapper.toList(meetings),
             total

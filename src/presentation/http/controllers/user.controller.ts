@@ -25,6 +25,7 @@ export class UserController {
     * @param res - Express response object.
     * @returns JSON with the user's profile data.
     */
+   
     async getProfileHandler(req: Request, res: Response): Promise<Response> {
 
         try {
