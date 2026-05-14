@@ -44,7 +44,6 @@ export class GetUserProfileUseCase implements IExecute<{ userId: string }, UserR
         this._subscriptionRepository.findByUserId(userId)
       ]);
 
-
       const activities: UserActivity[] = [
         ...recentProjects.map(p => ({
           type: 'project_created' as const,

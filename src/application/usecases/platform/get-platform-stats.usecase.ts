@@ -16,34 +16,37 @@ export class GetPlatformStatsUseCase implements IExecute<void, PlatformStatsDTO>
     ) { }
 
     async execute(): Promise<PlatformStatsDTO> {
+        try {
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-        const oneWeekAgo = new Date();
-        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            const [allUsers, allProjects] = await Promise.all([
+                this._userRepository.findAll(),
+                this._projectRepository.findAll()
+            ]);
 
-        const [allUsers, allProjects] = await Promise.all([
-            this._userRepository.findAll(),
-            this._projectRepository.findAll()
-        ]);
+            const totalUsers = allUsers.length;
+            const totalProjects = allProjects.length;
+            const activeProjects = allProjects.filter(p => p.status === 'active').length;
 
-        const totalUsers = allUsers.length;
-        const totalProjects = allProjects.length;
-        const activeProjects = allProjects.filter(p => p.status === 'active').length;
+            const usersThisWeek = 0;
 
-        const usersThisWeek = 0;
+            const projectsThisWeek = allProjects.filter(p =>
+                p.createdAt && new Date(p.createdAt) >= oneWeekAgo
+            ).length;
 
-        const projectsThisWeek = allProjects.filter(p =>
-            p.createdAt && new Date(p.createdAt) >= oneWeekAgo
-        ).length;
+            const averageRating = 4.9;
 
-        const averageRating = 4.9;
-
-        return {
-            totalUsers,
-            totalProjects,
-            activeProjects,
-            averageRating,
-            usersThisWeek,
-            projectsThisWeek
-        };
+            return {
+                totalUsers,
+                totalProjects,
+                activeProjects,
+                averageRating,
+                usersThisWeek,
+                projectsThisWeek
+            };
+        } catch (error) {
+            throw error
+        }
     }
 }
