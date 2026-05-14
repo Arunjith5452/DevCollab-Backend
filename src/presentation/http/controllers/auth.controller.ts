@@ -108,14 +108,16 @@ export class AuthController {
 
             res.cookie("refreshToken", result.refreshToken, {
                 httpOnly: true,
-                sameSite: "lax",
+                sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+                secure: process.env.NODE_ENV === "production",
                 maxAge: Number(process.env.REFRESH_TOKEN_MAX_AGE),
             });
 
             res.cookie("accessToken", result.accessToken, {
 
                 httpOnly: true,
-                sameSite: "lax",
+                sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+                secure: process.env.NODE_ENV === "production",
                 maxAge: Number(process.env.ACCESS_TOKEN_MAX_AGE),
             });
 
@@ -147,7 +149,8 @@ export class AuthController {
 
             res.cookie("accessToken", result.accessToken, {
                 httpOnly: true,
-                sameSite: "lax",
+                sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+                secure: process.env.NODE_ENV === "production",
                 maxAge: Number(process.env.ACCESS_TOKEN_MAX_AGE),
             });
 
@@ -248,13 +251,15 @@ export class AuthController {
 
             res.cookie("refreshToken", result.refreshToken, {
                 httpOnly: true,
-                sameSite: "lax",
+                sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+                secure: process.env.NODE_ENV === "production",
                 maxAge: Number(process.env.REFRESH_TOKEN_MAX_AGE),
             });
 
             res.cookie("accessToken", result.accessToken, {
                 httpOnly: true,
-                sameSite: "lax",
+                sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+                secure: process.env.NODE_ENV === "production",
                 maxAge: Number(process.env.ACCESS_TOKEN_MAX_AGE),
             });
 
@@ -288,13 +293,15 @@ export class AuthController {
 
             res.cookie("refreshToken", result.refreshToken, {
                 httpOnly: true,
-                sameSite: "lax",
+                sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+                secure: process.env.NODE_ENV === "production",
                 maxAge: Number(process.env.REFRESH_TOKEN_MAX_AGE),
             });
 
             res.cookie("accessToken", result.accessToken, {
                 httpOnly: true,
-                sameSite: "lax",
+                sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+                secure: process.env.NODE_ENV === "production",
                 maxAge: Number(process.env.ACCESS_TOKEN_MAX_AGE),
             });
 

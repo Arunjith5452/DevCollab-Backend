@@ -93,8 +93,8 @@ Integrated **Stripe Connect** for complex marketplace flows.
 2.  **Environment Configuration**
     ```env
     PORT=4000
-    MONGO_URI=mongodb://localhost:27017/devcollab
-    REDIS_HOST=localhost
+    MONGO_URI=mongodb:/devcollab
+    REDIS_HOST=
     ```
 
 3.  **Run Service**

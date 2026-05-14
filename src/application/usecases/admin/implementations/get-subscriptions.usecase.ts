@@ -16,7 +16,6 @@ export class GetAllSubscriptionsUseCase implements IExecute<GetSubscriptionsQuer
 
     async execute(query: GetSubscriptionsQueryDTO): Promise<{ subscriptions: SubscriptionWithUserDTO[], total: number }> {
         const { page, limit, search, status } = query;
-
         const result = await this._subscriptionRepository.findAllWithUserInfo(page, limit, status, search);
 
         return {

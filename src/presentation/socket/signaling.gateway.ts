@@ -89,10 +89,6 @@ export class SignalingGateway {
                 socket.to(payload.roomId).emit('audio-state', payload);
             });
 
-            socket.on('sync-note', (payload: { roomId: string; userId: string; userName: string; content: string }) => {
-                socket.to(payload.roomId).emit('note-synced', payload);
-            });
-
         });
     }
 }
