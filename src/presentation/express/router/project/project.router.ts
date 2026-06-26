@@ -8,6 +8,7 @@ import { ApplyToProjectDTO } from "@/application/dtos/project/apply-project.dto"
 import { CreateProjectDTO } from "@/application/dtos/project/createProject.dto";
 import { BlockGuard } from "../../middlewares/block-guard.middlware";
 import { UpdateProjectDTO } from "@/application/dtos/project/edit-project.dto";
+import { OptionalAuthGuard } from "../../middlewares/optional-auth-guard.middleware";
 
 
 const router = Router();
@@ -22,8 +23,8 @@ router.get('/platform/stats', (req: Request, res: Response) => projectController
 router.get('/projects/featured', (req: Request, res: Response) => projectController.getFeaturedProjects(req, res))
 
 router.post("/projects", AuthGuard(ALL_ROLES), BlockGuard(ALL_ROLES), validateDTO(CreateProjectDTO), (req: Request, res: Response) => projectController.createProject(req, res))
-router.get("/projects", AuthGuard(ALL_ROLES), BlockGuard(ALL_ROLES), (req: Request, res: Response) => projectController.getAllProjects(req, res))
-router.get("/projects/:projectId", AuthGuard(ALL_ROLES), BlockGuard(ALL_ROLES), (req: Request, res: Response) => projectController.projectDetails(req, res))
+router.get("/projects", OptionalAuthGuard(), (req: Request, res: Response) => projectController.getAllProjects(req, res))
+router.get("/projects/:projectId", OptionalAuthGuard(), (req: Request, res: Response) => projectController.projectDetails(req, res))
 router.post("/projects/:projectId/apply", AuthGuard(ALL_ROLES), BlockGuard(ALL_ROLES), validateDTO(ApplyToProjectDTO), (req: Request, res: Response) => projectController.applyToProject(req, res))
 router.get("/projects/:projectId/applications", AuthGuard(ALL_ROLES), BlockGuard(ALL_ROLES), (req: Request, res: Response) => projectController.getPendingApplication(req, res))
 router.post("/application/:applicationId/approve/:projectId", AuthGuard(ALL_ROLES), BlockGuard(ALL_ROLES), (req: Request, res: Response) => projectController.approveApplication(req, res))
