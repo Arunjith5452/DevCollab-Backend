@@ -71,6 +71,10 @@ export class CreateProjectUseCase implements IExecute<{ userId: string, dto: Cre
                 throw new Error(`Plan limit reached. Your current plan (${planName}) allows ${projectLimit} project(s). Upgrade to create more.`);
             }
 
+            if (!user.id) {
+                throw new Error("User ID is missing from the user entity");
+            }
+
             const project = ProjectEntity.create({
                 title: dto.title,
                 description: dto.description,
@@ -82,11 +86,11 @@ export class CreateProjectUseCase implements IExecute<{ userId: string, dto: Cre
                 expectation: dto.expectation,
                 visibility: dto.visibility,
                 requiredRoles: dto.requiredRoles,
-                creatorId: user.id!,
+                creatorId: user.id,
                 image: dto.image,
                 members: [
                     {
-                        userId: user.id!,
+                        userId: user.id,
                         role: Role.CREATOR,
                         joinedAt: new Date().toISOString(),
                         status: Status.ACTIVE,

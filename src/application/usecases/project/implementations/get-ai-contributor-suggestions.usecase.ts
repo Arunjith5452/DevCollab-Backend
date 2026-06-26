@@ -54,7 +54,7 @@ export class GetAiContributorSuggestionsUseCase implements IExecute<string, AiSu
         const candidates = applications.map(app => {
             const user = app.userId as unknown as PopulatedUser;
             return {
-                id: app.id!,
+                id: app.id || "unknown",
                 role: "Applicant",
                 skills: app.techStack || [],
                 name: user?.name || "Unknown Candidate",
@@ -103,7 +103,7 @@ export class GetAiContributorSuggestionsUseCase implements IExecute<string, AiSu
             const score = Math.round((matchCount / total) * 100);
 
             return {
-                id: app.id!,
+                id: app.id || "unknown",
                 score: Math.min(score + 10, 100),
                 reason: matches.length > 0
                     ? `Matches ${matches.length} required skills: ${matches.join(", ")}`

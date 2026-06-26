@@ -36,17 +36,25 @@ export class ListProjectUseCase implements IExecute<GetAllProjectsQuery, { messa
             }
 
             if (techStack) {
-                filter.techStack = { $regex: new RegExp(`^${techStack}$`, "i") };
+                const techs = techStack.split(',').map(t => t.trim()).filter(t => t);
+                if (techs.length > 0) {
+                    filter.techStack = { $all: techs.map(t => new RegExp(t, "i")) };
+                }
             }
 
             if (difficulty) {
-                filter.difficulty = difficulty;
+                const diffs = difficulty.split(',').map(d => d.trim()).filter(d => d);
+                if (diffs.length > 0) {
+                    filter.difficulty = { $in: diffs.map(d => new RegExp(`^${d}$`, "i")) };
+                }
             }
 
             if (roleNeeded) {
-                filter["requiredRoles.role"] = {
-                    $regex: `^${roleNeeded}$`,
-                    $options: "i"
+                const roles = roleNeeded.split(',').map(r => r.trim()).filter(r => r);
+                if (roles.length > 0) {
+                    filter["requiredRoles.role"] = {
+                        $all: roles.map(r => new RegExp(r, "i"))
+                    };
                 }
             }
 

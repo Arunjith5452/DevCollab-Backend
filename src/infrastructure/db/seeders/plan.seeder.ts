@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { container } from "@/infrastructure/di/inversify.di";
 import { PLAN_TYPES } from "@/infrastructure/di/types/plan";
 import { IPlanRepository } from "@/domain/repository/plan.repository.interface";
