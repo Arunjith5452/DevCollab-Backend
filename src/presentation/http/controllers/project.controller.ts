@@ -138,12 +138,13 @@ export class ProjectController {
 
         try {
 
-            const { search, techStack, difficulty, teamSize, page, limit } = req.query;
+            const { search, techStack, difficulty, roleNeeded, teamSize, page, limit } = req.query;
 
             const query = {
                 search: search as string,
                 techStack: techStack as string,
                 difficulty: difficulty as string,
+                roleNeeded: roleNeeded as string,
                 teamSize: teamSize as string,
                 page: Number(page) || 1,
                 limit: Number(limit) || 10,
