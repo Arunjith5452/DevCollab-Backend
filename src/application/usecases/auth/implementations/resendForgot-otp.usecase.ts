@@ -37,7 +37,6 @@ export class ResendForgotOTPUseCase implements IExecute<ResendOtp, { message: st
             'EX',
             expiryTime
         );
-        console.log(`Resent OTP for ${tempUser.email}: ${newOtp}`);
 
         await this._emailService.sendOtpEmail(tempUser.email, newOtp, 3);
 

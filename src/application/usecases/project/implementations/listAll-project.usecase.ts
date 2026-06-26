@@ -38,14 +38,14 @@ export class ListProjectUseCase implements IExecute<GetAllProjectsQuery, { messa
             if (techStack) {
                 const techs = techStack.split(',').map(t => t.trim()).filter(t => t);
                 if (techs.length > 0) {
-                    filter.techStack = { $all: techs.map(t => new RegExp(t, "i")) } as any;
+                    filter.techStack = { $all: techs.map(t => new RegExp(t, "i")) };
                 }
             }
 
             if (difficulty) {
                 const diffs = difficulty.split(',').map(d => d.trim()).filter(d => d);
                 if (diffs.length > 0) {
-                    filter.difficulty = { $in: diffs.map(d => new RegExp(`^${d}$`, "i")) } as any;
+                    filter.difficulty = { $in: diffs.map(d => new RegExp(`^${d}$`, "i")) };
                 }
             }
 
@@ -54,7 +54,7 @@ export class ListProjectUseCase implements IExecute<GetAllProjectsQuery, { messa
                 if (roles.length > 0) {
                     filter["requiredRoles.role"] = {
                         $all: roles.map(r => new RegExp(r, "i"))
-                    } as any;
+                    };
                 }
             }
 

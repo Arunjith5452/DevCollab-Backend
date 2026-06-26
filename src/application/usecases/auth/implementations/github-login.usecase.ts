@@ -39,7 +39,7 @@ export class GitHubLoginUseCase implements IExecute<GithubLoginDTO, AuthResult> 
 
                 const newUser = UserEntity.create({
                     email,
-                    username: name!,
+                    username: name ?? "Unknown",
                     password: randomPassword,
                     role: Role.USER,
                     status: Status.ACTIVE,
@@ -61,7 +61,8 @@ export class GitHubLoginUseCase implements IExecute<GithubLoginDTO, AuthResult> 
             }
 
             if (user && githubAccessToken) {
-                await this._userRepository.updateUser(user.id!, { githubAccessToken: githubAccessToken });
+                if (!user.id) throw new Error("User ID is missing");
+                await this._userRepository.updateUser(user.id, { githubAccessToken: githubAccessToken });
             }
 
             user.isBlocked()

@@ -62,7 +62,6 @@ export class HandleWebhookUseCase implements IExecute<WebhookDTO, { received: bo
 
                     if ((session.mode === 'payment' && session.metadata?.type === 'plan_purchase') || session.mode === 'subscription') {
                         const userId = session.metadata?.userId || session.client_reference_id;
-                        const planId = session.metadata?.planId;
                         const durationInDays = parseInt(session.metadata?.durationInDays || '30');
                         const productName = session.metadata?.productName || 'pro';
 
@@ -80,7 +79,8 @@ export class HandleWebhookUseCase implements IExecute<WebhookDTO, { received: bo
                         endDate.setDate(endDate.getDate() + durationInDays);
 
                         if (existingSub) {
-                            await this._subscriptionRepository.updateSubscription(existingSub.id!, {
+                            if (!existingSub.id) throw new Error("Subscription ID missing");
+                            await this._subscriptionRepository.updateSubscription(existingSub.id, {
                                 startDate,
                                 endDate,
                                 plan: productName,
@@ -137,7 +137,9 @@ export class HandleWebhookUseCase implements IExecute<WebhookDTO, { received: bo
                         if (sub) {
                             const newEndDate = new Date(invoice.period_end * 1000); // Stripe uses seconds
                             sub.extendSubscription(newEndDate);
-                            await this._subscriptionRepository.updateSubscription(sub.id!, { endDate: newEndDate, status: 'active' });
+                            if (sub.id) {
+                                await this._subscriptionRepository.updateSubscription(sub.id, { endDate: newEndDate, status: 'active' });
+                            }
                         }
                     }
                     break;
@@ -147,7 +149,9 @@ export class HandleWebhookUseCase implements IExecute<WebhookDTO, { received: bo
                     const dbSub = await this._subscriptionRepository.findByStripeSubscriptionId(deletedSub.id);
                     if (dbSub) {
                         dbSub.updateStatus('cancelled');
-                        await this._subscriptionRepository.updateSubscription(dbSub.id!, { status: 'cancelled' });
+                        if (dbSub.id) {
+                            await this._subscriptionRepository.updateSubscription(dbSub.id, { status: 'cancelled' });
+                        }
                     }
                     break;
 
