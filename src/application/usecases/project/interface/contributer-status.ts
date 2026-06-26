@@ -1,4 +1,4 @@
-interface GetContributorStatsQuery {
+export interface GetContributorStatsQuery {
     projectId: string;
     userId: string;
     page?: number;

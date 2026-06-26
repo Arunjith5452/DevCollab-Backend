@@ -37,7 +37,8 @@ export class CreateCheckoutSessionUseCase implements IExecute<CreateCheckoutSess
           mode = 'payment';
           priceId = undefined;
 
-          metadata.planId = plan.id!;
+          if (!plan.id) throw new Error("Plan ID is missing");
+          metadata.planId = plan.id;
           metadata.durationInDays = plan.durationInDays.toString();
           metadata.productName = plan.name;
           metadata.productDescription = plan.description;
@@ -59,7 +60,8 @@ export class CreateCheckoutSessionUseCase implements IExecute<CreateCheckoutSess
             if (plan) {
               amount = plan.price * 100;
               mode = 'payment';
-              metadata.planId = plan.id!;
+              if (!plan.id) throw new Error("Plan ID is missing");
+              metadata.planId = plan.id;
               metadata.durationInDays = plan.durationInDays.toString();
               metadata.productName = plan.name;
               metadata.productDescription = plan.description;
@@ -84,7 +86,8 @@ export class CreateCheckoutSessionUseCase implements IExecute<CreateCheckoutSess
         const existingSub = await this._subscriptionRepository.findByUserId(userId);
 
         if (existingSub) {
-          await this._subscriptionRepository.updateSubscription(existingSub.id!, {
+          if (!existingSub.id) throw new Error("Subscription ID is missing");
+          await this._subscriptionRepository.updateSubscription(existingSub.id, {
             startDate,
             endDate,
             plan: metadata.productName,
@@ -107,12 +110,14 @@ export class CreateCheckoutSessionUseCase implements IExecute<CreateCheckoutSess
         } as unknown as Stripe.Checkout.Session;
       }
 
+      if (!dto.success_url || !dto.cancel_url) throw new Error("Success and cancel URLs are required");
+
       return await this._paymentService.createCheckoutSession(
         amount,
         dto.currency || 'inr',
         metadata,
-        dto.success_url!,
-        dto.cancel_url!,
+        dto.success_url,
+        dto.cancel_url,
         mode,
         priceId
       )

@@ -49,7 +49,6 @@ export class RegiserUseCase implements IExecute<RegisterDTO, { token: string }> 
 
             await this._emailService.sendOtpEmail(email, otp, 3);
 
-            console.log(`OTP for ${email}: ${otp}`)
 
             return { token }
 

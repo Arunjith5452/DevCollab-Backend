@@ -4,6 +4,8 @@ import { inject, injectable } from "inversify";
 import { MeetingEntity } from "@/domain/entities/meeting.entity";
 import { MEETING_TYPES } from "@/infrastructure/di/types/meetings";
 
+import { logger } from "@/infrastructure/providers/logs/logger.service";
+
 @injectable()
 export class UpdateMeetingNotesUseCase implements IExecute<{ meetingId: string; notes: string; userId?: string; userName?: string }, void> {
     constructor(
@@ -19,11 +21,10 @@ export class UpdateMeetingNotesUseCase implements IExecute<{ meetingId: string; 
         }
 
         if (userId && userName) {
-            console.log(`[UpdateMeetingNotesUseCase] Collaborative update for ${userName} (${userId})`);
             meeting.updateParticipantNote(userId, userName, notes);
             await this._meetingRepository.updateParticipantNote(meetingId, userId, userName, notes);
         } else {
-            console.warn(`[UpdateMeetingNotesUseCase] Falling back to legacy update for meeting ${meetingId}. userId: ${userId}, userName: ${userName}`);
+            logger.warn(`[UpdateMeetingNotesUseCase] Falling back to legacy update for meeting ${meetingId}. userId: ${userId}, userName: ${userName}`);
             // Legacy/Fallback: update as general notes (usually creator)
             meeting.updateNotes(notes);
             await this._meetingRepository.updateNotes(meetingId, meeting.notes);
