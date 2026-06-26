@@ -51,5 +51,6 @@ jobs:
               --name devcollab-backend \
               -p 3001:3001 \
               --env-file /home/${{ secrets.EC2_USERNAME }}/.env \
+              --link redis-db:redis-db \
               --restart always \
               arunjith5452/devcollab-backend:latest
