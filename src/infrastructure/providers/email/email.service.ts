@@ -21,7 +21,7 @@ export class EmailService implements IEmailService {
                 rejectUnauthorized: true
             },
             family: 4
-        } as any);
+        } as unknown as nodemailer.TransportOptions);
 
         this.verifyConnection();
     }
