@@ -2,7 +2,6 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "commonjs",
-    "moduleResolution": "node",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -11,9 +10,8 @@
     "emitDecoratorMetadata": true,
     "rootDir": "src",
     "outDir": "dist",
-    "baseUrl": "./src",
     "paths": {
-      "@/*": ["*"]
+      "@/*": ["./src/*"]
     },
     "incremental": true,
     "tsBuildInfoFile": ".tsbuildinfo",
