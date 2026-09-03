@@ -58,7 +58,7 @@ export class SignalingGateway {
                 socket.on('disconnect', () => {
                     logger.info(`User ${userName} (${userId}) disconnected`);
                     socket.to(roomId).emit('user-disconnected', { userId, userName, videoEnabled: this.userVideoState.get(userId) ?? true });
-                    this.userVideoState.delete(userId); // Use cleanup with caution if reconnection logic exists
+                    this.userVideoState.delete(userId); 
                     this.userAudioState.delete(userId);
                 });
             });
