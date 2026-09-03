@@ -22,7 +22,7 @@ export class CloudinaryService implements IStorageService {
         });
     }
 
-    async generateUploadSignedUrl(fileName: string, fileType: string): Promise<SignedUrlResponse> {
+    async generateUploadSignedUrl(fileName: string, _fileType: string): Promise<SignedUrlResponse> {
         try {
             const timestamp = Math.round((new Date).getTime() / 1000);
 
