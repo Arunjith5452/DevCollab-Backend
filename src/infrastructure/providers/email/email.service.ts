@@ -17,11 +17,16 @@ export class EmailService implements IEmailService {
         logger.info(`[EmailService Init] User: ${maskedUser} | Raw pass length: ${rawPass.length} | Processed pass length: ${pass.length}`);
 
         this.transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true,
             auth: {
                 user: user,
                 pass: pass
-            }
+            },
+            connectionTimeout: 10000,
+            greetingTimeout: 10000,
+            socketTimeout: 10000
         });
 
         this.verifyConnection();
@@ -32,7 +37,7 @@ export class EmailService implements IEmailService {
      */
     private async verifyConnection(): Promise<void> {
         try {
-            logger.info('[EmailService] Verifying SMTP connection to Gmail...');
+            logger.info('[EmailService] Verifying SMTP connection to smtp.gmail.com:465...');
             await this.transporter.verify();
             logger.info('✅ [EmailService] SMTP Connection successfully verified and ready to send emails.');
         } catch (error: unknown) {
