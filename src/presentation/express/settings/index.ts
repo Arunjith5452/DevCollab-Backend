@@ -1,5 +1,3 @@
-import { setDefaultResultOrder } from "dns";
-setDefaultResultOrder("ipv4first"); // Force IPv4 globally — required on Render (no outbound IPv6)
 import "dotenv/config";
 import "reflect-metadata";
 import "source-map-support";

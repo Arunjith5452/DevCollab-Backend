@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon -r dotenv/config -r tsconfig-paths/register -r @swc-node/register src/presentation/express/settings/index.ts",
     "build": "tsc && tsc-alias",
-    "start": "node dist/presentation/express/settings/index.js",
+    "start": "node --dns-result-order=ipv4first dist/presentation/express/settings/index.js",
     "lint": "eslint ./src --ext .ts",
     "lint:fix": "eslint ./src --ext .ts --fix "
   },
