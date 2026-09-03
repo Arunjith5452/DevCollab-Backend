@@ -1,4 +1,5 @@
 import nodemailer, { Transporter } from 'nodemailer';
+import { resolve4 } from 'dns/promises';
 import { injectable } from 'inversify';
 import { IEmailService } from '../interface/email.interface';
 import { otpEmailTemplate } from '../templates/email/otp-email.template';
@@ -6,37 +7,62 @@ import { logger } from '../logs/logger.service';
 
 @injectable()
 export class EmailService implements IEmailService {
-    private transporter: Transporter;
+    private transporter: Transporter | null = null;
+    private initPromise: Promise<void> | null = null;
 
     constructor() {
-        this.transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 587,
-            secure: false,      // false = STARTTLS (upgrades after connection)
-            requireTLS: true,   // Force TLS upgrade, reject if not available
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            },
-            tls: {
-                rejectUnauthorized: true
-            },
-            family: 4
-        } as unknown as nodemailer.TransportOptions);
-
-        this.verifyConnection();
+        // Start async initialization immediately but don't block the constructor
+        this.initPromise = this.initTransporter();
     }
 
     /**
-     * Verify email transporter connection
+     * Resolve smtp.gmail.com to an IPv4 address and create the transporter.
+     * This bypasses Render's broken IPv6 routing by giving nodemailer
+     * a raw IPv4 address so it never attempts an IPv6 connection.
      */
-    private async verifyConnection(): Promise<void> {
+    private async initTransporter(): Promise<void> {
         try {
+            // Explicitly resolve to IPv4 only — bypasses all DNS/IPv6 issues
+            const ipv4Addresses = await resolve4('smtp.gmail.com');
+            const smtpHost = ipv4Addresses[0];
+            logger.info(`Resolved smtp.gmail.com to IPv4: ${smtpHost}`);
+
+            this.transporter = nodemailer.createTransport({
+                host: smtpHost,          // Raw IPv4 address — no DNS lookup needed
+                port: 587,
+                secure: false,           // STARTTLS (upgrades after connect)
+                requireTLS: true,
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS
+                },
+                tls: {
+                    servername: 'smtp.gmail.com',  // Required for TLS certificate validation
+                    rejectUnauthorized: true
+                }
+            });
+
             await this.transporter.verify();
             logger.info('Email service is ready to send emails');
         } catch (error) {
             logger.error('Email service configuration error:', error);
+            // Don't throw — let individual email sends report the error
         }
+    }
+
+    /**
+     * Get the transporter, waiting for initialization if needed
+     */
+    private async getTransporter(): Promise<Transporter> {
+        await this.initPromise;
+        if (!this.transporter) {
+            // Retry initialization if the first attempt failed
+            await this.initTransporter();
+        }
+        if (!this.transporter) {
+            throw new Error('Email service is not available');
+        }
+        return this.transporter;
     }
 
     /**
@@ -47,9 +73,10 @@ export class EmailService implements IEmailService {
      */
     async sendOtpEmail(email: string, otp: number, expiryMinutes: number = 3): Promise<void> {
         try {
+            const transporter = await this.getTransporter();
             const htmlContent = otpEmailTemplate(otp, expiryMinutes);
 
-            await this.transporter.sendMail({
+            await transporter.sendMail({
                 from: `"DevCollab" <${process.env.EMAIL_USER}>`,
                 to: email,
                 subject: 'Your DevCollab Verification Code',
@@ -71,7 +98,8 @@ export class EmailService implements IEmailService {
      */
     async sendWelcomeEmail(email: string, name: string): Promise<void> {
         try {
-            await this.transporter.sendMail({
+            const transporter = await this.getTransporter();
+            await transporter.sendMail({
                 from: `"DevCollab" <${process.env.EMAIL_USER}>`,
                 to: email,
                 subject: 'Welcome to DevCollab!',
@@ -91,7 +119,8 @@ export class EmailService implements IEmailService {
      */
     async sendPasswordResetEmail(email: string, resetLink: string): Promise<void> {
         try {
-            await this.transporter.sendMail({
+            const transporter = await this.getTransporter();
+            await transporter.sendMail({
                 from: `"DevCollab" <${process.env.EMAIL_USER}>`,
                 to: email,
                 subject: 'Reset Your DevCollab Password',
