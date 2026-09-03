@@ -11,8 +11,9 @@ export class EmailService implements IEmailService {
     constructor() {
         this.transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
-            port: 465,
-            secure: true, // use SSL
+            port: 587,
+            secure: false,      // false = STARTTLS (upgrades after connection)
+            requireTLS: true,   // Force TLS upgrade, reject if not available
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS
